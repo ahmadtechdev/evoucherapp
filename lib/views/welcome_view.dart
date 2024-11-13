@@ -17,7 +17,7 @@ class WelcomeScreen extends StatelessWidget {
         height: screenHeight,
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/img/bg1.jpg'),
+            image: AssetImage('assets/img/bg1.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -30,9 +30,9 @@ class WelcomeScreen extends StatelessWidget {
                 flex: 2,
                 child: Center(
                   child:Image.asset(
-                    'assets/img/newLogo.png',
-                    height: screenHeight / 4,
-                    width: screenWidth / 2,
+                    'assets/img/logoX.png',
+                    height: screenHeight / 2,
+                    width: screenWidth/1.7,
                     fit: BoxFit.contain,
                   ) ,
                 ),

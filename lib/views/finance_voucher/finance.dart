@@ -1,9 +1,12 @@
-import 'package:evoucher/views/finance_voucher/journal_voucher.dart';
+import 'package:evoucher/views/finance_voucher/cash_entry_voucher.dart';
+import 'package:evoucher/views/finance_voucher/expense_entry_voucher.dart';
+import 'package:evoucher/views/finance_voucher/journal_entry_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../common/color_extension.dart';
 import '../../common_widget/bottom_navigation.dart';
+import 'journal_view_voucher.dart';
 
 class Finance extends StatefulWidget {
   const Finance({super.key});
@@ -40,7 +43,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.primary,
                 onTap: () {
                   // Handle Entry Journal Voucher tap
-                  Get.to(()=>JournalVoucher());
+                  Get.to(()=>JournalEntryVoucher());
                 },
               ),
               VoucherOption(
@@ -49,6 +52,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.primary,
                 onTap: () {
                   // Handle View Journal Voucher tap
+                  Get.to(()=>JournalViewVoucher());
                 },
               ),
               VoucherOption(
@@ -60,50 +64,69 @@ class _FinanceState extends State<Finance> {
                   // Handle Unposted J Voucher tap
                 },
               ),
-              VoucherOption(
-                title: 'Void Journal Voucher',
-                icon: Icons.block_outlined,
-                color: TColor.primary,
-                onTap: () {
-                  // Handle Void Journal Voucher tap
-                },
-              ),
+
             ]),
             const SizedBox(height: 24),
-            _buildSectionTitle('Foreign Payment Voucher'),
+            _buildSectionTitle('Cash Voucher'),
             _buildVoucherOptions([
               VoucherOption(
-                title: 'Entry Foreign Payment',
+                title: 'Entry Cash Voucher',
                 icon: Icons.add_circle_outline,
                 color: TColor.secondary,
                 onTap: () {
-                  // Handle Entry Foreign Payment tap
+                  // Handle Entry Journal Voucher tap
+                  Get.to(()=>CashEntryVoucher());
                 },
               ),
               VoucherOption(
-                title: 'View Foreign Payment',
+                title: 'View Cash Voucher',
                 icon: Icons.visibility_outlined,
                 color: TColor.secondary,
                 onTap: () {
-                  // Handle View Foreign Payment tap
+                  // Handle View Journal Voucher tap
                 },
               ),
               VoucherOption(
-                title: 'Voided Foreign Payment',
-                icon: Icons.block_outlined,
+                title: 'Unposted C Voucher',
+                icon: Icons.pending_actions_outlined,
                 color: TColor.secondary,
+                badge: '0',
                 onTap: () {
-                  // Handle Voided Foreign Payment tap
+                  // Handle Unposted J Voucher tap
+                },
+              ),
+
+            ]),
+            const SizedBox(height: 24),
+            _buildSectionTitle('Expense Voucher'),
+            _buildVoucherOptions([
+              VoucherOption(
+                title: 'Entry Expense Voucher',
+                icon: Icons.add_circle_outline,
+                color: TColor.fourth,
+                onTap: () {
+                  // Handle Entry Journal Voucher tap
+                  Get.to(()=>ExpenseEntryVoucher());
                 },
               ),
               VoucherOption(
-                title: 'Foreign Payment Report',
-                icon: Icons.description_outlined,
-                color: TColor.secondary,
+                title: 'View Expense Voucher',
+                icon: Icons.visibility_outlined,
+                color: TColor.fourth,
                 onTap: () {
-                  // Handle Foreign Payment Report tap
+                  // Handle View Journal Voucher tap
                 },
               ),
+              VoucherOption(
+                title: 'Unposted E Voucher',
+                icon: Icons.pending_actions_outlined,
+                color: TColor.fourth,
+                badge: '0',
+                onTap: () {
+                  // Handle Unposted J Voucher tap
+                },
+              ),
+
             ]),
           ],
         ),
@@ -173,10 +196,11 @@ class _FinanceState extends State<Finance> {
                 ),
               ),
             )
-                : Icon(
-              Icons.chevron_right,
-              color: TColor.secondaryText,
-            ),
+                : null,
+            // Icon(
+            //   Icons.chevron_right,
+            //   color: TColor.secondaryText,
+            // ),
             onTap: option.onTap,
           ),
         );
