@@ -30,7 +30,7 @@ class WelcomeScreen extends StatelessWidget {
                 flex: 2,
                 child: Center(
                   child:Image.asset(
-                    'assets/img/logo.png',
+                    'assets/img/newLogo.png',
                     height: screenHeight / 4,
                     width: screenWidth / 2,
                     fit: BoxFit.contain,
@@ -41,7 +41,7 @@ class WelcomeScreen extends StatelessWidget {
               // White container at bottom
               Container(
                 width: double.infinity,
-                height: screenHeight/3,
+                height: screenHeight/3.5,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -54,13 +54,41 @@ class WelcomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      'TRAVEL AGENCY ACCOUNTING SOFTWARE',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF2D3142),
-                        height: 1.2,
+                    RichText(
+                      text:  TextSpan(
+                        children: [
+                          TextSpan(
+                            text: "Travel ",
+                            style: TextStyle(
+                              color: TColor.primaryText,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),TextSpan(
+                            text: "Agency ",
+                            style: TextStyle(
+                              color: TColor.primaryText,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          TextSpan(
+                            text: "Accounting",
+                            style: TextStyle(
+                              color: TColor.secondary,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          TextSpan(
+                            text: " Software.",
+                            style: TextStyle(
+                              color: TColor.primaryText,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 40),

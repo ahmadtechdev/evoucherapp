@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../common/color_extension.dart';
+import '../../common_widget/date_selecter.dart';
 
 class SalesDashboardWidget extends StatefulWidget {
   const SalesDashboardWidget({super.key});
@@ -34,33 +35,6 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget> with Single
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2025),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: TColor.primary,
-              onPrimary: TColor.white,
-              surface: TColor.white,
-              onSurface: TColor.primaryText,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -89,7 +63,15 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget> with Single
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildDateSelector(fontSize),
+                DateSelector(
+                  fontSize: fontSize,
+                  initialDate: selectedDate,
+                  onDateChanged: (newDate) {
+                    setState(() {
+                      selectedDate = newDate;
+                    });
+                  },
+                ),
                 const SizedBox(height: 20),
                 _buildSalesGrid(constraints, cardPadding, fontSize, iconSize),
                 const SizedBox(height: 20),
@@ -98,59 +80,6 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget> with Single
           ),
         );
       },
-    );
-  }
-
-  Widget _buildDateSelector(double fontSize) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: TColor.primary.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Text(
-            'SALES ON:',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: fontSize,
-              color: TColor.primaryText,
-            ),
-          ),
-          const SizedBox(width: 12),
-          InkWell(
-            onTap: () => _selectDate(context),
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: TColor.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: TColor.primary.withOpacity(0.2)),
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    DateFormat('dd/MM/yyyy').format(selectedDate),
-                    style: TextStyle(
-                      fontSize: fontSize,
-                      color: TColor.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.calendar_today,
-                    size: fontSize,
-                    color: TColor.primary,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 

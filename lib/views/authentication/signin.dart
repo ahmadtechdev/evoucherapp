@@ -226,7 +226,7 @@ class _SignInState extends State<SignIn> {
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () {
-                                  // Handle forgot password
+                                  Get.offAll(() => const Home());
                                 },
                                 child: const Text(
                                   "Forgot password?",
