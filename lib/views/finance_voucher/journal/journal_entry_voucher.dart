@@ -1,9 +1,8 @@
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 
-import '../../common/color_extension.dart';
-import '../../common_widget/date_selecter.dart';
-import '../../common_widget/entry_card.dart';
+import '../../../common/color_extension.dart';
+import '../../../common_widget/date_selecter.dart';
+import '../entry_card.dart';
 
 
 class JournalEntryVoucher extends StatefulWidget {

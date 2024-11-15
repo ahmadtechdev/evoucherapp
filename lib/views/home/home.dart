@@ -16,7 +16,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title:  Padding(
-          padding: EdgeInsets.only(left: 20),
+          padding: const EdgeInsets.only(left: 20),
           child: Image.asset(
             'assets/img/newLogo.png',
             scale: 3,
@@ -31,7 +31,7 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      drawer: const CustomDrawer(),
+      drawer: const CustomDrawer(currentIndex: 0),
       body: const SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16.0),

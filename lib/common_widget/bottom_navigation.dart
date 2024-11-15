@@ -17,7 +17,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
     // Navigate based on index
     switch (index) {
       case 0:
-        Get.to(()=>Finance());
+        Get.to(()=>const Finance());
         break;
       case 1:
         // Navigator.pushNamed(context, '/ticket');

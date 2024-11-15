@@ -1,12 +1,17 @@
-import 'package:evoucher/views/finance_voucher/cash_entry_voucher.dart';
-import 'package:evoucher/views/finance_voucher/expense_entry_voucher.dart';
-import 'package:evoucher/views/finance_voucher/journal_entry_voucher.dart';
+import 'package:evoucher/views/finance_voucher/cash/cash_entry_voucher.dart';
+import 'package:evoucher/views/finance_voucher/cash/cash_view_voucher.dart';
+import 'package:evoucher/views/finance_voucher/cash/unposted_c_voucher.dart';
+import 'package:evoucher/views/finance_voucher/expense/expense_entry_voucher.dart';
+import 'package:evoucher/views/finance_voucher/expense/expense_view_voucher.dart';
+import 'package:evoucher/views/finance_voucher/journal/journal_entry_voucher.dart';
+import 'package:evoucher/views/finance_voucher/journal/unposted_j_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../common/color_extension.dart';
 import '../../common_widget/bottom_navigation.dart';
-import 'journal_view_voucher.dart';
+import 'expense/unposted_e_voucher.dart';
+import 'journal/journal_view_voucher.dart';
 
 class Finance extends StatefulWidget {
   const Finance({super.key});
@@ -43,7 +48,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.primary,
                 onTap: () {
                   // Handle Entry Journal Voucher tap
-                  Get.to(()=>JournalEntryVoucher());
+                  Get.to(()=>const JournalEntryVoucher());
                 },
               ),
               VoucherOption(
@@ -52,7 +57,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.primary,
                 onTap: () {
                   // Handle View Journal Voucher tap
-                  Get.to(()=>JournalViewVoucher());
+                  Get.to(()=>const JournalViewVoucher());
                 },
               ),
               VoucherOption(
@@ -62,6 +67,7 @@ class _FinanceState extends State<Finance> {
                 badge: '0',
                 onTap: () {
                   // Handle Unposted J Voucher tap
+                  Get.to(()=>const UnPostedJVoucher());
                 },
               ),
 
@@ -75,7 +81,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.secondary,
                 onTap: () {
                   // Handle Entry Journal Voucher tap
-                  Get.to(()=>CashEntryVoucher());
+                  Get.to(()=>const CashEntryVoucher());
                 },
               ),
               VoucherOption(
@@ -84,6 +90,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.secondary,
                 onTap: () {
                   // Handle View Journal Voucher tap
+                  Get.to(()=>const CashViewVoucher());
                 },
               ),
               VoucherOption(
@@ -93,6 +100,7 @@ class _FinanceState extends State<Finance> {
                 badge: '0',
                 onTap: () {
                   // Handle Unposted J Voucher tap
+                  Get.to(()=>const UnPostedCVoucher());
                 },
               ),
 
@@ -106,7 +114,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.fourth,
                 onTap: () {
                   // Handle Entry Journal Voucher tap
-                  Get.to(()=>ExpenseEntryVoucher());
+                  Get.to(()=>const ExpenseEntryVoucher());
                 },
               ),
               VoucherOption(
@@ -115,6 +123,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.fourth,
                 onTap: () {
                   // Handle View Journal Voucher tap
+                  Get.to(()=>const ExpenseViewVoucher());
                 },
               ),
               VoucherOption(
@@ -124,6 +133,7 @@ class _FinanceState extends State<Finance> {
                 badge: '0',
                 onTap: () {
                   // Handle Unposted J Voucher tap
+                  Get.to(()=>const UnPostedEVoucher());
                 },
               ),
 

@@ -3,25 +3,25 @@ import 'package:intl/intl.dart';
 
 import '../common/color_extension.dart';
 
-class DateSelector extends StatefulWidget {
+class DateSelector2 extends StatefulWidget {
   final double fontSize;
   final DateTime initialDate;
   final ValueChanged<DateTime> onDateChanged;
   final String label;
 
-  const DateSelector({
+  const DateSelector2({
     super.key,
     required this.fontSize,
     required this.initialDate,
     required this.onDateChanged,
-    this. label = "SALES ON:",
+    this. label = "",
   });
 
   @override
-  _DateSelectorState createState() => _DateSelectorState();
+  _DateSelector2State createState() => _DateSelector2State();
 }
 
-class _DateSelectorState extends State<DateSelector> {
+class _DateSelector2State extends State<DateSelector2> {
   late DateTime selectedDate;
 
   @override
@@ -78,7 +78,8 @@ class _DateSelectorState extends State<DateSelector> {
         color: TColor.primary.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             widget.label,
@@ -88,12 +89,12 @@ class _DateSelectorState extends State<DateSelector> {
               color: TColor.primaryText,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 5),
           InkWell(
             onTap: () => _selectDate(context),
             borderRadius: BorderRadius.circular(8),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
               decoration: BoxDecoration(
                 color: TColor.white,
                 borderRadius: BorderRadius.circular(8),

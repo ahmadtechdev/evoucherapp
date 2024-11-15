@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../common/color_extension.dart';
 import '../../common_widget/date_selecter.dart';
@@ -224,7 +223,7 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget> with Single
                               'View More',
                               style: TextStyle(fontSize: fontSize * 0.85), // Slightly smaller font
                             ),
-                            SizedBox(width: 4), // Add small spacing
+                            const SizedBox(width: 4), // Add small spacing
                             Icon(Icons.arrow_forward, size: fontSize * 0.85), // Match text size
                           ],
                         ),

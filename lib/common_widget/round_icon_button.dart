@@ -5,7 +5,7 @@ import '../common/color_extension.dart';
 class RoundIconButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String title;
-  final String icon;
+  final IconData icon;
   final Color color;
   final double fontSize;
   final FontWeight fontWeight;
@@ -32,11 +32,9 @@ class RoundIconButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
+            Icon(
               icon,
-              width: 15,
-              height: 15,
-              fit: BoxFit.contain,
+
             ),
             const SizedBox(
               width: 8,

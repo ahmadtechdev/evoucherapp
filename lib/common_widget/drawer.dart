@@ -1,15 +1,42 @@
+import 'package:evoucher/views/accounts/accounts.dart';
+import 'package:evoucher/views/charts_of_accounts/charts_of_accounts.dart';
+import 'package:evoucher/views/home/home.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../common/color_extension.dart';
 
 class CustomDrawer extends StatefulWidget {
-  const CustomDrawer({super.key});
+
+  final int currentIndex;
+
+  const CustomDrawer({
+    super.key,
+    this.currentIndex = 0, // Default to home
+  });
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  int selectedIndex = 0;
+  late int selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedIndex = widget.currentIndex;
+  }
+
+  @override
+  void didUpdateWidget(CustomDrawer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentIndex != widget.currentIndex) {
+      setState(() {
+        selectedIndex = widget.currentIndex;
+      });
+    }
+  }
+
 
   Widget _buildListTile({
     required String title,
@@ -116,7 +143,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
             title: 'Home',
             icon: Icons.dashboard_rounded,
             index: 0,
-            onTap: () => Navigator.pop(context),
+            onTap: (){
+              Get.to(()=> const Home());
+            },
           ),
           _buildListTile(
             title: 'ACCOUNTS',
@@ -130,11 +159,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
             title: 'Chart of Accounts',
             icon: Icons.account_balance_rounded,
             index: 2,
+              onTap: (){
+                Get.to(()=> ChartOfAccountsScreen());
+              }
+          ),_buildListTile(
+            title: 'Accounts',
+            icon: Icons.person,
+            index: 3,
+            onTap: (){
+              Get.to(()=> Accounts());
+            }
           ),
           _buildListTile(
             title: 'Foreign Accounts',
             icon: Icons.public_rounded,
-            index: 3,
+            index: 4,
           ),
           _buildListTile(
             title: 'All Inv Aging Report',

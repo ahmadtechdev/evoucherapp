@@ -1,19 +1,18 @@
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 
-import '../../common/color_extension.dart';
-import '../../common_widget/date_selecter.dart';
-import '../../common_widget/entry_card.dart';
+import '../../../common/color_extension.dart';
+import '../../../common_widget/date_selecter.dart';
+import '../entry_card.dart';
 
 
-class CashEntryVoucher extends StatefulWidget {
-  const CashEntryVoucher({super.key});
+class ExpenseEntryVoucher extends StatefulWidget {
+  const ExpenseEntryVoucher({super.key});
 
   @override
-  State<CashEntryVoucher> createState() => _CashEntryVoucherState();
+  State<ExpenseEntryVoucher> createState() => _ExpenseEntryVoucherState();
 }
 
-class _CashEntryVoucherState extends State<CashEntryVoucher> {
+class _ExpenseEntryVoucherState extends State<ExpenseEntryVoucher> {
   DateTime selectedDate = DateTime.now();
 
   double totalDebit = 0.0;
@@ -51,7 +50,7 @@ class _CashEntryVoucherState extends State<CashEntryVoucher> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Cash Voucher'),
+          title: const Text('Expense Voucher'),
           backgroundColor: TColor.primary,
           foregroundColor: TColor.white,
         ),

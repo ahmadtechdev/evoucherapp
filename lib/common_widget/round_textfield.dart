@@ -66,6 +66,52 @@ class RoundTextfield extends StatelessWidget {
   }
 }
 
+class SearchTextField extends StatelessWidget{
+  final TextEditingController? controller;
+  final String hintText;
+  final ValueChanged<String> onChange;
+
+  const SearchTextField({
+    super.key,
+
+    required this.hintText,
+    this.controller,
+    required this.onChange,
+
+  });
+
+  @override
+  Widget build(BuildContext context){
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        controller: controller,
+        onChanged: onChange as void Function(String),
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: TextStyle(color: TColor.placeholder),
+          prefixIcon: Icon(Icons.search, color: TColor.secondary),
+          filled: true,
+          fillColor: TColor.textfield,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: TColor.secondary),
+          ),
+        ),
+      ),
+    );
+  }
+
+}
+
 class RoundTitleTextfield extends StatelessWidget {
   final TextEditingController? controller;
   final String title;
