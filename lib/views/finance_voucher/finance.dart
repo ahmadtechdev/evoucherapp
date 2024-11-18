@@ -1,3 +1,4 @@
+import 'package:evoucher/views/finance_voucher/bank/bank_entry_voucher.dart';
 import 'package:evoucher/views/finance_voucher/cash/cash_entry_voucher.dart';
 import 'package:evoucher/views/finance_voucher/cash/cash_view_voucher.dart';
 import 'package:evoucher/views/finance_voucher/cash/unposted_c_voucher.dart';
@@ -136,7 +137,38 @@ class _FinanceState extends State<Finance> {
                   Get.to(()=>const UnPostedEVoucher());
                 },
               ),
-
+            ]),
+            const SizedBox(height: 24),
+            _buildSectionTitle('Bank Voucher'),
+            _buildVoucherOptions([
+              VoucherOption(
+                title: 'Entry Bank Voucher',
+                icon: Icons.add_circle_outline,
+                color: TColor.secondaryText,
+                onTap: () {
+                  // Handle Entry Journal Voucher tap
+                  Get.to(()=>const BankEntryVoucher());
+                },
+              ),
+              VoucherOption(
+                title: 'View Bank Voucher',
+                icon: Icons.visibility_outlined,
+                color: TColor.secondaryText,
+                onTap: () {
+                  // Handle View Journal Voucher tap
+                  // Get.to(()=>const ExpenseViewVoucher());
+                },
+              ),
+              VoucherOption(
+                title: 'Unposted B Voucher',
+                icon: Icons.pending_actions_outlined,
+                color: TColor.secondaryText,
+                badge: '0',
+                onTap: () {
+                  // Handle Unposted J Voucher tap
+                  // Get.to(()=>const UnPostedEVoucher());
+                },
+              ),
             ]),
           ],
         ),

@@ -7,7 +7,7 @@ import 'modal.dart';
 
 
 class ChartOfAccountsScreen extends StatelessWidget {
-  const ChartOfAccountsScreen({Key? key}) : super(key: key);
+  const ChartOfAccountsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

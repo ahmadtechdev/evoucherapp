@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../common_widget/bottom_navigation.dart';
 import '../../common_widget/drawer.dart';
-import 'home_sales_dashboard.dart'; // Update this import path
+import 'home_sales_dashboard.dart';
+
+import 'search_portion.dart'; // Import your existing textfields
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,7 +17,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  Padding(
+        title: Padding(
           padding: const EdgeInsets.only(left: 20),
           child: Image.asset(
             'assets/img/newLogo.png',
@@ -35,10 +37,19 @@ class _HomeState extends State<Home> {
       body: const SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: SalesDashboardWidget(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SalesDashboardWidget(),
+              SizedBox(height: 20),
+              SearchWidget(), // New section below the dashboard
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(),
     );
   }
+
+
 }

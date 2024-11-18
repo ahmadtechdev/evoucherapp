@@ -25,18 +25,6 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
   double totalCredit = 0.0;
   List<Map<String, dynamic>> entries = [];
 
-  List<String> accounts = [
-    'Cash Account',
-    'Bank Account',
-    'Sales Account',
-    'Purchase Account',
-    'Accounts Receivable',
-    'Accounts Payable',
-    'Capital Account',
-    'Drawing Account',
-    'Expense Account',
-    'Revenue Account'
-  ];
 
   @override
   void initState() {
@@ -54,7 +42,7 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
         var entriesList = widget.voucherData['entries'] as List;
         entries = entriesList.map((entry) {
           return {
-            'account': entry['account'] ?? accounts[0],
+            'account': entry['account'] ?? "",
             'description': widget.voucherData['description'] ?? '',
             'debit': 0.0,
             'credit': _parseAmount(widget.voucherData['amount']),
@@ -63,7 +51,7 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
       } else {
         // Fallback entry if no entries exist
         entries = [{
-          'account': accounts[0],
+          'account': "",
           'description': widget.voucherData['description'] ?? '',
           'debit': 0.0,
           'credit': _parseAmount(widget.voucherData['amount']),
@@ -73,7 +61,7 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
       print('Error initializing data: $e');
       // Fallback entry
       entries = [{
-        'account': accounts[0],
+        'account': "",
         'description': '',
         'debit': 0.0,
         'credit': 0.0,
@@ -227,7 +215,7 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
                   ),
                   const SizedBox(height: 24),
                   ReusableEntryCard(
-                    accounts: accounts,
+
                     showImageUpload: true,
                     primaryColor: TColor.primary,
                     textFieldColor: TColor.textfield,

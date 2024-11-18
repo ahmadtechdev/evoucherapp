@@ -10,7 +10,11 @@ class ApiService {
 
   Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> body) async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
+    final token = prefs.getString('token') ?? ''; // Retrieve the token
+
+    if (token.isEmpty) {
+      throw Exception('Token is missing');
+    }
 
     final url = Uri.parse(baseUrl + endpoint);
 
@@ -24,8 +28,11 @@ class ApiService {
 
       // Add headers
       request.headers.addAll({
-        "Authorization": token.isNotEmpty ? "Bearer $token" : "",
+        "Authorization": token.isNotEmpty ? "Bearer $token" : "", // Add the token to headers if needed
       });
+
+      // Add the token to the body (as required by your API)
+      body['token'] = token;
 
       // Add form fields
       body.forEach((key, value) {
@@ -56,75 +63,49 @@ class ApiService {
       throw Exception('Network error: Please check your internet connection');
     }
   }
-
-
-  Future<Map<String, dynamic>> get(String endpoint) async {
+  Future<Map<String, dynamic>> get(String endpoint, {Map<String, String>? queryParams}) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final url = Uri.parse(baseUrl + endpoint);
-    print(url);
+    // Create URL with query parameters
+    final uri = Uri.parse(baseUrl + endpoint).replace(
+      queryParameters: {
+        'token': token,
+        ...?queryParams,
+      },
+    );
 
     try {
+      // Print request details for debugging
+      print('Request URL: $uri');
+
       final response = await http.get(
-        url,
+        uri,
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
+          "Authorization": token.isNotEmpty ? "Bearer $token" : "",
         },
       );
 
-      print(response);
+      // Print response for debugging
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        // Extract error message from response body if possible
-        String errorMessage = 'Failed to load data';
-        try {
-          final errorResponse = jsonDecode(response.body);
-          errorMessage = errorResponse['message'] ?? errorMessage;
-        } catch (e) {
-          // Handle JSON parsing error
-        }
-        throw Exception(errorMessage);
-      }
-    } catch (e) {
-      // Handle network errors or other unexpected issues
-      throw Exception('Network error or unexpected issue: $e');
-    }
-  }
-
-  Future<Map<String, dynamic>> delete(String endpoint) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    final url = Uri.parse(baseUrl + endpoint);
-
-    try {
-      final response = await http.delete(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
+      final responseData = Map<String, dynamic>.from(
+        json.decode(response.body),
       );
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        return responseData;
       } else {
-        String errorMessage = 'Failed to delete item';
-        try {
-          final errorResponse = jsonDecode(response.body);
-          errorMessage = errorResponse['message'] ?? errorMessage;
-        } catch (e) {
-          // Handle JSON parsing error
-        }
+        String errorMessage = responseData['message'] ?? 'Request failed';
         throw Exception(errorMessage);
       }
     } catch (e) {
-      throw Exception('Network error: $e');
+      print('Network error: $e');
+      throw Exception('Network error: Please check your internet connection');
     }
   }
 }
+
+
 

@@ -1,4 +1,4 @@
-import 'package:evoucher/views/accounts/accounts.dart';
+import 'package:evoucher/views/accounts/accounts/accounts.dart';
 import 'package:evoucher/views/charts_of_accounts/charts_of_accounts.dart';
 import 'package:evoucher/views/home/home.dart';
 import 'package:flutter/material.dart';

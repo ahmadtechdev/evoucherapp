@@ -2,81 +2,170 @@
 
 import 'package:flutter/material.dart';
 import '../../common/color_extension.dart';
+import '../../common_widget/custom_dropdown.dart';
+import '../../common_widget/round_textfield.dart';
 
-class SearchWidget extends StatelessWidget {
-  const SearchWidget({Key? key}) : super(key: key);
+class SearchWidget extends StatefulWidget {
+
+  const SearchWidget({super.key});
+
+  @override
+  State<SearchWidget> createState() => _SearchWidgetState();
+}
+
+class _SearchWidgetState extends State<SearchWidget> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    _controller.forward();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            decoration: InputDecoration(
-              hintText: 'Search by Ticket No.',
-              hintStyle: TextStyle(color: TColor.placeholder),
-              filled: true,
-              fillColor: TColor.textfield,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide.none,
-              ),
-              prefixIcon: Icon(Icons.search, color: TColor.primaryText),
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: TColor.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: TColor.primary.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
             ),
-          ),
-          const SizedBox(height: 16.0),
-          TextField(
-            decoration: InputDecoration(
-              hintText: 'Search by Pax Name',
-              hintStyle: TextStyle(color: TColor.placeholder),
-              filled: true,
-              fillColor: TColor.textfield,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide.none,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSearchRow(
+              leftWidget: const RoundTextfield(
+                hintText: 'Search Ticket by Ticket No.',
               ),
-              prefixIcon: Icon(Icons.search, color: TColor.primaryText),
+              rightButtonLabel: 'Search',
+              rightButtonIcon: Icons.flight,
             ),
-          ),
-          const SizedBox(height: 16.0),
-          TextField(
-            decoration: InputDecoration(
-              hintText: 'Search by PNR',
-              hintStyle: TextStyle(color: TColor.placeholder),
-              filled: true,
-              fillColor: TColor.textfield,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide.none,
+            const SizedBox(height: 12),
+            _buildSearchRow(
+              leftWidget: const RoundTextfield(
+                hintText: 'Search Ticket by Pax Name',
               ),
-              prefixIcon: Icon(Icons.search, color: TColor.primaryText),
+              rightButtonLabel: 'Search',
+              rightButtonIcon: Icons.flight_takeoff,
             ),
-          ),
-          const SizedBox(height: 24.0),
-          ElevatedButton(
-            onPressed: () {
-              // Handle search button press
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: TColor.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
+            const SizedBox(height: 12),
+            _buildSearchRow(
+              leftWidget: const RoundTextfield(
+                hintText: 'Search Ticket by PNR',
               ),
-              minimumSize: const Size.fromHeight(48.0),
+              rightButtonLabel: 'Search',
+              rightButtonIcon: Icons.local_airport,
             ),
-            child: Text(
-              'Search',
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-                color: TColor.white,
+            const SizedBox(height: 20),
+            _buildSearchRow(
+              leftWidget: CustomDropdown(
+                hint: 'Select An Account',
+                items: ['Account 1', 'Account 2', 'Account 3'], // Dummy data
+                onChanged: (value) {},
               ),
+              rightButtonLabel: 'Search',
+              rightButtonIcon: Icons.monetization_on,
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            _buildSearchRow(
+              leftWidget: CustomDropdown(
+                hint: 'Select Foreign Account',
+                items: ['Foreign Account 1', 'Foreign Account 2'], // Dummy data
+                onChanged: (value) {},
+              ),
+              rightButtonLabel: 'View',
+              rightButtonIcon: Icons.visibility,
+            ),
+            const SizedBox(height: 12),
+            _buildSearchRow(
+              leftWidget: CustomDropdown(
+                hint: 'Search by Voucher No',
+                items: ['Voucher 1', 'Voucher 2', 'Voucher 3'], // Dummy data
+                onChanged: (value) {},
+              ),
+              rightButtonLabel: 'View',
+              rightButtonIcon: Icons.receipt,
+            ),
+            const SizedBox(height: 20),
+            _buildSearchRow(
+              leftWidget: CustomDropdown(
+                hint: 'Consultant Sales',
+                items: ['Consultant A', 'Consultant B'], // Dummy data
+                onChanged: (value) {},
+              ),
+              rightButtonLabel: 'Cons Wise',
+              rightButtonIcon: Icons.visibility,
+            ),
+            const SizedBox(height: 12),
+            _buildSearchRow(
+              leftWidget: CustomDropdown(
+                hint: 'Select Users',
+                items: ['User 1', 'User 2'], // Dummy data
+                onChanged: (value) {},
+              ),
+              rightButtonLabel: 'User Wise',
+              rightButtonIcon: Icons.person,
+            ),
+            const SizedBox(height: 12),
+            _buildSearchRow(
+              leftWidget: CustomDropdown(
+                hint: 'Select Multi Invoice',
+                items: ['Invoice 1', 'Invoice 2'], // Dummy data
+                onChanged: (value) {},
+              ),
+              rightButtonLabel: 'Invoice',
+              rightButtonIcon: Icons.monetization_on,
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildSearchRow({
+    required Widget leftWidget,
+    required String rightButtonLabel,
+    required IconData rightButtonIcon,
+  }) {
+    return Row(
+      children: [
+        Expanded(child: leftWidget),
+        const SizedBox(width: 8),
+        ElevatedButton.icon(
+          onPressed: () {
+            // Handle search/view actions
+          },
+          icon: Icon(rightButtonIcon, size: 18),
+          // label: Text(rightButtonLabel),
+          label:const Icon(Icons.search),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: TColor.secondary,
+            foregroundColor: TColor.white,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

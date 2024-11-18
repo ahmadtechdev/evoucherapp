@@ -19,19 +19,6 @@ class _ExpenseEntryVoucherState extends State<ExpenseEntryVoucher> {
   double totalCredit = 0.0;
   final FocusNode _mainFocusNode = FocusNode();
 
-  List<String> accounts = [
-    'Cash Account',
-    'Bank Account',
-    'Sales Account',
-    'Purchase Account',
-    'Accounts Receivable',
-    'Accounts Payable',
-    'Capital Account',
-    'Drawing Account',
-    'Expense Account',
-    'Revenue Account'
-  ];
-
   @override
   void dispose() {
     _mainFocusNode.dispose();
@@ -73,7 +60,7 @@ class _ExpenseEntryVoucherState extends State<ExpenseEntryVoucher> {
                 const SizedBox(height: 24),
                 // In your build method:
                 ReusableEntryCard(
-                  accounts: accounts, // Your list of accounts
+
                   showImageUpload: true, // or false if you don't want image upload
                   primaryColor: TColor.primary,
                   textFieldColor: TColor.textfield,

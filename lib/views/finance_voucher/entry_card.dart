@@ -1,8 +1,12 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:evoucher/common/color_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
+import '../accounts/accounts/accounts_provider.dart';
+
 
 class EntryCardData {
   String account;
@@ -12,6 +16,7 @@ class EntryCardData {
   File? imageFile;
   final String id;
   final TextEditingController descriptionController;
+  final TextEditingController chequeController;
   final TextEditingController debitController;
   final TextEditingController creditController;
 
@@ -23,37 +28,41 @@ class EntryCardData {
     this.imageFile,
   })  : id = DateTime.now().millisecondsSinceEpoch.toString(),
         descriptionController = TextEditingController(text: ''),
+        chequeController = TextEditingController(text: ''),
         debitController = TextEditingController(text: ''),
         creditController = TextEditingController(text: '');
 
   void dispose() {
     descriptionController.dispose();
+    chequeController.dispose();
     debitController.dispose();
     creditController.dispose();
   }
 
   bool get hasDebitValue => debit > 0 || debitController.text.isNotEmpty;
-
   bool get hasCreditValue => credit > 0 || creditController.text.isNotEmpty;
 }
 
-class ReusableEntryCard extends StatefulWidget {
+class ReusableEntryCard extends ConsumerStatefulWidget {
   final bool showImageUpload;
-  final List<String> accounts;
+  final bool showChequeField;
   final Function(double, double)? onTotalChanged;
   final Color primaryColor;
   final Color textFieldColor;
   final Color textColor;
   final Color placeholderColor;
-  final bool isViewMode; // New property
-  final bool showPrintButton; // New property
-  final bool showAddRowButton; // New property
-  final List<Map<String, dynamic>>? initialData; // New property
+  final bool isViewMode;
+  final bool showPrintButton;
+  final bool showAddRowButton;
+  final List<Map<String, dynamic>>? initialData;
+
+  // Add getter to expose entries
+  List<EntryCardData> get currentEntries => _ReusableEntryCardState._entries;
 
   const ReusableEntryCard({
     super.key,
-    required this.accounts,
     this.showImageUpload = false,
+    this.showChequeField = false,
     this.onTotalChanged,
     this.primaryColor = const Color(0xFF2196F3),
     this.textFieldColor = const Color(0xFFF5F5F5),
@@ -66,11 +75,11 @@ class ReusableEntryCard extends StatefulWidget {
   });
 
   @override
-  State<ReusableEntryCard> createState() => _ReusableEntryCardState();
+  ConsumerState<ReusableEntryCard> createState() => _ReusableEntryCardState();
 }
 
-class _ReusableEntryCardState extends State<ReusableEntryCard> {
-  List<EntryCardData> entries = [];
+class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
+  static final List<EntryCardData> _entries = [];
   double totalDebit = 0.0;
   double totalCredit = 0.0;
 
@@ -83,7 +92,7 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
 
   @override
   void dispose() {
-    for (var entry in entries) {
+    for (var entry in _entries) {
       entry.dispose();
     }
     super.dispose();
@@ -91,15 +100,15 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
 
   void _addEntry() {
     setState(() {
-      entries.add(EntryCardData());
+      _entries.add(EntryCardData());
     });
   }
 
   void _removeEntry(int index) {
-    if (index >= 0 && index < entries.length && entries.length > 1) {
+    if (index >= 0 && index < _entries.length && _entries.length > 1) {
       setState(() {
-        final removedEntry = entries[index];
-        entries.removeAt(index);
+        final removedEntry = _entries[index];
+        _entries.removeAt(index);
         removedEntry.dispose();
         _calculateTotals();
       });
@@ -110,7 +119,7 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
     double newTotalDebit = 0.0;
     double newTotalCredit = 0.0;
 
-    for (var entry in entries) {
+    for (var entry in _entries) {
       newTotalDebit += entry.debit;
       newTotalCredit += entry.credit;
     }
@@ -173,6 +182,9 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
   }
 
   Widget _buildEntryCard(EntryCardData entry, int index) {
+
+    final accountsAsyncValue = ref.watch(accountsDataProvider);
+
     return Card(
       key: ValueKey(entry.id),
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -208,49 +220,60 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
               ],
             ),
             const SizedBox(height: 12),
-            DropdownSearch<String>(
-              popupProps: PopupProps.menu(
-                showSearchBox: true,
-                searchFieldProps: TextFieldProps(
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: "Search account...",
-                    prefixIcon:
-                        Icon(Icons.search, color: widget.placeholderColor),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
+            accountsAsyncValue.when(
+              loading: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              error: (err, stack) => Center(
+                child: Text('Error loading accounts: $err'),
+              ),
+              data: (accounts) {
+                final accountNames = accounts.map((account) => account.name).toList();
+                return DropdownSearch<String>(
+                  enabled: !widget.isViewMode,
+                  popupProps: PopupProps.menu(
+
+                    showSearchBox: true,
+                    searchFieldProps: TextFieldProps(
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: "Search account...",
+                        prefixIcon: Icon(Icons.search, color: widget.placeholderColor),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: widget.textFieldColor,
+                      ),
                     ),
-                    filled: true,
-                    fillColor: widget.textFieldColor,
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height / 1.5,
+                    ),
+                    showSelectedItems: true,
+                    searchDelay: const Duration(milliseconds: 300),
                   ),
-                ),
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height / 1.5,
-                ),
-                showSelectedItems: true,
-                searchDelay: const Duration(milliseconds: 300),
-              ),
-              items: widget.accounts,
-              selectedItem: entry.account.isEmpty ? null : entry.account,
-              onChanged: (value) {
-                setState(() {
-                  entry.account = value ?? '';
-                });
+                  items: accountNames,
+                  selectedItem: entry.account.isEmpty ? null : entry.account,
+                  onChanged: (value) {
+                    setState(() {
+                      entry.account = value ?? '';
+                    });
+                  },
+                  dropdownDecoratorProps: DropDownDecoratorProps(
+                    dropdownSearchDecoration: InputDecoration(
+                      filled: true,
+                      fillColor: widget.textFieldColor,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
+                      hintText: 'Select an account',
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                );
               },
-              dropdownDecoratorProps: DropDownDecoratorProps(
-                dropdownSearchDecoration: InputDecoration(
-                  filled: true,
-                  fillColor: widget.textFieldColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  hintText: 'Select an account',
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-              ),
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -273,6 +296,29 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
               },
             ),
             const SizedBox(height: 12),
+            if (widget.showChequeField) ...[
+              TextFormField(
+                controller: entry.chequeController,
+                readOnly: widget.isViewMode ? true : false,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: widget.textFieldColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  hintText: 'Cheque No. (Optional)',
+                  hintStyle: TextStyle(color: widget.placeholderColor),
+                  contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                onChanged: (value) {
+                  entry.description = value;
+                },
+              ),
+              const SizedBox(height: 12),
+            ],
+
             Row(
               children: [
                 Expanded(
@@ -428,12 +474,12 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: entries.length,
+          itemCount: _entries.length,
           itemBuilder: (context, index) =>
-              _buildEntryCard(entries[index], index),
+              _buildEntryCard(_entries[index], index),
         ),
         const SizedBox(height: 16),
-        if (widget.showAddRowButton)
+        if (widget.showAddRowButton || !widget.isViewMode)
           SizedBox(
             width: MediaQuery.of(context).size.width / 2.5,
             child: ElevatedButton(

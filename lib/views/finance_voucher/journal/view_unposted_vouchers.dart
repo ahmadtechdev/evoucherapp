@@ -12,18 +12,6 @@ class ViewUnPostedVouchers extends StatefulWidget {
 
 class _ViewUnPostedVouchersState extends State<ViewUnPostedVouchers> {
 
-  List<String> accounts = [
-    'Cash Account',
-    'Bank Account',
-    'Sales Account',
-    'Purchase Account',
-    'Accounts Receivable',
-    'Accounts Payable',
-    'Capital Account',
-    'Drawing Account',
-    'Expense Account',
-    'Revenue Account'
-  ];
   @override
   Widget build(BuildContext context) {
 
@@ -41,7 +29,7 @@ class _ViewUnPostedVouchersState extends State<ViewUnPostedVouchers> {
             const SizedBox(height: 24),
             // In your build method:
             ReusableEntryCard(
-              accounts: accounts, // Your list of accounts
+
               showImageUpload: false, // or false if you don't want image upload
               primaryColor: TColor.primary,
               isViewMode: true,
