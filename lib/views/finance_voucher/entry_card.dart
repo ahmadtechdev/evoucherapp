@@ -7,7 +7,6 @@ import 'dart:io';
 
 import '../accounts/accounts/accounts_provider.dart';
 
-
 class EntryCardData {
   String account;
   String description;
@@ -16,7 +15,6 @@ class EntryCardData {
   File? imageFile;
   final String id;
   final TextEditingController descriptionController;
-  final TextEditingController chequeController;
   final TextEditingController debitController;
   final TextEditingController creditController;
 
@@ -28,41 +26,37 @@ class EntryCardData {
     this.imageFile,
   })  : id = DateTime.now().millisecondsSinceEpoch.toString(),
         descriptionController = TextEditingController(text: ''),
-        chequeController = TextEditingController(text: ''),
         debitController = TextEditingController(text: ''),
         creditController = TextEditingController(text: '');
 
   void dispose() {
     descriptionController.dispose();
-    chequeController.dispose();
     debitController.dispose();
     creditController.dispose();
   }
 
   bool get hasDebitValue => debit > 0 || debitController.text.isNotEmpty;
+
   bool get hasCreditValue => credit > 0 || creditController.text.isNotEmpty;
 }
 
 class ReusableEntryCard extends ConsumerStatefulWidget {
   final bool showImageUpload;
-  final bool showChequeField;
+
   final Function(double, double)? onTotalChanged;
   final Color primaryColor;
   final Color textFieldColor;
   final Color textColor;
   final Color placeholderColor;
-  final bool isViewMode;
-  final bool showPrintButton;
-  final bool showAddRowButton;
-  final List<Map<String, dynamic>>? initialData;
-
-  // Add getter to expose entries
-  List<EntryCardData> get currentEntries => _ReusableEntryCardState._entries;
+  final bool isViewMode; // New property
+  final bool showPrintButton; // New property
+  final bool showAddRowButton; // New property
+  final List<Map<String, dynamic>>? initialData; // New property
 
   const ReusableEntryCard({
     super.key,
+
     this.showImageUpload = false,
-    this.showChequeField = false,
     this.onTotalChanged,
     this.primaryColor = const Color(0xFF2196F3),
     this.textFieldColor = const Color(0xFFF5F5F5),
@@ -73,13 +67,13 @@ class ReusableEntryCard extends ConsumerStatefulWidget {
     this.showAddRowButton = false,
     this.initialData,
   });
-
   @override
   ConsumerState<ReusableEntryCard> createState() => _ReusableEntryCardState();
+
 }
 
 class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
-  static final List<EntryCardData> _entries = [];
+  List<EntryCardData> entries = [];
   double totalDebit = 0.0;
   double totalCredit = 0.0;
 
@@ -92,7 +86,7 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
 
   @override
   void dispose() {
-    for (var entry in _entries) {
+    for (var entry in entries) {
       entry.dispose();
     }
     super.dispose();
@@ -100,15 +94,15 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
 
   void _addEntry() {
     setState(() {
-      _entries.add(EntryCardData());
+      entries.add(EntryCardData());
     });
   }
 
   void _removeEntry(int index) {
-    if (index >= 0 && index < _entries.length && _entries.length > 1) {
+    if (index >= 0 && index < entries.length && entries.length > 1) {
       setState(() {
-        final removedEntry = _entries[index];
-        _entries.removeAt(index);
+        final removedEntry = entries[index];
+        entries.removeAt(index);
         removedEntry.dispose();
         _calculateTotals();
       });
@@ -119,7 +113,7 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
     double newTotalDebit = 0.0;
     double newTotalCredit = 0.0;
 
-    for (var entry in _entries) {
+    for (var entry in entries) {
       newTotalDebit += entry.debit;
       newTotalCredit += entry.credit;
     }
@@ -182,7 +176,6 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
   }
 
   Widget _buildEntryCard(EntryCardData entry, int index) {
-
     final accountsAsyncValue = ref.watch(accountsDataProvider);
 
     return Card(
@@ -275,6 +268,7 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                 );
               },
             ),
+
             const SizedBox(height: 12),
             TextFormField(
               controller: entry.descriptionController,
@@ -289,36 +283,13 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                 hintText: 'Description',
                 hintStyle: TextStyle(color: widget.placeholderColor),
                 contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
               onChanged: (value) {
                 entry.description = value;
               },
             ),
             const SizedBox(height: 12),
-            if (widget.showChequeField) ...[
-              TextFormField(
-                controller: entry.chequeController,
-                readOnly: widget.isViewMode ? true : false,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: widget.textFieldColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  hintText: 'Cheque No. (Optional)',
-                  hintStyle: TextStyle(color: widget.placeholderColor),
-                  contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                onChanged: (value) {
-                  entry.description = value;
-                },
-              ),
-              const SizedBox(height: 12),
-            ],
-
             Row(
               children: [
                 Expanded(
@@ -409,48 +380,48 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                       ),
                       child: entry.imageFile != null
                           ? Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.file(
-                                    entry.imageFile!,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                Positioned(
-                                  right: 4,
-                                  top: 4,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.close,
-                                        color: Colors.red),
-                                    onPressed: () {
-                                      setState(() {
-                                        entry.imageFile = null;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
-                            )
+                        fit: StackFit.expand,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              entry.imageFile!,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            right: 4,
+                            top: 4,
+                            child: IconButton(
+                              icon: const Icon(Icons.close,
+                                  color: Colors.red),
+                              onPressed: () {
+                                setState(() {
+                                  entry.imageFile = null;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      )
                           : InkWell(
-                              onTap: () => _pickImage(entry),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.add_photo_alternate,
-                                      size: 32, color: widget.primaryColor),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Add Image',
-                                    style: TextStyle(
-                                      color: widget.primaryColor,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
+                        onTap: () => _pickImage(entry),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.add_photo_alternate,
+                                size: 32, color: widget.primaryColor),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Add Image',
+                              style: TextStyle(
+                                color: widget.primaryColor,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -469,14 +440,15 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
 
   @override
   Widget build(BuildContext context) {
+
     return Column(
       children: [
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: _entries.length,
+          itemCount: entries.length,
           itemBuilder: (context, index) =>
-              _buildEntryCard(_entries[index], index),
+              _buildEntryCard(entries[index], index),
         ),
         const SizedBox(height: 16),
         if (widget.showAddRowButton || !widget.isViewMode)
@@ -487,7 +459,7 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: TColor.fourth,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -511,64 +483,64 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
           ),
         const SizedBox(height: 16),
         if (widget.showAddRowButton || !widget.isViewMode)
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: TColor.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-                color: widget.primaryColor.withOpacity(0.2), width: 2),
-          ),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Total Debit',
-                      style: TextStyle(
-                          color: TColor.primaryText,
-                          fontWeight: FontWeight.bold)),
-                  Text(
-                    totalDebit.toStringAsFixed(2),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Total Credit',
-                      style: TextStyle(
-                          color: TColor.primaryText,
-                          fontWeight: FontWeight.bold)),
-                  Text(
-                    totalCredit.toStringAsFixed(2),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const Divider(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Difference',
-                      style: TextStyle(
-                          color: TColor.primaryText,
-                          fontWeight: FontWeight.bold)),
-                  Text(
-                    (totalDebit - totalCredit).toStringAsFixed(2),
-                    style: TextStyle(
-                      color:
-                          totalDebit == totalCredit ? Colors.green : Colors.red,
-                      fontWeight: FontWeight.bold,
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: TColor.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                  color: widget.primaryColor.withOpacity(0.2), width: 2),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Total Debit',
+                        style: TextStyle(
+                            color: TColor.primaryText,
+                            fontWeight: FontWeight.bold)),
+                    Text(
+                      totalDebit.toStringAsFixed(2),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Total Credit',
+                        style: TextStyle(
+                            color: TColor.primaryText,
+                            fontWeight: FontWeight.bold)),
+                    Text(
+                      totalCredit.toStringAsFixed(2),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const Divider(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Difference',
+                        style: TextStyle(
+                            color: TColor.primaryText,
+                            fontWeight: FontWeight.bold)),
+                    Text(
+                      (totalDebit - totalCredit).toStringAsFixed(2),
+                      style: TextStyle(
+                        color:
+                        totalDebit == totalCredit ? Colors.green : Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
       ],
     );
   }

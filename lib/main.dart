@@ -1,3 +1,4 @@
+import 'package:evoucher/views/on_broading.dart';
 import 'package:evoucher/views/welcome_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: TColor.primary),
         useMaterial3: true,
       ),
-      home: const WelcomeScreen(),
+      home: const OnBoardingView(),
     );
   }
 }

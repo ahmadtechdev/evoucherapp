@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:evoucher/common_widget/dart_selector2.dart';
-import 'package:flutter/material.dart';
+import 'package:excel/excel.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // Assume these files contain your theme and common widgets.
 import '../../../common/color_extension.dart';
@@ -10,6 +15,9 @@ import '../../../common_widget/date_selecter.dart';
 import '../../../common_widget/round_textfield.dart';
 import 'ledger_modal.dart';
 import 'ledger_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:path/path.dart' as path;
+
 
 class LedgerScreen extends ConsumerStatefulWidget {
   final String accountId;
@@ -38,6 +46,57 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
     toDate = DateTime.now();
     fromDate = DateTime(toDate.year, toDate.month - 3, toDate.day);
   }
+  void _exportToExcel() async {
+    // Create a new Excel document
+    var excel = Excel.createExcel();
+    Sheet sheet = excel['Sheet1'];
+
+    // Add headers
+    sheet.appendRow([
+      TextCellValue('Voucher'),
+      TextCellValue('Date'),
+      TextCellValue('Description'),
+      TextCellValue('Debit'),
+      TextCellValue('Credit'),
+      TextCellValue('Balance'),
+    ]);
+
+    // Add transaction data
+    for (var voucher in _filteredVouchers) {
+      sheet.appendRow([
+        TextCellValue(voucher.voucher),
+        TextCellValue(voucher.date),
+        TextCellValue(voucher.description),
+        DoubleCellValue(voucher.debit),
+        DoubleCellValue(voucher.credit),
+        TextCellValue(voucher.balance),
+      ]);
+    }
+
+    // Get the Downloads directory
+    String downloadsPath = '/storage/emulated/0/Download'; // Use the common path for Downloads
+
+    // Define the file path
+    String filePath = '$downloadsPath/ledger_${widget.accountId}.xlsx';
+
+    // Save the Excel file
+    List<int>? fileBytes = excel.save();
+    if (fileBytes != null) {
+      File(filePath)
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(fileBytes);
+
+      // Optionally, show a confirmation message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Excel file exported to $filePath')),
+      );
+    } else {
+      // Handle the failure case
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to export Excel file')),
+      );
+    }
+  }
 
   void _searchTransactions(String query) {
     final asyncValue = ref.read(ledgerDataProvider(
@@ -56,6 +115,17 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
             voucher.voucher.toLowerCase().contains(query.toLowerCase());
       }).toList();
     });
+  }
+
+  launchWhatsappWithMobileNumber() async {
+    String message = "Journey Online Message";
+    String mobileNumber = "923027253781";
+    final url = "https://wa.me/$mobileNumber?text=$message";
+    if (await canLaunchUrl(Uri.parse(Uri.encodeFull(url)))) {
+      await launchUrl(Uri.parse(Uri.encodeFull(url)));
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   Widget build(BuildContext context) {
@@ -173,10 +243,10 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
       child: Row(
         children: [
           _buildActionButton(
-              MdiIcons.microsoftExcel, 'Excel', TColor.primary, () {}),
+              MdiIcons.microsoftExcel, 'Excel', TColor.primary, _exportToExcel),
           _buildActionButton(MdiIcons.printer, 'Print', TColor.third, () {}),
           _buildActionButton(
-              MdiIcons.whatsapp, 'Whatsapp', TColor.secondary, () {}),
+              MdiIcons.whatsapp, 'Whatsapp', TColor.secondary, launchWhatsappWithMobileNumber),
         ],
       ),
     );
@@ -440,7 +510,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
       decoration: BoxDecoration(
         color: TColor.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: TColor.primary.withOpacity(0.1)),
+        // border: Border.all(color: TColor.primary.withOpacity(0.1)),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withOpacity(0.05),

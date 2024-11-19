@@ -11,11 +11,6 @@ class ApiService {
   Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> body) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? ''; // Retrieve the token
-
-    if (token.isEmpty) {
-      throw Exception('Token is missing');
-    }
-
     final url = Uri.parse(baseUrl + endpoint);
 
     try {
