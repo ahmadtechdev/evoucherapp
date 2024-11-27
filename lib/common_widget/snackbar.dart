@@ -1,39 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class CustomSnackBar extends StatelessWidget {
+class CustomSnackBar {
   final String message;
   final Color backgroundColor;
 
-  const CustomSnackBar({
-    super.key,
+  CustomSnackBar({
     required this.message,
     required this.backgroundColor,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return SnackBar(
-      content: Text(message),
+  void show() {
+    Get.snackbar(
+      "Journey Online", // Title can be left empty if not needed
+      message,
       backgroundColor: backgroundColor,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-      ),
+      colorText: Colors.white, // Text color
+      snackPosition: SnackPosition.BOTTOM,
+      borderRadius: 22,
       margin: const EdgeInsets.only(bottom: 12, right: 20, left: 20),
-    );
-  }
-
-  void show(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-        ),
-        margin: const EdgeInsets.only(bottom: 12, right: 20, left: 20),
-      ),
+      duration: const Duration(seconds: 3),
+      isDismissible: true,
+      snackStyle: SnackStyle.FLOATING,
     );
   }
 }

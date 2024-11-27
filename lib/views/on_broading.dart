@@ -19,13 +19,14 @@ class _OnBoardingViewState extends State<OnBoardingView> {
     {
       "title": "Enhance Airline Systems",
       "subtitle": "Revolutionizing airline operations with modern solutions",
-      "animation": "assets/animation/Animation - 1732012232457.json",
+      "animation": "assets/animation/Animation - 1732709233466.json",
       "isLastPage": false
     },
+
     {
       "title": "Streamlined Integration",
       "subtitle": "Seamless integration for websites, mobile apps, and backend systems",
-      "animation": "assets/animation/Animation - 1732012370883.json",
+      "animation": "assets/animation/Animation - 1732711157070.json",
       "isLastPage": false
     },
     {
@@ -87,6 +88,7 @@ class _OnBoardingViewState extends State<OnBoardingView> {
           image: DecorationImage(
             image: AssetImage('assets/img/bg1.png'),
             fit: BoxFit.cover,
+            opacity: 0.9,
           ),
         ),
         child: SafeArea(
@@ -298,12 +300,20 @@ class _OnboardingPage extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 26,
               fontWeight: FontWeight.bold,
               color: TColor.white,
+              shadows: [
+                Shadow(
+                  color: Colors.black.withOpacity(0.5),
+                  offset: Offset(2, 2),
+                  blurRadius: 4,
+                ),
+              ],
             ),
             textAlign: TextAlign.center,
           ),
+
 
           const SizedBox(height: 16),
 
@@ -312,8 +322,17 @@ class _OnboardingPage extends StatelessWidget {
             subtitle,
             style: TextStyle(
               fontSize: 16,
+
               color: TColor.white,
               height: 1.5,
+              fontStyle: FontStyle.italic, // Adds a subtle emphasis
+              shadows: [
+                Shadow(
+                  color: Colors.black.withOpacity(0.3),
+                  offset: Offset(1, 1),
+                  blurRadius: 2,
+                ),
+              ],
             ),
             textAlign: TextAlign.center,
           ),

@@ -20,10 +20,20 @@ class _AccountsState extends ConsumerState<Accounts> {
   final TextEditingController _searchController = TextEditingController();
   List<AccountModel> _filteredAccounts = [];
 
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      _searchAccounts(_searchController.text);
+    });
+  }
+
   void _searchAccounts(String query) {
     final accounts = ref.read(accountsDataProvider).value ?? [];
     setState(() {
-      _filteredAccounts = accounts.where((account) {
+      _filteredAccounts = query.isEmpty
+          ? accounts
+          : accounts.where((account) {
         return account.name.toLowerCase().contains(query.toLowerCase()) ||
             account.contact.contains(query) ||
             account.subHead.toLowerCase().contains(query.toLowerCase());
@@ -46,152 +56,50 @@ class _AccountsState extends ConsumerState<Accounts> {
       drawer: const CustomDrawer(currentIndex: 3),
       body: Column(
         children: [
-          SearchTextField(
-            hintText: 'Search Accounts...',
-            controller: _searchController,
-            onChange: _searchAccounts,
+          // Search TextField
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: SearchTextField(
+              hintText: 'Search Accounts...',
+              controller: _searchController,
+              onChange: (_) {}, // Listener is already added in initState.
+            ),
           ),
           Expanded(
             child: accountsAsyncValue.when(
               data: (accounts) {
-                // Initialize filtered accounts if empty
-                if (_filteredAccounts.isEmpty) {
+                // Initialize filtered accounts if it's empty
+                if (_filteredAccounts.isEmpty && _searchController.text.isEmpty) {
                   _filteredAccounts = accounts;
                 }
 
-                return ListView.builder(
+                return _filteredAccounts.isEmpty
+                    ? Center(
+                  child: Text(
+                    'No accounts found',
+                    style: TextStyle(
+                      color: TColor.secondaryText,
+                      fontSize: 16,
+                    ),
+                  ),
+                )
+                    : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: _filteredAccounts.length,
                   itemBuilder: (context, index) {
                     final account = _filteredAccounts[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: TColor.white,
-                        border: Border.all(
-                          color: TColor.primary.withOpacity(0.2),
-                          width: 1.0,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  account.name,
-                                  style: TextStyle(
-                                    color: TColor.primaryText,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: TColor.secondary.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    "ID: ${account.id}",
-                                    style: TextStyle(
-                                      color: TColor.secondary,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              account.contact,
-                              style: TextStyle(
-                                color: TColor.third,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Sub Head: ',
-                                  style: TextStyle(
-                                    color: TColor.secondaryText,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                Text(
-                                  account.subHead,
-                                  style: TextStyle(
-                                    color: TColor.primaryText,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                ElevatedButton.icon(
-                                  onPressed: () {
-                                    Get.to(() => LedgerScreen(
-                                      accountId: account.id,
-                                      accountName: account.name,
-                                    ));
-                                  },
-                                  icon: const Icon(Icons.visibility, size: 18),
-                                  label: const Text('View'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: TColor.primary,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                ElevatedButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.book, size: 18),
-                                  label: const Text('Ledger'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: TColor.secondary,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Added by: ${account.addedBy}',
-                              style: TextStyle(
-                                color: TColor.secondaryText,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                    return _buildAccountCard(context, account);
                   },
                 );
               },
               error: (error, stack) => Center(
-                child: Text('Error: ${error.toString()}'),
+                child: Text(
+                  'Error: ${error.toString()}',
+                  style: TextStyle(
+                    color: TColor.secondaryText,
+                    fontSize: 16,
+                  ),
+                ),
               ),
               loading: () => const Center(
                 child: CircularProgressIndicator(),
@@ -199,6 +107,128 @@ class _AccountsState extends ConsumerState<Accounts> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAccountCard(BuildContext context, AccountModel account) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: TColor.white,
+        border: Border.all(
+          color: TColor.primary.withOpacity(0.2),
+          width: 1.0,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Account Name and ID
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  account.name,
+                  style: TextStyle(
+                    color: TColor.primaryText,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: TColor.secondary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    "ID: ${account.id}",
+                    style: TextStyle(
+                      color: TColor.secondary,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Account Contact
+            Text(
+              account.contact,
+              style: TextStyle(
+                color: TColor.third,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Sub Head
+            Row(
+              children: [
+                Text(
+                  'Sub Head: ',
+                  style: TextStyle(
+                    color: TColor.secondaryText,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  account.subHead,
+                  style: TextStyle(
+                    color: TColor.primaryText,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Action Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Get.to(() => LedgerScreen(
+                      accountId: account.id,
+                      accountName: account.name,
+                    ));
+                  },
+                  icon: const Icon(Icons.visibility, size: 18),
+                  label: const Text('View'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: TColor.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // Ledger button logic
+                  },
+                  icon: const Icon(Icons.book, size: 18),
+                  label: const Text('Ledger'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: TColor.secondary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Added By
+            Text(
+              'Added by: ${account.addedBy}',
+              style: TextStyle(
+                color: TColor.secondaryText,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

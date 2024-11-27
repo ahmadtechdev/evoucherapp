@@ -40,31 +40,31 @@ class _SignInState extends State<SignIn> {
           CustomSnackBar(
             message: response['message'],
             backgroundColor: Colors.green,
-          ).show(context);
+          ).show();
           Get.offAll(() => const Home());
         }
       } else {
         CustomSnackBar(
           message: response['message'],
           backgroundColor: Colors.red,
-        ).show(context);
+        ).show();
       }
     } catch (e) {
       if (mounted) {
         CustomSnackBar(
           message: "Error saving user data: ${e.toString()}",
           backgroundColor: Colors.red,
-        ).show(context);
+        ).show();
       }
     }
   }
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) {
-      const CustomSnackBar(
+      CustomSnackBar(
         message: "Please fill in all required fields",
         backgroundColor: Colors.red,
-      ).show(context);
+      ).show();
       return;
     }
 
@@ -88,7 +88,7 @@ class _SignInState extends State<SignIn> {
         CustomSnackBar(
           message: response['message'] ?? "Login failed",
           backgroundColor: Colors.red,
-        ).show(context);
+        ).show();
       }
     } catch (e) {
       if (mounted) {
@@ -97,7 +97,7 @@ class _SignInState extends State<SignIn> {
               ? e.toString().split('Exception: ')[1]
               : 'Connection error. Please try again.',
           backgroundColor: Colors.red,
-        ).show(context);
+        ).show();
       }
     } finally {
       if (mounted) {
