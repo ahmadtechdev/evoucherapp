@@ -43,12 +43,13 @@ class _JournalEntryVoucherState extends State<JournalEntryVoucher> {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 DateSelector(
-                  fontSize: 16,
+                  fontSize: 14,
+                  vpad: 8,
                   initialDate: selectedDate,
                   label: "DATE:",
                   onDateChanged: (newDate) {
@@ -57,10 +58,9 @@ class _JournalEntryVoucherState extends State<JournalEntryVoucher> {
                     });
                   },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 8),
                 // In your build method:
                 ReusableEntryCard(
-
                   showImageUpload: false, // or false if you don't want image upload
                   primaryColor: TColor.primary,
                   textFieldColor: TColor.textfield,
@@ -71,7 +71,7 @@ class _JournalEntryVoucherState extends State<JournalEntryVoucher> {
                     print('Total Debit: $totalDebit, Total Credit: $totalCredit');
                   },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
                Center(
                   child: SizedBox(
                     width: screenWidth/1.5,

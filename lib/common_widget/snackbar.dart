@@ -4,10 +4,12 @@ import 'package:get/get.dart';
 class CustomSnackBar {
   final String message;
   final Color backgroundColor;
+  final Duration duration;
 
   CustomSnackBar({
     required this.message,
     required this.backgroundColor,
+    this.duration = const Duration(seconds: 3),
   });
 
   void show() {

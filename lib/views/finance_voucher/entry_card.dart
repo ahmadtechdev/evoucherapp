@@ -1,5 +1,6 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:evoucher/common/color_extension.dart';
+import 'package:evoucher/common_widget/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -51,11 +52,11 @@ class ReusableEntryCard extends ConsumerStatefulWidget {
   final bool isViewMode; // New property
   final bool showPrintButton; // New property
   final bool showAddRowButton; // New property
-  final List<Map<String, dynamic>>? initialData; // New property
+  final List<Map<String, dynamic>>? initialData;
+  // New property
 
   const ReusableEntryCard({
     super.key,
-
     this.showImageUpload = false,
     this.onTotalChanged,
     this.primaryColor = const Color(0xFF2196F3),
@@ -67,9 +68,9 @@ class ReusableEntryCard extends ConsumerStatefulWidget {
     this.showAddRowButton = false,
     this.initialData,
   });
+
   @override
   ConsumerState<ReusableEntryCard> createState() => _ReusableEntryCardState();
-
 }
 
 class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
@@ -95,8 +96,8 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
   void _addEntry() {
     setState(() {
       entries.add(EntryCardData());
-    });
-  }
+       });
+    }
 
   void _removeEntry(int index) {
     if (index >= 0 && index < entries.length && entries.length > 1) {
@@ -180,39 +181,38 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
 
     return Card(
       key: ValueKey(entry.id),
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 2),
       elevation: 2,
       color: widget.primaryColor.withOpacity(0.5),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Text(
-                    'Entry ${index + 1}',
-                    style: TextStyle(
-                      color: widget.textColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                Text(
+                  'Entry ${index + 1}',
+                  style: TextStyle(
+                    color: widget.textColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
                   ),
                 ),
                 if (index > 0)
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.red),
+                    icon: const Icon(Icons.close, color: Colors.red, size: 18),
                     onPressed: () => _removeEntry(index),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+
+
                   ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 4),
             accountsAsyncValue.when(
               loading: () => const Center(
                 child: CircularProgressIndicator(),
@@ -221,17 +221,18 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                 child: Text('Error loading accounts: $err'),
               ),
               data: (accounts) {
-                final accountNames = accounts.map((account) => account.name).toList();
+                final accountNames =
+                    accounts.map((account) => account.name).toList();
                 return DropdownSearch<String>(
                   enabled: !widget.isViewMode,
                   popupProps: PopupProps.menu(
-
                     showSearchBox: true,
                     searchFieldProps: TextFieldProps(
                       autofocus: true,
                       decoration: InputDecoration(
                         hintText: "Search account...",
-                        prefixIcon: Icon(Icons.search, color: widget.placeholderColor),
+                        prefixIcon:
+                            Icon(Icons.search, color: widget.placeholderColor),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide.none,
@@ -262,17 +263,21 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                         borderSide: BorderSide.none,
                       ),
                       hintText: 'Select an account',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      hintStyle: const TextStyle(
+                        fontSize: 14
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 0),
                     ),
                   ),
                 );
               },
             ),
-
-            const SizedBox(height: 12),
+            const SizedBox(height: 4),
             TextFormField(
               controller: entry.descriptionController,
               readOnly: widget.isViewMode ? true : false,
+              style: const TextStyle(fontSize: 14),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: widget.textFieldColor,
@@ -283,19 +288,20 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                 hintText: 'Description',
                 hintStyle: TextStyle(color: widget.placeholderColor),
                 contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               ),
               onChanged: (value) {
                 entry.description = value;
               },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 4),
             Row(
               children: [
                 Expanded(
                   child: TextFormField(
                     controller: entry.debitController,
                     readOnly: widget.isViewMode ? true : false,
+                    style: const TextStyle(fontSize: 14),
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: entry.hasCreditValue
@@ -311,7 +317,7 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                               ? widget.placeholderColor.withOpacity(0.5)
                               : widget.placeholderColor),
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                          horizontal: 12, vertical: 6),
                     ),
                     enabled: !entry.hasCreditValue,
                     keyboardType: TextInputType.number,
@@ -327,11 +333,12 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                     },
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 4),
                 Expanded(
                   child: TextFormField(
                     controller: entry.creditController,
                     readOnly: widget.isViewMode ? true : false,
+                    style: const TextStyle(fontSize: 14),
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: entry.hasDebitValue
@@ -347,7 +354,7 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                               ? widget.placeholderColor.withOpacity(0.5)
                               : widget.placeholderColor),
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                          horizontal: 12, vertical: 6),
                     ),
                     enabled: !entry.hasDebitValue,
                     keyboardType: TextInputType.number,
@@ -366,12 +373,12 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
               ],
             ),
             if (widget.showImageUpload) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
                     child: Container(
-                      height: 100,
+                      height: 80,
                       decoration: BoxDecoration(
                         color: widget.textFieldColor,
                         borderRadius: BorderRadius.circular(8),
@@ -380,48 +387,48 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                       ),
                       child: entry.imageFile != null
                           ? Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.file(
-                              entry.imageFile!,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Positioned(
-                            right: 4,
-                            top: 4,
-                            child: IconButton(
-                              icon: const Icon(Icons.close,
-                                  color: Colors.red),
-                              onPressed: () {
-                                setState(() {
-                                  entry.imageFile = null;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      )
+                              fit: StackFit.expand,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    entry.imageFile!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Positioned(
+                                  right: 4,
+                                  top: 4,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.close,
+                                        color: Colors.red),
+                                    onPressed: () {
+                                      setState(() {
+                                        entry.imageFile = null;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            )
                           : InkWell(
-                        onTap: () => _pickImage(entry),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.add_photo_alternate,
-                                size: 32, color: widget.primaryColor),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Add Image',
-                              style: TextStyle(
-                                color: widget.primaryColor,
-                                fontWeight: FontWeight.w500,
+                              onTap: () => _pickImage(entry),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.add_photo_alternate,
+                                      size: 32, color: widget.primaryColor),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Add Image',
+                                    style: TextStyle(
+                                      color: widget.primaryColor,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
                 ],
@@ -429,7 +436,7 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
             ],
             if (widget.showPrintButton)
               Padding(
-                padding: const EdgeInsets.only(top: 16),
+                padding: const EdgeInsets.only(top: 8),
                 child: _buildPrintButton(entry),
               ),
           ],
@@ -440,17 +447,26 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
       children: [
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: entries.length,
-          itemBuilder: (context, index) =>
-              _buildEntryCard(entries[index], index),
+
+
+        SingleChildScrollView(
+          child: Container(
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.blueAccent)
+            ),
+            height: MediaQuery.of(context).size.height/1.9,
+            child: ListView.builder(
+              shrinkWrap: true,
+              // physics: const NeverScrollableScrollPhysics(),
+              itemCount: entries.length,
+              itemBuilder: (context, index) =>
+                  _buildEntryCard(entries[index], index),
+            ),
+          ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 4),
         if (widget.showAddRowButton || !widget.isViewMode)
           SizedBox(
             width: MediaQuery.of(context).size.width / 2.5,
@@ -459,9 +475,9 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: TColor.fourth,
                 padding:
-                const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(6),
                 ),
               ),
               child: Row(
@@ -471,9 +487,10 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                     color: TColor.primaryText,
                   ),
                   Text(
-                    'Add Entry',
+                    'Add Row',
                     style: TextStyle(
                       color: TColor.primaryText,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -481,10 +498,10 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
               ),
             ),
           ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 4),
         if (widget.showAddRowButton || !widget.isViewMode)
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: BoxDecoration(
               color: TColor.white,
               borderRadius: BorderRadius.circular(12),
@@ -506,7 +523,7 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -531,8 +548,9 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
                     Text(
                       (totalDebit - totalCredit).toStringAsFixed(2),
                       style: TextStyle(
-                        color:
-                        totalDebit == totalCredit ? Colors.green : Colors.red,
+                        color: totalDebit == totalCredit
+                            ? Colors.green
+                            : Colors.red,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -541,6 +559,7 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
               ],
             ),
           ),
+
       ],
     );
   }

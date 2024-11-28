@@ -12,12 +12,22 @@ class WelcomeScreen extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Padding(
+          padding: const EdgeInsets.only(left: 20),
+          child: Image.asset(
+            'assets/img/newLogo.png',
+            scale: 3,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: Container(
         width: screenWidth,
         height: screenHeight,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/img/bg1.png'),
+        decoration: BoxDecoration(
+          image: const DecorationImage(
+            image: AssetImage('assets/img/bg1.jpg'),
             fit: BoxFit.cover,
           ),
         ),
@@ -29,11 +39,16 @@ class WelcomeScreen extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: Center(
-                  child:Image.asset(
-                    'assets/img/logoX.png',
-                    height: screenHeight / 2,
-                    width: screenWidth/1.7,
-                    fit: BoxFit.contain,
+                  child:Container(
+
+
+
+                    // child: Image.asset(
+                    //   'assets/img/logoX.png',
+                    //   height: screenHeight / 2,
+                    //   width: screenWidth/1.7,
+                    //   fit: BoxFit.contain,
+                    // ),
                   ) ,
                 ),
               ),
@@ -41,7 +56,7 @@ class WelcomeScreen extends StatelessWidget {
               // White container at bottom
               Container(
                 width: double.infinity,
-                height: screenHeight/3.5,
+                height: 240,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -58,7 +73,7 @@ class WelcomeScreen extends StatelessWidget {
                       text:  TextSpan(
                         children: [
                           TextSpan(
-                            text: "Travel ",
+                            text: " Best Travel ",
                             style: TextStyle(
                               color: TColor.primaryText,
                               fontSize: 28,
@@ -81,7 +96,7 @@ class WelcomeScreen extends StatelessWidget {
                             ),
                           ),
                           TextSpan(
-                            text: " Software.",
+                            text: " Software In Pakistan.",
                             style: TextStyle(
                               color: TColor.primaryText,
                               fontSize: 28,
@@ -91,7 +106,7 @@ class WelcomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 30),
                     GestureDetector(
                       onTap: () {
                         Get.to(() => const SignIn());

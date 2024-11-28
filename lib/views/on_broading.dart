@@ -17,29 +17,29 @@ class _OnBoardingViewState extends State<OnBoardingView> {
 
   final List<Map<String, dynamic>> _onboardingData = [
     {
-      "title": "Enhance Airline Systems",
-      "subtitle": "Revolutionizing airline operations with modern solutions",
-      "animation": "assets/animation/Animation - 1732709233466.json",
+      "title": "Accounting Solutions",
+      "subtitle": "Revolutionizing finance with modern applications",
+      "animation": "assets/animation/Animation - 1732770726664.json",
       "isLastPage": false
     },
 
     {
-      "title": "Streamlined Integration",
-      "subtitle": "Seamless integration for websites, mobile apps, and backend systems",
-      "animation": "assets/animation/Animation - 1732711157070.json",
+      "title": "Seamless HR Systems",
+      "subtitle": "Effortless integration for HR and accounting software",
+      "animation": "assets/animation/Animation - 1732709233466.json",
       "isLastPage": false
     },
     {
-      "title": "Real-time Updates",
-      "subtitle": "Empowering airlines with cutting-edge tracking and communication tools",
+      "title": "Online Innovations",
+      "subtitle": "Empowering businesses with cutting-edge digital solutions",
       "animation": "assets/animation/Animation - 1732012339792.json",
       "isLastPage": false
     },
     {
       "isLastPage": true
     }
-
   ];
+
 
   @override
   void initState() {
@@ -289,8 +289,10 @@ class _OnboardingPage extends StatelessWidget {
             flex: 3,
             child: Lottie.asset(
               animationPath,
+
               fit: BoxFit.contain,
               alignment: Alignment.center,
+
             ),
           ),
 

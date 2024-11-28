@@ -1,6 +1,8 @@
+import 'package:evoucher/views/home/report_grid_section.dart';
 import 'package:flutter/material.dart';
 import '../../common_widget/bottom_navigation.dart';
 import '../../common_widget/drawer.dart';
+import 'TopReportSection.dart';
 import 'home_sales_dashboard.dart';
 
 import 'search_portion.dart'; // Import your existing textfields
@@ -40,9 +42,13 @@ class _HomeState extends State<Home> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SalesDashboardWidget(),
+              ReportSection(),
               SizedBox(height: 20),
-              SearchWidget(), // New section below the dashboard
+              SalesDashboardWidget(),
+              // SizedBox(height: 20),
+              // SearchWidget(), // New section below the dashboard
+              SizedBox(height: 20),
+              ReportsGridSection(),
             ],
           ),
         ),

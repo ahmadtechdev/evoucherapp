@@ -9,6 +9,7 @@ class DateSelector extends StatelessWidget {
   final DateTime initialDate;
   final ValueChanged<DateTime> onDateChanged;
   final String label;
+  final double vpad;
 
   DateSelector({
     super.key,
@@ -16,6 +17,7 @@ class DateSelector extends StatelessWidget {
     required this.initialDate,
     required this.onDateChanged,
     this.label = "SALES ON:",
+    this.vpad = 12,
   });
 
   final Rx<DateTime> selectedDate = DateTime.now().obs; // Observable for managing state
@@ -60,7 +62,7 @@ class DateSelector extends StatelessWidget {
 
     return Obx(
           () => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: vpad),
         decoration: BoxDecoration(
           color: TColor.primary.withOpacity(0.05),
           borderRadius: BorderRadius.circular(12),

@@ -1,3 +1,4 @@
+import 'package:evoucher/views/authentication/signup.dart';
 import 'package:evoucher/views/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -191,19 +192,20 @@ class _SignInState extends State<SignIn> {
                             ),
                             const SizedBox(height: 8),
                              Text(
-                              "Discover the World with Every Sign In",
+                              "Sign In to your Account",
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: TColor.secondaryText,
                                 fontSize: 16,
                               ),
                             ),
-                            const SizedBox(height: 40),
+                            const SizedBox(height: 20),
 
                             RoundTextfield(
                               hintText: "User name",
                               controller: txtUser,
                             ),
-                            const SizedBox(height: 25),
+                            const SizedBox(height: 20),
                             RoundTextfield(
                               hintText: "Password",
                               controller: txtPassword,
@@ -221,7 +223,7 @@ class _SignInState extends State<SignIn> {
                                 },
                               ),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 8),
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
@@ -236,7 +238,7 @@ class _SignInState extends State<SignIn> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 8),
 
                             SizedBox(
                               width: double.maxFinite,
@@ -252,7 +254,33 @@ class _SignInState extends State<SignIn> {
                                 onPressed: _handleLogin,
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () {
+                                Get.to(() => const SignUpView());
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Don't have an Account? ",
+                                    style: TextStyle(
+                                      color: TColor.secondaryText,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Sign Up",
+                                    style: TextStyle(
+                                      color: TColor.secondary,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
