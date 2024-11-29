@@ -2,7 +2,7 @@ import 'package:evoucher/views/authentication/signin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
+import 'dart:math' as math;
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/round_textfield.dart';
@@ -26,127 +26,169 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController txtConfirmPassword = TextEditingController();
 
   final ApiService _apiService = ApiService();
+  final _formKey = GlobalKey<FormState>();
+
+  bool isLoading = false;
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-
-      body: Container(
-        height: screenHeight,
-        width: screenWidth,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/img/bg2.jpg"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 25),
-            child: Column(
-              children: [
-                const SizedBox(height: 64),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-
-                      Text(
-                        "Sign Up",
-                        style: TextStyle(
-                            color: TColor.primaryText,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w800),
-                      ),
-                      Text(
-                        "Add your details to Register",
-                        style: TextStyle(
-                            color: TColor.secondaryText,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(height: 16),
-                      RoundTextfield(
-                        hintText: "Full Name",
-                        controller: txtName,
-                      ),
-                      const SizedBox(height: 16),
-                      RoundTextfield(
-                        hintText: "Valid Email",
-                        controller: txtEmail,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      const SizedBox(height: 16),
-                      RoundTextfield(
-                        hintText: "Contact No",
-                        controller: txtMobile,
-                        keyboardType: TextInputType.phone,
-                      ),
-                      const SizedBox(height: 16),
-                      RoundTextfield(
-                        hintText: "Company Name",
-                        controller: txtName,
-                      ),
-                      const SizedBox(height: 16),
-                      RoundTextfield(
-                        hintText: "Company Address",
-                        controller: txtAddress,
-                      ),
-                      const SizedBox(height: 16),
-                      RoundTextfield(
-                        hintText: "City Name",
-                        controller: txtAddress,
-                      ),
-                      const SizedBox(height: 16),
-                      RoundTextfield(
-                        hintText: "Select Demo",
-                        controller: txtAddress,
-                      ),
-                      const SizedBox(height: 16),
-                      RoundButton(
-                          title: "Sign Up",
-                          onPressed: () {
-                            // btnSignUp();
-                          }),
-                      const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () {
-                          Get.to(() => const SignIn());
-                        },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Already have an Account? ",
-                              style: TextStyle(
-                                  color: TColor.primaryText,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                            Text(
-                              "Login",
-                              style: TextStyle(
-                                  color: TColor.secondary,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      body: Stack(
+        children: [
+          // Background gradient
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF1976D2),
+                  Color(0xFF2196F3),
+                ],
+              ),
             ),
           ),
-        ),
+
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Transform.rotate(
+              angle: 3.14159, // Equivalent to 180 degrees in radians
+              child: CustomPaint(
+                size: Size(screenWidth, 100),
+                painter: WavesPainter(),
+              ),
+            ),
+          ),
+
+
+
+          // Main Content - Centered
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Form(
+                  key: _formKey,
+                  child:
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    width: screenWidth * 0.9,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+
+                        Text(
+                          "Sign Up",
+                          style: TextStyle(
+                              color: TColor.primaryText,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w800),
+                        ),
+                        Text(
+                          "Add your details to Register",
+                          style: TextStyle(
+                              color: TColor.secondaryText,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 16),
+                        RoundTextfield(
+                          hintText: "Full Name",
+                          controller: txtName,
+                        ),
+                        const SizedBox(height: 16),
+                        RoundTextfield(
+                          hintText: "Valid Email",
+                          controller: txtEmail,
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 16),
+                        RoundTextfield(
+                          hintText: "Contact No",
+                          controller: txtMobile,
+                          keyboardType: TextInputType.phone,
+                        ),
+                        const SizedBox(height: 16),
+                        RoundTextfield(
+                          hintText: "Company Name",
+                          controller: txtName,
+                        ),
+                        const SizedBox(height: 16),
+                        RoundTextfield(
+                          hintText: "Company Address",
+                          controller: txtAddress,
+                        ),
+                        const SizedBox(height: 16),
+                        RoundTextfield(
+                          hintText: "City Name",
+                          controller: txtAddress,
+                        ),
+                        const SizedBox(height: 16),
+                        RoundTextfield(
+                          hintText: "Select Demo",
+                          controller: txtAddress,
+                        ),
+                        const SizedBox(height: 16),
+                        RoundButton(
+                            title: "Sign Up",
+                            onPressed: () {
+                              // btnSignUp();
+                            }),
+                        const SizedBox(height: 16),
+                        TextButton(
+                          onPressed: () {
+                            Get.to(() => const SignIn());
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "Already have an Account? ",
+                                style: TextStyle(
+                                    color: TColor.primaryText,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                "Login",
+                                style: TextStyle(
+                                    color: TColor.secondary,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                  ,
+                ),
+              ),
+            ),
+          ),
+
+          // Waves at the bottom
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: CustomPaint(
+              size: Size(screenWidth, 100),
+              painter: WavesPainter(),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -200,3 +242,51 @@ class _SignUpViewState extends State<SignUpView> {
   //   }
   // }
 }
+
+
+class WavesPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.15)
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.moveTo(0, size.height * 0.5);
+
+    // Create smooth wave pattern
+    for (double i = 0; i <= size.width; i++) {
+      path.lineTo(
+        i,
+        size.height * 0.5 + math.sin(i * 0.02) * 20 + math.cos(i * 0.015) * 15,
+      );
+    }
+
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    canvas.drawPath(path, paint);
+
+    // Second wave with different opacity
+    final paint2 = Paint()
+      ..color = Colors.white.withOpacity(0.1)
+      ..style = PaintingStyle.fill;
+
+    final path2 = Path();
+    path2.moveTo(0, size.height * 0.6);
+
+    for (double i = 0; i <= size.width; i++) {
+      path2.lineTo(
+        i,
+        size.height * 0.6 + math.cos(i * 0.02) * 15 + math.sin(i * 0.015) * 10,
+      );
+    }
+
+    path2.lineTo(size.width, size.height);
+    path2.lineTo(0, size.height);
+    canvas.drawPath(path2, paint2);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+

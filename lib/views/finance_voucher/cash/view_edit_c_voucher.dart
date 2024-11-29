@@ -5,6 +5,8 @@ import '../../../common_widget/date_selecter.dart';
 import '../entry_card.dart';
 import 'package:intl/intl.dart';
 
+import '../entry_controller.dart';
+
 class CashVoucherDetail extends StatefulWidget {
   final Map<String, dynamic> voucherData;
 
@@ -23,6 +25,7 @@ class _CashVoucherDetailState extends State<CashVoucherDetail> {
   final FocusNode _mainFocusNode = FocusNode();
   double totalDebit = 0.0;
   double totalCredit = 0.0;
+  late final VoucherController voucherController;
   List<Map<String, dynamic>> entries = [];
 
   @override
@@ -66,6 +69,21 @@ class _CashVoucherDetailState extends State<CashVoucherDetail> {
         'credit': 0.0,
       }];
     }
+
+    // Use Get.find instead of Get.put to ensure the controller is already registered
+    voucherController = Get.find<VoucherController>();
+
+    // Clear any existing entries when the page is first loaded
+    voucherController.clearEntries();
+    for (var entryData in entries) {
+      voucherController.addEntry(EntryModel(
+        account: entryData['account'],
+        description: entryData['description'],
+        debit: entryData['debit'],
+        credit: entryData['credit'],
+      ));
+    }
+
   }
 
   double _parseAmount(dynamic amount) {
@@ -220,15 +238,10 @@ class _CashVoucherDetailState extends State<CashVoucherDetail> {
                     textFieldColor: TColor.textfield,
                     textColor: TColor.white,
                     placeholderColor: TColor.placeholder,
-                    // isViewMode: !isEditMode,
-                    onTotalChanged: (debit, credit) {
-                      setState(() {
-                        totalDebit = debit;
-                        totalCredit = credit;
-                      });
-                    },
-                    // showPrintButton: !isEditMode,
-                    // initialData: entries,
+                    isViewMode: !isEditMode,
+
+                    showPrintButton: !isEditMode,
+                    initialData: entries,
                   ),
                   const SizedBox(height: 24),
                   if (isEditMode)

@@ -1,49 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 
 import '../../../common/color_extension.dart';
 import '../../../common_widget/drawer.dart';
 import '../../../common_widget/round_textfield.dart';
 import 'accounts_modal_class.dart';
-import 'accounts_provider.dart';
+import 'account_controller.dart';
 import '../accounts_ledger/view_accounts_ledger.dart';
 
-class Accounts extends ConsumerStatefulWidget {
+class Accounts extends StatelessWidget {
   const Accounts({super.key});
 
   @override
-  ConsumerState<Accounts> createState() => _AccountsState();
-}
-
-class _AccountsState extends ConsumerState<Accounts> {
-  final TextEditingController _searchController = TextEditingController();
-  List<AccountModel> _filteredAccounts = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _searchController.addListener(() {
-      _searchAccounts(_searchController.text);
-    });
-  }
-
-  void _searchAccounts(String query) {
-    final accounts = ref.read(accountsDataProvider).value ?? [];
-    setState(() {
-      _filteredAccounts = query.isEmpty
-          ? accounts
-          : accounts.where((account) {
-        return account.name.toLowerCase().contains(query.toLowerCase()) ||
-            account.contact.contains(query) ||
-            account.subHead.toLowerCase().contains(query.toLowerCase());
-      }).toList();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final accountsAsyncValue = ref.watch(accountsDataProvider);
+    // Initialize the AccountsController
+    final AccountsController accountsController = Get.put(AccountsController());
 
     return Scaffold(
       backgroundColor: TColor.white,
@@ -61,20 +32,26 @@ class _AccountsState extends ConsumerState<Accounts> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: SearchTextField(
               hintText: 'Search Accounts...',
-              controller: _searchController,
-              onChange: (_) {}, // Listener is already added in initState.
+              controller: TextEditingController(),
+              onChange: (query) {
+                accountsController.searchAccounts(query);
+              },
             ),
           ),
-          Expanded(
-            child: accountsAsyncValue.when(
-              data: (accounts) {
-                // Initialize filtered accounts if it's empty
-                if (_filteredAccounts.isEmpty && _searchController.text.isEmpty) {
-                  _filteredAccounts = accounts;
-                }
+          Obx(() {
+            // Show loading indicator while fetching accounts
+            if (accountsController.isLoading.value) {
+              return const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
 
-                return _filteredAccounts.isEmpty
-                    ? Center(
+            // Check if filtered accounts is empty
+            if (accountsController.filteredAccounts.isEmpty) {
+              return Expanded(
+                child: Center(
                   child: Text(
                     'No accounts found',
                     style: TextStyle(
@@ -82,30 +59,22 @@ class _AccountsState extends ConsumerState<Accounts> {
                       fontSize: 16,
                     ),
                   ),
-                )
-                    : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: _filteredAccounts.length,
-                  itemBuilder: (context, index) {
-                    final account = _filteredAccounts[index];
-                    return _buildAccountCard(context, account);
-                  },
-                );
-              },
-              error: (error, stack) => Center(
-                child: Text(
-                  'Error: ${error.toString()}',
-                  style: TextStyle(
-                    color: TColor.secondaryText,
-                    fontSize: 16,
-                  ),
                 ),
+              );
+            }
+
+            // Display the list of accounts
+            return Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: accountsController.filteredAccounts.length,
+                itemBuilder: (context, index) {
+                  final account = accountsController.filteredAccounts[index];
+                  return _buildAccountCard(context, account);
+                },
               ),
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );
@@ -231,11 +200,5 @@ class _AccountsState extends ConsumerState<Accounts> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
   }
 }

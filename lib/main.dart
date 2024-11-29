@@ -23,8 +23,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Initialize the controller
-    Get.put(VoucherController());
-    Get.put(AccountsController());
+    Get.lazyPut(() => VoucherController());
+    Get.lazyPut(() => AccountsController());
 
     return GetMaterialApp(
       title: 'Flutter Demo',

@@ -5,6 +5,8 @@ import '../../../common_widget/date_selecter.dart';
 import '../entry_card.dart';
 import 'package:intl/intl.dart';
 
+import '../entry_controller.dart';
+
 class JournalVoucherDetail extends StatefulWidget {
   final Map<String, dynamic> voucherData;
 
@@ -23,6 +25,7 @@ class _JournalVoucherDetailState extends State<JournalVoucherDetail> {
   final FocusNode _mainFocusNode = FocusNode();
   double totalDebit = 0.0;
   double totalCredit = 0.0;
+  late final VoucherController voucherController;
   List<Map<String, dynamic>> entries = [];
 
 
@@ -67,6 +70,12 @@ class _JournalVoucherDetailState extends State<JournalVoucherDetail> {
         'credit': 0.0,
       }];
     }
+
+    // Use Get.find instead of Get.put to ensure the controller is already registered
+    voucherController = Get.find<VoucherController>();
+
+    // Clear any existing entries when the page is first loaded
+    voucherController.clearEntries();
   }
 
   double _parseAmount(dynamic amount) {
@@ -221,15 +230,10 @@ class _JournalVoucherDetailState extends State<JournalVoucherDetail> {
                     textFieldColor: TColor.textfield,
                     textColor: TColor.white,
                     placeholderColor: TColor.placeholder,
-                    // isViewMode: !isEditMode,
-                    onTotalChanged: (debit, credit) {
-                      setState(() {
-                        totalDebit = debit;
-                        totalCredit = credit;
-                      });
-                    },
-                    // showPrintButton: !isEditMode,
-                    // initialData: entries,
+                    isViewMode: !isEditMode,
+
+                    showPrintButton: !isEditMode,
+                    initialData: entries,
                   ),
                   const SizedBox(height: 24),
                   if (isEditMode)
