@@ -221,15 +221,15 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
                     textFieldColor: TColor.textfield,
                     textColor: TColor.white,
                     placeholderColor: TColor.placeholder,
-                    isViewMode: !isEditMode,
+                    // isViewMode: !isEditMode,
                     onTotalChanged: (debit, credit) {
                       setState(() {
                         totalDebit = debit;
                         totalCredit = credit;
                       });
                     },
-                    showPrintButton: !isEditMode,
-                    initialData: entries,
+                    // showPrintButton: !isEditMode,
+                    // initialData: entries,
                   ),
                   const SizedBox(height: 24),
                   if (isEditMode)

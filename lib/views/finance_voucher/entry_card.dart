@@ -1,12 +1,12 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:evoucher/common/color_extension.dart';
-import 'package:evoucher/common_widget/snackbar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-import '../accounts/accounts/accounts_provider.dart';
+import '../accounts/accounts/account_controller.dart';
+import 'entry_controller.dart';
 
 class EntryCardData {
   String account;
@@ -37,23 +37,20 @@ class EntryCardData {
   }
 
   bool get hasDebitValue => debit > 0 || debitController.text.isNotEmpty;
-
   bool get hasCreditValue => credit > 0 || creditController.text.isNotEmpty;
 }
 
-class ReusableEntryCard extends ConsumerStatefulWidget {
+class ReusableEntryCard extends StatefulWidget {
   final bool showImageUpload;
-
   final Function(double, double)? onTotalChanged;
   final Color primaryColor;
   final Color textFieldColor;
   final Color textColor;
   final Color placeholderColor;
-  final bool isViewMode; // New property
-  final bool showPrintButton; // New property
-  final bool showAddRowButton; // New property
+  final bool isViewMode;
+  final bool showPrintButton;
+  final bool showAddRowButton;
   final List<Map<String, dynamic>>? initialData;
-  // New property
 
   const ReusableEntryCard({
     super.key,
@@ -70,19 +67,41 @@ class ReusableEntryCard extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ReusableEntryCard> createState() => _ReusableEntryCardState();
+  State<ReusableEntryCard> createState() => _ReusableEntryCardState();
 }
 
-class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
+class _ReusableEntryCardState extends State<ReusableEntryCard> {
+  late final AccountsController accountsController;
+  late final VoucherController voucherController;
   List<EntryCardData> entries = [];
   double totalDebit = 0.0;
   double totalCredit = 0.0;
 
   @override
+  @override
   void initState() {
     super.initState();
-    // Start with one entry
-    _addEntry();
+    accountsController = Get.find<AccountsController>();
+    voucherController = Get.find<VoucherController>();
+
+    if (voucherController.entries.isNotEmpty) {
+      // If controller has existing entries, load them
+      for (var controllerEntry in voucherController.entries) {
+        var entryData = EntryCardData(
+          account: controllerEntry.account,
+          description: controllerEntry.description,
+          debit: controllerEntry.debit,
+          credit: controllerEntry.credit,
+        );
+        entryData.descriptionController.text = controllerEntry.description;
+        entryData.debitController.text = controllerEntry.debit.toString();
+        entryData.creditController.text = controllerEntry.credit.toString();
+        entries.add(entryData);
+      }
+    } else {
+      _addEntry(); // Add initial empty entry if no existing data
+    }
+    _calculateTotals();
   }
 
   @override
@@ -95,21 +114,28 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
 
   void _addEntry() {
     setState(() {
-      entries.add(EntryCardData());
-       });
-    }
+      var entryData = EntryCardData();
+      entries.add(entryData);
+      voucherController.addEntry(EntryModel(
+        account: entryData.account,
+        description: entryData.description,
+        debit: entryData.debit,
+        credit: entryData.credit,
+      ));
+    });
+  }
 
   void _removeEntry(int index) {
     if (index >= 0 && index < entries.length && entries.length > 1) {
       setState(() {
         final removedEntry = entries[index];
         entries.removeAt(index);
+        voucherController.removeEntry(index);
         removedEntry.dispose();
         _calculateTotals();
       });
     }
   }
-
   void _calculateTotals() {
     double newTotalDebit = 0.0;
     double newTotalCredit = 0.0;
@@ -177,9 +203,7 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
   }
 
   Widget _buildEntryCard(EntryCardData entry, int index) {
-    final accountsAsyncValue = ref.watch(accountsDataProvider);
-
-    return Card(
+      return Card(
       key: ValueKey(entry.id),
       margin: const EdgeInsets.symmetric(vertical: 2),
       elevation: 2,
@@ -213,66 +237,67 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
               ],
             ),
             const SizedBox(height: 4),
-            accountsAsyncValue.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
-              error: (err, stack) => Center(
-                child: Text('Error loading accounts: $err'),
-              ),
-              data: (accounts) {
-                final accountNames =
-                    accounts.map((account) => account.name).toList();
-                return DropdownSearch<String>(
-                  enabled: !widget.isViewMode,
-                  popupProps: PopupProps.menu(
-                    showSearchBox: true,
-                    searchFieldProps: TextFieldProps(
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        hintText: "Search account...",
-                        prefixIcon:
-                            Icon(Icons.search, color: widget.placeholderColor),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: widget.textFieldColor,
-                      ),
-                    ),
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height / 1.5,
-                    ),
-                    showSelectedItems: true,
-                    searchDelay: const Duration(milliseconds: 300),
-                  ),
-                  items: accountNames,
-                  selectedItem: entry.account.isEmpty ? null : entry.account,
-                  onChanged: (value) {
-                    setState(() {
-                      entry.account = value ?? '';
-                    });
-                  },
-                  dropdownDecoratorProps: DropDownDecoratorProps(
-                    dropdownSearchDecoration: InputDecoration(
-                      filled: true,
-                      fillColor: widget.textFieldColor,
+            Obx(() {
+              final accountsList = accountsController.accounts;
+              final accountNames = accountsList.map((account) => account.name).toList();
+
+              return DropdownSearch<String>(
+                enabled: !widget.isViewMode,
+                popupProps: PopupProps.menu(
+                  showSearchBox: true,
+                  searchFieldProps: TextFieldProps(
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: "Search account...",
+                      prefixIcon:
+                      Icon(Icons.search, color: widget.placeholderColor),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide.none,
                       ),
-                      hintText: 'Select an account',
-                      hintStyle: const TextStyle(
-                        fontSize: 14
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 0),
+                      filled: true,
+                      fillColor: widget.textFieldColor,
                     ),
                   ),
-                );
-              },
-            ),
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height / 1.5,
+                  ),
+                  showSelectedItems: true,
+                  searchDelay: const Duration(milliseconds: 300),
+                ),
+                items: accountNames,
+                selectedItem: entry.account.isEmpty ? null : entry.account,
+                onChanged: (value) {
+                  setState(() {
+                    entry.account = value ?? '';
+                    voucherController.updateEntryData(
+                      index,
+                      entry.account,
+                      entry.description,
+                      entry.debit,
+                      entry.credit,
+                    );
+                  });
+                },
+                dropdownDecoratorProps: DropDownDecoratorProps(
+                  dropdownSearchDecoration: InputDecoration(
+                    filled: true,
+                    fillColor: widget.textFieldColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    hintText: 'Select an account',
+                    hintStyle: const TextStyle(
+                        fontSize: 14
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 0),
+                  ),
+                ),
+              );
+            }),
+
             const SizedBox(height: 4),
             TextFormField(
               controller: entry.descriptionController,
@@ -292,148 +317,142 @@ class _ReusableEntryCardState extends ConsumerState<ReusableEntryCard> {
               ),
               onChanged: (value) {
                 entry.description = value;
+                voucherController.updateEntryData(
+                  index,
+                  entry.account,
+                  value,
+                  entry.debit,
+                  entry.credit,
+                );
               },
             ),
             const SizedBox(height: 4),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: entry.debitController,
-                    readOnly: widget.isViewMode ? true : false,
-                    style: const TextStyle(fontSize: 14),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: entry.hasCreditValue
-                          ? widget.textFieldColor.withOpacity(0.5)
-                          : widget.textFieldColor,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      hintText: 'Debit',
-                      hintStyle: TextStyle(
-                          color: entry.hasCreditValue
-                              ? widget.placeholderColor.withOpacity(0.5)
-                              : widget.placeholderColor),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: entry.debitController,
+                  readOnly: widget.isViewMode,
+                  style: const TextStyle(fontSize: 14),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: entry.hasCreditValue
+                        ? widget.textFieldColor.withOpacity(0.5)
+                        : widget.textFieldColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
                     ),
-                    enabled: !entry.hasCreditValue,
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      setState(() {
-                        if (value.isEmpty) {
-                          entry.debit = 0.0;
-                        } else {
-                          entry.debit = double.tryParse(value) ?? 0.0;
-                        }
-                        _calculateTotals();
-                      });
-                    },
+                    hintText: 'Debit',
+                    hintStyle: TextStyle(
+                        color: entry.hasCreditValue
+                            ? widget.placeholderColor.withOpacity(0.5)
+                            : widget.placeholderColor),
+                    contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   ),
+                  enabled: !entry.hasCreditValue,
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    setState(() {
+                      entry.debit = value.isEmpty ? 0.0 : double.tryParse(value) ?? 0.0;
+                      voucherController.updateEntryData(
+                        index,
+                        entry.account,
+                        entry.description,
+                        entry.debit,
+                        entry.credit,
+                      );
+                      _calculateTotals();
+                    });
+                  },
                 ),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: TextFormField(
-                    controller: entry.creditController,
-                    readOnly: widget.isViewMode ? true : false,
-                    style: const TextStyle(fontSize: 14),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: entry.hasDebitValue
-                          ? widget.textFieldColor.withOpacity(0.5)
-                          : widget.textFieldColor,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      hintText: 'Credit',
-                      hintStyle: TextStyle(
-                          color: entry.hasDebitValue
-                              ? widget.placeholderColor.withOpacity(0.5)
-                              : widget.placeholderColor),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                    ),
-                    enabled: !entry.hasDebitValue,
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      setState(() {
-                        if (value.isEmpty) {
-                          entry.credit = 0.0;
-                        } else {
-                          entry.credit = double.tryParse(value) ?? 0.0;
-                        }
-                        _calculateTotals();
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-            if (widget.showImageUpload) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: widget.textFieldColor,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                            color: widget.primaryColor.withOpacity(0.2)),
-                      ),
-                      child: entry.imageFile != null
-                          ? Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.file(
-                                    entry.imageFile!,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                Positioned(
-                                  right: 4,
-                                  top: 4,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.close,
-                                        color: Colors.red),
-                                    onPressed: () {
-                                      setState(() {
-                                        entry.imageFile = null;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
-                            )
-                          : InkWell(
-                              onTap: () => _pickImage(entry),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.add_photo_alternate,
-                                      size: 32, color: widget.primaryColor),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Add Image',
-                                    style: TextStyle(
-                                      color: widget.primaryColor,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                    ),
-                  ),
-                ],
               ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: TextFormField(
+                  controller: entry.creditController,
+                  readOnly: widget.isViewMode,
+                  style: const TextStyle(fontSize: 14),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: entry.hasDebitValue
+                        ? widget.textFieldColor.withOpacity(0.5)
+                        : widget.textFieldColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    hintText: 'Credit',
+                    hintStyle: TextStyle(
+                        color: entry.hasDebitValue
+                            ? widget.placeholderColor.withOpacity(0.5)
+                            : widget.placeholderColor),
+                    contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  ),
+                  enabled: !entry.hasDebitValue,
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {
+                    setState(() {
+                      entry.credit = value.isEmpty ? 0.0 : double.tryParse(value) ?? 0.0;
+                      voucherController.updateEntryData(
+                        index,
+                        entry.account,
+                        entry.description,
+                        entry.debit,
+                        entry.credit,
+                      );
+                      _calculateTotals();
+                    });
+                  },
+                ),
+              ),
+              if (widget.showImageUpload) ...[
+                const SizedBox(width: 4),
+                InkWell(
+                  onTap: () => _pickImage(entry),
+                  child: Container(
+                    height: 52, // Matches the text field height
+                    width: 52, // Optional, creates a square button
+                    decoration: BoxDecoration(
+                      color: widget.textFieldColor,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: widget.primaryColor.withOpacity(0.2)),
+                    ),
+                    child: entry.imageFile != null
+                        ? Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            entry.imageFile!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ),
+                        Positioned(
+                          right: 4,
+                          top: 4,
+                          child: IconButton(
+                            icon: const Icon(Icons.close, color: Colors.red, size: 16),
+                            onPressed: () {
+                              setState(() {
+                                entry.imageFile = null;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    )
+                        : Icon(Icons.add_photo_alternate, color: widget.primaryColor),
+                  ),
+                ),
+              ]
+
             ],
+          ),
             if (widget.showPrintButton)
               Padding(
                 padding: const EdgeInsets.only(top: 8),

@@ -32,8 +32,8 @@ class _ViewUnPostedVouchersState extends State<ViewUnPostedVouchers> {
 
               showImageUpload: false, // or false if you don't want image upload
               primaryColor: TColor.primary,
-              isViewMode: true,
-              showAddRowButton: false,
+              // isViewMode: true,
+              // showAddRowButton: false,
               textFieldColor: TColor.textfield,
               textColor: TColor.white,
               placeholderColor: TColor.placeholder,
