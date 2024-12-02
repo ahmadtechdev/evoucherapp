@@ -3,24 +3,34 @@ import 'package:intl/intl.dart';
 
 import '../../../service/api_service.dart';
 import 'ledger_modal.dart';
-import '../accounts/account_controller.dart'; // Import the account controller
 
 class LedgerController extends GetxController {
-  final ApiService apiService;
 
-  LedgerController({required this.apiService});
+  final String accountId;
+  final String accountName;
 
-  Rx<DateTime> fromDate = DateTime.now().subtract(const Duration(days: 90)).obs;
-  Rx<DateTime> toDate = DateTime.now().obs;
+  LedgerController({
+    required this.accountId,
+    required this.accountName
+  });
 
+  // Observable variables
+  final Rx<DateTime> fromDate = DateTime.now().subtract(const Duration(days: 90)).obs;
+  final Rx<DateTime> toDate = DateTime.now().obs;
   final RxList<LedgerVoucher> vouchers = <LedgerVoucher>[].obs;
   final RxList<LedgerVoucher> filteredVouchers = <LedgerVoucher>[].obs;
   final Rx<LedgerMasterData?> masterData = Rx<LedgerMasterData?>(null);
+  final ApiService apiService = ApiService();
 
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
 
-  Future<void> fetchLedgerData(String accountId) async {
+  @override
+  void onInit() {
+    super.onInit();
+    fetchLedgerData();
+  }
+  Future<void> fetchLedgerData() async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
@@ -55,6 +65,7 @@ class LedgerController extends GetxController {
   void updateDateRange(DateTime from, DateTime to) {
     fromDate.value = from;
     toDate.value = to;
+    fetchLedgerData();
   }
 
   void searchTransactions(String query) {

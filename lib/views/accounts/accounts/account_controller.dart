@@ -64,7 +64,6 @@ class AccountsController extends GetxController {
     } else {
       filteredAccounts.value = accounts.where((account) {
         return account.name.toLowerCase().contains(query.toLowerCase()) ||
-            account.contact.contains(query) ||
             account.subHead.toLowerCase().contains(query.toLowerCase());
       }).toList();
     }

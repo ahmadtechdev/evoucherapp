@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../common/color_extension.dart';
-import '../../../common_widget/drawer.dart';
+import '../../../common/drawer.dart';
 import '../../../common_widget/round_textfield.dart';
 import 'accounts_modal_class.dart';
 import 'account_controller.dart';
@@ -14,7 +14,9 @@ class Accounts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Initialize the AccountsController
-    final AccountsController accountsController = Get.put(AccountsController());
+    final AccountsController accountsController = Get.find<AccountsController>();
+    // final AccountsController accountsController = Get.put(AccountsController());
+    // accountsController = Get.find<AccountsController>();
 
     return Scaffold(
       backgroundColor: TColor.white,
@@ -24,7 +26,7 @@ class Accounts extends StatelessWidget {
         foregroundColor: TColor.white,
         title: const Text('Accounts'),
       ),
-      drawer: const CustomDrawer(currentIndex: 3),
+      drawer: const CustomDrawer(currentIndex: 1),
       body: Column(
         children: [
           // Search TextField
@@ -92,48 +94,50 @@ class Accounts extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Account Name and ID
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  account.name,
-                  style: TextStyle(
-                    color: TColor.primaryText,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: TColor.secondary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    "ID: ${account.id}",
-                    style: TextStyle(
-                      color: TColor.secondary,
-                      fontSize: 14,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width/1.8,
+                    child: Text(
+                      account.name,
+                      style: TextStyle(
+                        color: TColor.primaryText,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2, // Allows the text to go to a second line
+                      overflow: TextOverflow.visible, // Ensures overflow content is displayed
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // Account Contact
-            Text(
-              account.contact,
-              style: TextStyle(
-                color: TColor.third,
-                fontSize: 16,
+
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: TColor.secondary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      "ID: ${account.id}",
+                      style: TextStyle(
+                        color: TColor.secondary,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 8),
+            // Account Contact
+
             // Sub Head
             Row(
               children: [
@@ -156,26 +160,21 @@ class Accounts extends StatelessWidget {
             const SizedBox(height: 8),
             // Action Buttons
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Text(
+                  'Added by: ${account.addedBy}',
+                  style: TextStyle(
+                    color: TColor.secondaryText,
+                    fontSize: 14,
+                  ),
+                ),
                 ElevatedButton.icon(
                   onPressed: () {
                     Get.to(() => LedgerScreen(
                       accountId: account.id,
                       accountName: account.name,
                     ));
-                  },
-                  icon: const Icon(Icons.visibility, size: 18),
-                  label: const Text('View'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: TColor.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    // Ledger button logic
                   },
                   icon: const Icon(Icons.book, size: 18),
                   label: const Text('Ledger'),
@@ -189,13 +188,7 @@ class Accounts extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             // Added By
-            Text(
-              'Added by: ${account.addedBy}',
-              style: TextStyle(
-                color: TColor.secondaryText,
-                fontSize: 14,
-              ),
-            ),
+
           ],
         ),
       ),

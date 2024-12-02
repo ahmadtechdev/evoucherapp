@@ -11,4 +11,5 @@ class TColor {
   static Color get textfield => const Color(0xffF2F2F2);
   static Color get placeholder => const Color(0xffB6B7B7);
   static Color get white => const Color(0xffffffff);
+  static Color get black => const Color(0xff000000);
 }

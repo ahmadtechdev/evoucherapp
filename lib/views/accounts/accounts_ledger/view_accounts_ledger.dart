@@ -2,24 +2,19 @@ import 'dart:io';
 
 import 'package:evoucher/common_widget/dart_selector2.dart';
 import 'package:excel/excel.dart';
-
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// Assume these files contain your theme and common widgets.
 import '../../../common/color_extension.dart';
-import '../../../common_widget/date_selecter.dart';
 import '../../../common_widget/round_textfield.dart';
+import '../../../service/api_service.dart';
+import 'ledger_controller.dart';
 import 'ledger_modal.dart';
-import 'ledger_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as path;
 
-
-class LedgerScreen extends ConsumerStatefulWidget {
+class LedgerScreen extends StatelessWidget {
   final String accountId;
   final String accountName;
 
@@ -30,28 +25,136 @@ class LedgerScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<LedgerScreen> createState() => _LedgerScreenState();
-}
+  Widget build(BuildContext context) {
+    // Initialize the controller with dependency injection
+    final LedgerController controller = Get.put(
+        LedgerController(
+            accountId: accountId,
+            accountName: accountName
+        )
+    );
 
-class _LedgerScreenState extends ConsumerState<LedgerScreen> {
-  late DateTime fromDate;
-  late DateTime toDate;
-  final searchController = TextEditingController();
-  List<LedgerVoucher> _filteredVouchers = [];
+    return Scaffold(
+      appBar: _buildAppBar(),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-  @override
-  void initState() {
-    super.initState();
-    // Set initial date range to last 3 months
-    toDate = DateTime.now();
-    fromDate = DateTime(toDate.year, toDate.month - 3, toDate.day);
+        if (controller.errorMessage.isNotEmpty) {
+          return Center(child: Text('Error: ${controller.errorMessage.value}'));
+        }
+
+        if (controller.masterData.value == null) {
+          return const Center(child: Text('No data available'));
+        }
+
+        final masterData = controller.masterData.value!;
+        final vouchers = controller.filteredVouchers;
+
+        // Calculate totals
+        double totalDebit = controller.calculateTotalDebit();
+        double totalCredit = controller.calculateTotalCredit();
+
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              _buildDateRangeSection(controller),
+              _buildActionButtons(context, controller),
+              Text(
+                'FROM: ${DateFormat('EEE, dd-MMM-yyyy').format(controller.fromDate.value)} | TO: ${DateFormat('EEE, dd-MMM-yyyy').format(controller.toDate.value)}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: TColor.secondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                'Opening Balance ${masterData.opening}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: TColor.secondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SearchTextField(
+                hintText: 'Search transactions...',
+                onChange: controller.searchTransactions,
+              ),
+              _buildTransactionList(vouchers),
+              _buildSummaryCard(totalDebit, totalCredit, masterData.closing),
+              _buildSummaryDetails(masterData),
+            ],
+          ),
+        );
+      }),
+    );
   }
-  void _exportToExcel() async {
-    // Create a new Excel document
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Text(
+          'Ledger of $accountId | $accountName',
+          style: TextStyle(color: TColor.primaryText),
+        ),
+      ),
+      backgroundColor: TColor.white,
+      elevation: 0.5,
+    );
+  }
+
+  Widget _buildDateRangeSection(LedgerController controller) {
+    return Container(
+      color: TColor.white,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          const SizedBox(width: 18),
+          DateSelector2(
+            fontSize: 14,
+            initialDate: controller.fromDate.value,
+            onDateChanged: (date) {
+              controller.updateDateRange(date, controller.toDate.value);
+            },
+            label: "FROM:",
+          ),
+          const SizedBox(width: 18),
+          DateSelector2(
+            fontSize: 14,
+            initialDate: controller.toDate.value,
+            onDateChanged: (date) {
+              controller.updateDateRange(controller.fromDate.value, date);
+            },
+            label: "TO:  ",
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context, LedgerController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, top: 16),
+      child: Row(
+        children: [
+          _buildActionButton(
+              MdiIcons.microsoftExcel, 'Excel', TColor.primary,
+                  () => _exportToExcel(context, controller.filteredVouchers)),
+          _buildActionButton(MdiIcons.printer, 'Print', TColor.third, () {}),
+          _buildActionButton(
+              MdiIcons.whatsapp, 'Whatsapp', TColor.secondary, launchWhatsappWithMobileNumber),
+        ],
+      ),
+    );
+  }
+
+  void _exportToExcel(BuildContext context, List<LedgerVoucher> vouchers) async {
+    // Excel export logic remains the same as in the original file
     var excel = Excel.createExcel();
     Sheet sheet = excel['Sheet1'];
 
-    // Add headers
     sheet.appendRow([
       TextCellValue('Voucher'),
       TextCellValue('Date'),
@@ -61,8 +164,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
       TextCellValue('Balance'),
     ]);
 
-    // Add transaction data
-    for (var voucher in _filteredVouchers) {
+    for (var voucher in vouchers) {
       sheet.appendRow([
         TextCellValue(voucher.voucher),
         TextCellValue(voucher.date),
@@ -73,51 +175,26 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
       ]);
     }
 
-    // Get the Downloads directory
-    String downloadsPath = '/storage/emulated/0/Download'; // Use the common path for Downloads
+    String downloadsPath = '/storage/emulated/0/Download';
+    String filePath = '$downloadsPath/ledger_$accountId.xlsx';
 
-    // Define the file path
-    String filePath = '$downloadsPath/ledger_${widget.accountId}.xlsx';
-
-    // Save the Excel file
     List<int>? fileBytes = excel.save();
     if (fileBytes != null) {
       File(filePath)
         ..createSync(recursive: true)
         ..writeAsBytesSync(fileBytes);
 
-      // Optionally, show a confirmation message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Excel file exported to $filePath')),
       );
     } else {
-      // Handle the failure case
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to export Excel file')),
       );
     }
   }
 
-  void _searchTransactions(String query) {
-    final asyncValue = ref.read(ledgerDataProvider(
-      (accountId: widget.accountId, fromDate: fromDate, toDate: toDate),
-    ));
-
-    if (asyncValue.value == null) return;
-
-    final (_, vouchers) = asyncValue.value!;
-
-    setState(() {
-      _filteredVouchers = vouchers.where((voucher) {
-        return voucher.description
-                .toLowerCase()
-                .contains(query.toLowerCase()) ||
-            voucher.voucher.toLowerCase().contains(query.toLowerCase());
-      }).toList();
-    });
-  }
-
-  launchWhatsappWithMobileNumber() async {
+  Future<void> launchWhatsappWithMobileNumber() async {
     String message = "Journey Online Message";
     String mobileNumber = "923027253781";
     final url = "https://wa.me/$mobileNumber?text=$message";
@@ -128,144 +205,10 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
     }
   }
 
-  Widget build(BuildContext context) {
-    final asyncLedger = ref.watch(ledgerDataProvider(
-      (accountId: widget.accountId, fromDate: fromDate, toDate: toDate),
-    ));
-
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: asyncLedger.when(
-        data: (data) {
-          final (masterData, vouchers) = data;
-          if (_filteredVouchers.isEmpty) {
-            _filteredVouchers = vouchers;
-          }
-
-          // Calculate totals
-          double totalDebit = 0;
-          double totalCredit = 0;
-          for (var voucher in vouchers) {
-            totalDebit += voucher.debit;
-            totalCredit += voucher.credit;
-          }
-
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildDateRangeSection(),
-                _buildActionButtons(),
-                Text(
-                  'FROM: ${DateFormat('EEE, dd-MMM-yyyy').format(fromDate)} | TO: ${DateFormat('EEE, dd-MMM-yyyy').format(toDate)}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: TColor.secondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Text(
-                  'Opening Balance ${masterData.opening}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: TColor.secondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SearchTextField(
-                  hintText: 'Search transactions...',
-                  controller: searchController,
-                  onChange: _searchTransactions,
-                ),
-                _buildTransactionList(_filteredVouchers),
-                _buildSummaryCard(totalDebit, totalCredit, masterData.closing),
-                _buildSummaryDetails(masterData),
-              ],
-            ),
-          );
-        },
-        error: (error, stack) {
-          print('Error: ${error.runtimeType} - $error');
-          print('Stack trace: $stack');
-
-          return Center(
-            child: Text('Error: ${error.toString()}'),
-          );
-        },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-    );
-  }
-
-  AppBar _buildAppBar() {
-    return AppBar(
-      title: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Text(
-          'Ledger of ${widget.accountId} | ${widget.accountName}',
-          style: TextStyle(color: TColor.primaryText),
-        ),
-      ),
-      backgroundColor: TColor.white,
-      elevation: 0.5,
-    );
-  }
-
-  Widget _buildDateRangeSection() {
-    return Container(
-      color: TColor.white,
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          const SizedBox(width: 18),
-          DateSelector2(
-            fontSize: 14,
-            initialDate: fromDate,
-            onDateChanged: (date) => setState(() => fromDate = date),
-            label: "FROM:",
-          ),
-          const SizedBox(width: 18),
-          DateSelector2(
-            fontSize: 14,
-            initialDate: toDate,
-            onDateChanged: (date) => setState(() => toDate = date),
-            label: "TO:  ",
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButtons() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16, top: 16),
-      child: Row(
-        children: [
-          _buildActionButton(
-              MdiIcons.microsoftExcel, 'Excel', TColor.primary, _exportToExcel),
-          _buildActionButton(MdiIcons.printer, 'Print', TColor.third, () {}),
-          _buildActionButton(
-              MdiIcons.whatsapp, 'Whatsapp', TColor.secondary, launchWhatsappWithMobileNumber),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButton(
-      IconData icon, String label, Color color, VoidCallback onPressed) {
-    return TextButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon),
-      label: Text(label),
-      style: TextButton.styleFrom(foregroundColor: color),
-    );
-  }
-
   Widget _buildTransactionList(List<LedgerVoucher> vouchers) {
     return ListView.builder(
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(16),
       itemCount: vouchers.length,
       itemBuilder: (context, index) => _buildTransactionCard(vouchers[index]),
@@ -294,17 +237,6 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
     );
   }
 
-  Map<String, dynamic> _getTransactionData(int index) {
-    return {
-      'voucher': 'Voucher ${index + 1}',
-      'date': '23 Oct 2024',
-      'description': index % 2 == 0 ? 'TEST' : 'RECEIVING',
-      'debit': index % 2 == 0 ? 56.00 : 0.00,
-      'credit': index % 2 == 0 ? 0.00 : 25000.00,
-      'balance': index % 2 == 0 ? 56.00 + index : 24944.00 - index,
-      'isCredit': index % 2 != 0
-    };
-  }
 
   Widget _buildTransactionDetails(LedgerVoucher voucher) {
     bool isCredit = voucher.balance.toLowerCase().contains('cr');
@@ -336,7 +268,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
                       DateFormat('dd MMM yyyy')
                           .format(DateTime.parse(voucher.date)),
                       style:
-                          TextStyle(color: TColor.secondaryText, fontSize: 12),
+                      TextStyle(color: TColor.secondaryText, fontSize: 12),
                     ),
                   ],
                 ),
@@ -375,6 +307,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
     );
   }
 
+
   Widget _buildTransactionAmounts(LedgerVoucher voucher) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -387,6 +320,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
       ),
     );
   }
+
 
   Widget _buildAmountBox(String label, num amount) {
     return Container(
@@ -483,6 +417,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
     );
   }
 
+
   Widget _buildWOAccountButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -503,6 +438,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
       ),
     );
   }
+
 
   Widget _buildSummaryDetails(LedgerMasterData masterData) {
     return Container(
@@ -588,4 +524,17 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> {
       ),
     );
   }
+
+  Widget _buildActionButton(
+      IconData icon, String label, Color color, VoidCallback onPressed) {
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon),
+      label: Text(label),
+      style: TextButton.styleFrom(foregroundColor: color),
+    );
+  }
+// Rest of the methods remain the same as in the original file
+// _buildTransactionList, _buildTransactionCard, _buildSummaryCard, etc.
+// Refer to the original file for their implementation
 }

@@ -1,4 +1,5 @@
 import 'package:evoucher/views/accounts/accounts/account_controller.dart';
+import 'package:evoucher/views/accounts/accounts_ledger/ledger_controller.dart';
 import 'package:evoucher/views/finance_voucher/entry_controller.dart';
 import 'package:evoucher/views/on_broading.dart';
 import 'package:evoucher/views/welcome_view.dart';
@@ -10,9 +11,7 @@ import 'common/color_extension.dart';
 
 void main() {
   runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
+    const MyApp(),
   );
 }
 
@@ -23,8 +22,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Initialize the controller
-    Get.lazyPut(() => VoucherController());
-    Get.lazyPut(() => AccountsController());
+    // Get.put( VoucherController());
+    Get.lazyPut(() => AccountsController(), fenix: true);
+    Get.lazyPut(() => VoucherController(), fenix: true);
 
     return GetMaterialApp(
       title: 'Flutter Demo',

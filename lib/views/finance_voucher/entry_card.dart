@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
+import '../../common/accounts_dropdown.dart';
 import '../accounts/accounts/account_controller.dart';
 import 'entry_controller.dart';
 
@@ -237,66 +237,21 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
               ],
             ),
             const SizedBox(height: 4),
-            Obx(() {
-              final accountsList = accountsController.accounts;
-              final accountNames = accountsList.map((account) => account.name).toList();
-
-              return DropdownSearch<String>(
-                enabled: !widget.isViewMode,
-                popupProps: PopupProps.menu(
-                  showSearchBox: true,
-                  searchFieldProps: TextFieldProps(
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      hintText: "Search account...",
-                      prefixIcon:
-                      Icon(Icons.search, color: widget.placeholderColor),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: widget.textFieldColor,
-                    ),
-                  ),
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height / 1.5,
-                  ),
-                  showSelectedItems: true,
-                  searchDelay: const Duration(milliseconds: 300),
-                ),
-                items: accountNames,
-                selectedItem: entry.account.isEmpty ? null : entry.account,
-                onChanged: (value) {
-                  setState(() {
-                    entry.account = value ?? '';
-                    voucherController.updateEntryData(
-                      index,
-                      entry.account,
-                      entry.description,
-                      entry.debit,
-                      entry.credit,
-                    );
-                  });
-                },
-                dropdownDecoratorProps: DropDownDecoratorProps(
-                  dropdownSearchDecoration: InputDecoration(
-                    filled: true,
-                    fillColor: widget.textFieldColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
-                    ),
-                    hintText: 'Select an account',
-                    hintStyle: const TextStyle(
-                        fontSize: 14
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 0),
-                  ),
-                ),
-              );
-            }),
+            AccountDropdown(
+              initialValue: entry.account,
+              onChanged: (value) {
+                setState(() {
+                  entry.account = value ?? '';
+                  voucherController.updateEntryData(
+                    index,
+                    entry.account,
+                    entry.description,
+                    entry.debit,
+                    entry.credit,
+                  );
+                });
+              },
+            ),
 
             const SizedBox(height: 4),
             TextFormField(
@@ -473,7 +428,10 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
         SingleChildScrollView(
           child: Container(
             decoration: BoxDecoration(
-                border: Border.all(color: Colors.blueAccent)
+              color: TColor.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                  color: widget.primaryColor.withOpacity(0.2), width: 2),
             ),
             height: MediaQuery.of(context).size.height/1.9,
             child: ListView.builder(

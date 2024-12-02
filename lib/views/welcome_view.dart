@@ -52,7 +52,7 @@ class WelcomeScreen extends StatelessWidget {
                     children: [
                       // Logo
                       Image.asset(
-                        'assets/img/456546.png',
+                        'assets/img/newLogo.png',
                         height: screenHeight * 0.12,
                         fit: BoxFit.contain,
                       ),
