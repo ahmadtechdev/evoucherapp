@@ -3,6 +3,12 @@ import 'package:evoucher/views/home/home.dart';
 import 'package:evoucher/views/invoice_settlement/invoice_settlement.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../views/daily_acitvity_report/daily_activity_report.dart';
+import '../views/daily_cash_activity/daily_cash_activity.dart';
+import '../views/daily_cash_book/daily_cash_book.dart';
+import '../views/expense_report/expense_report.dart';
+import '../views/incomes_report/incomes_report.dart';
+import '../views/monthly_sale_report/monthly_sale_report.dart';
 import 'color_extension.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -189,20 +195,45 @@ class _CustomDrawerState extends State<CustomDrawer> {
         title: 'Daily Cash Book',
         icon: Icons.menu_book_rounded,
         index: currentIndex++,
+        onTap: () => Get.to(() => const DailyCashBook()),
       ),
       _buildNavigationItem(
         title: 'Daily Activity Report',
         icon: Icons.calendar_today_rounded,
         index: currentIndex++,
-      ),
+        onTap: () => Get.to(() => const DailyActivityReport()),
 
+      ),
+      _buildNavigationItem(
+        title: 'Daily Cash Activity',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => const DailyCashActivity()),
+
+      ),
+      _buildNavigationItem(
+        title: 'Monthly Sale Report',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => const MonthlySalesReport()),
+
+      ),   _buildNavigationItem(
+        title: 'Expenses Report',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => const ExpenseComparisonReport()),
+
+      ), _buildNavigationItem(
+        title: 'Incomes Report',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => const IncomesComparisonReport()),
+
+      ),
     ]);
 
     final accountsReports = [
-      'Daily Cash Activity',
-      'Monthly Sale Report',
-      'Expenses Report',
-      'Incomes Report',
+
       'Total Income Report',
       'Daily Sales Report',
       'Recovery List',
@@ -210,10 +241,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
     items.addAll(
       accountsReports.map((title) => _buildNavigationItem(
-        title: title,
-        icon: Icons.analytics_rounded,
-        index: currentIndex++,
-      )),
+            title: title,
+            icon: Icons.analytics_rounded,
+            index: currentIndex++,
+          )),
     );
 
     // Financial Reports Section

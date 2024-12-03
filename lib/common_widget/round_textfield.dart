@@ -43,7 +43,9 @@ class RoundTextfield extends StatelessWidget {
               obscureText: obscureText,
               keyboardType: keyboardType,
               onChanged: onChanged,
+
               decoration: InputDecoration(
+
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -53,6 +55,7 @@ class RoundTextfield extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.w500),
               ),
+
             ),
           ),
           if (right != null)
