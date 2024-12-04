@@ -280,15 +280,9 @@ class ExpenseComparisonReportState extends State<ExpenseComparisonReport> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: TColor.primary,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: TColor.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: TColor.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: TColor.primary.withOpacity(0.2), width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,7 +290,7 @@ class ExpenseComparisonReportState extends State<ExpenseComparisonReport> {
           Text(
             'Total Expenses Summary',
             style: TextStyle(
-              color: TColor.white,
+              color: TColor.primaryText,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -390,12 +384,12 @@ class ExpenseComparisonReportState extends State<ExpenseComparisonReport> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: TColor.white.withOpacity(0.8), size: 24),
+        Icon(icon, color: TColor.primary.withOpacity(0.8), size: 24),
         const SizedBox(height: 8),
         Text(
           label,
           style: TextStyle(
-            color: TColor.white.withOpacity(0.8),
+            color: TColor.secondaryText,
             fontSize: 14,
           ),
         ),
@@ -403,7 +397,7 @@ class ExpenseComparisonReportState extends State<ExpenseComparisonReport> {
         Text(
           amount,
           style: TextStyle(
-            color: TColor.white,
+            color: TColor.primaryText,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),

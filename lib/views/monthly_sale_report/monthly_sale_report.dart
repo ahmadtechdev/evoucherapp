@@ -258,23 +258,17 @@ class _MonthlySalesReportState extends State<MonthlySalesReport> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: TColor.primary,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: TColor.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: TColor.primary.withOpacity(0.2), width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Total Sales Summary',
             style: TextStyle(
-              color: Colors.white,
+              color: TColor.primaryText,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -313,20 +307,20 @@ class _MonthlySalesReportState extends State<MonthlySalesReport> {
   Widget _buildTotalItem(String label, String amount, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white.withOpacity(0.8), size: 24),
+        Icon(icon, color: TColor.primary.withOpacity(0.8), size: 24),
         const SizedBox(height: 8),
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
+            color:TColor.secondaryText,
             fontSize: 14,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           amount,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: TColor.primaryText,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),

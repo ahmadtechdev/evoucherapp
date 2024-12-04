@@ -54,11 +54,12 @@ class WelcomeScreen extends StatelessWidget {
                       Image.asset(
                         'assets/img/newLogo.png',
                         height: screenHeight * 0.12,
+                        width: screenWidth*0.9,
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(height: 30),
                       Text(
-                        'Welcome to eVoucher',
+                        'Welcome to Evoucher',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 24,

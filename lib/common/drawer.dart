@@ -3,12 +3,16 @@ import 'package:evoucher/views/home/home.dart';
 import 'package:evoucher/views/invoice_settlement/invoice_settlement.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../views/charts_of_accounts/charts_of_accounts.dart';
 import '../views/daily_acitvity_report/daily_activity_report.dart';
 import '../views/daily_cash_activity/daily_cash_activity.dart';
 import '../views/daily_cash_book/daily_cash_book.dart';
+import '../views/daily_sales_report/daily_sales_report.dart';
 import '../views/expense_report/expense_report.dart';
 import '../views/incomes_report/incomes_report.dart';
 import '../views/monthly_sale_report/monthly_sale_report.dart';
+import '../views/recovery_list/recovery_list.dart';
+import '../views/trial_balance/charts_of_accounts.dart';
 import 'color_extension.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -229,23 +233,22 @@ class _CustomDrawerState extends State<CustomDrawer> {
         index: currentIndex++,
         onTap: () => Get.to(() => const IncomesComparisonReport()),
 
+      ), _buildNavigationItem(
+        title: 'Daily Sales Report',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => DailySalesReportScreen()),
+
+      ),_buildNavigationItem(
+        title: 'Recovery List',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => RecoveryListsScreen()),
+
       ),
     ]);
 
-    final accountsReports = [
 
-      'Total Income Report',
-      'Daily Sales Report',
-      'Recovery List',
-    ];
-
-    items.addAll(
-      accountsReports.map((title) => _buildNavigationItem(
-            title: title,
-            icon: Icons.analytics_rounded,
-            index: currentIndex++,
-          )),
-    );
 
     // Financial Reports Section
     items.add(_buildSectionHeader(
@@ -253,8 +256,18 @@ class _CustomDrawerState extends State<CustomDrawer> {
       icon: Icons.analytics_rounded,
     ));
 
+    items.addAll([
+      _buildNavigationItem(
+        title: 'Trial Balance',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => const TrialOfBalanceScreen()),
+
+      ),
+    ]);
+
     final financialReports = [
-      'Trial Balance',
+
       'Categorized Trial Balance',
       'Monthly Profit Loss',
       'Total Monthly Profit Loss',

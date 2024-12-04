@@ -296,15 +296,9 @@ class IncomesComparisonReportState extends State<IncomesComparisonReport> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: TColor.primary,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: TColor.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: TColor.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: TColor.primary.withOpacity(0.2), width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,7 +306,7 @@ class IncomesComparisonReportState extends State<IncomesComparisonReport> {
           Text(
             'Total Incomes Summary',
             style: TextStyle(
-              color: TColor.white,
+              color: TColor.primaryText,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -388,12 +382,8 @@ class IncomesComparisonReportState extends State<IncomesComparisonReport> {
                   Icons.devices_other,
                 ),
               ),
-              Expanded(
-                child: _buildTotalItem(
-                  '',
-                  '',
-                  Icons.do_not_disturb_on_total_silence,
-                ),
+              const Expanded(
+                child: SizedBox()
               ),
             ],
           ),
@@ -404,23 +394,23 @@ class IncomesComparisonReportState extends State<IncomesComparisonReport> {
 
   Widget _buildTotalItem(String label, String amount, IconData icon) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(icon, color: TColor.white.withOpacity(0.8), size: 24),
+        Icon(icon, color: TColor.primary.withOpacity(0.8), size: 22),
         const SizedBox(height: 8),
         Text(
           label,
           style: TextStyle(
-            color: TColor.white.withOpacity(0.8),
-            fontSize: 14,
+            color: TColor.secondaryText,
+            fontSize: 12,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           amount,
           style: TextStyle(
-            color: TColor.white,
-            fontSize: 16,
+            color: TColor.primaryText,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),
