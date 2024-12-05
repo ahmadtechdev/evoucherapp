@@ -9,10 +9,10 @@ class TotalSection extends StatelessWidget {
   final double totalCredit;
 
   const TotalSection({
-    Key? key,
+    super.key,
     required this.totalDebit,
     required this.totalCredit,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -30,8 +30,8 @@ class SubHeaderExpansionTile extends StatelessWidget {
               },
             ),
             // This is the default expansion arrow icon
-            RotationTransition(
-              turns: const AlwaysStoppedAnimation(0.0),
+            const RotationTransition(
+              turns: AlwaysStoppedAnimation(0.0),
               child: Icon(Icons.expand_more),
             ),
           ],

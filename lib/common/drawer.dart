@@ -3,15 +3,15 @@ import 'package:evoucher/views/home/home.dart';
 import 'package:evoucher/views/invoice_settlement/invoice_settlement.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../views/charts_of_accounts/charts_of_accounts.dart';
 import '../views/daily_acitvity_report/daily_activity_report.dart';
 import '../views/daily_cash_activity/daily_cash_activity.dart';
 import '../views/daily_cash_book/daily_cash_book.dart';
 import '../views/daily_sales_report/daily_sales_report.dart';
 import '../views/expense_report/expense_report.dart';
-import '../views/incomes_report/incomes_report.dart';
+import '../views/incomes_report/income_report_view.dart';
 import '../views/monthly_sale_report/monthly_sale_report.dart';
 import '../views/recovery_list/recovery_list.dart';
+import '../views/top_customer_sale/top_customer_sale.dart';
 import '../views/trial_balance/charts_of_accounts.dart';
 import 'color_extension.dart';
 
@@ -184,7 +184,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
       title: 'Accounts',
       icon: Icons.person,
       index: currentIndex++,
-      onTap: () => Get.to(() => Accounts()),
+      onTap: () => Get.to(() => const Accounts()),
     ));
 
     // Reports Section
@@ -199,13 +199,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
         title: 'Daily Cash Book',
         icon: Icons.menu_book_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => const DailyCashBook()),
+        onTap: () => Get.to(() => DailyCashBook()),
       ),
       _buildNavigationItem(
         title: 'Daily Activity Report',
         icon: Icons.calendar_today_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => const DailyActivityReport()),
+        onTap: () => Get.to(() => DailyActivityReport()),
 
       ),
       _buildNavigationItem(
@@ -219,13 +219,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
         title: 'Monthly Sale Report',
         icon: Icons.analytics_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => const MonthlySalesReport()),
+        onTap: () => Get.to(() => MonthlySalesReport()),
 
       ),   _buildNavigationItem(
         title: 'Expenses Report',
         icon: Icons.analytics_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => const ExpenseComparisonReport()),
+        onTap: () => Get.to(() =>  ExpenseComparisonReport()),
 
       ), _buildNavigationItem(
         title: 'Incomes Report',
@@ -237,13 +237,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
         title: 'Daily Sales Report',
         icon: Icons.analytics_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => DailySalesReportScreen()),
+        onTap: () => Get.to(() => const DailySalesReportScreen()),
 
       ),_buildNavigationItem(
         title: 'Recovery List',
         icon: Icons.analytics_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => RecoveryListsScreen()),
+        onTap: () => Get.to(() => const RecoveryListsScreen()),
 
       ),
     ]);
@@ -265,10 +265,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
       ),
     ]);
-
     final financialReports = [
 
-      'Categorized Trial Balance',
       'Monthly Profit Loss',
       'Total Monthly Profit Loss',
       'Total Expenses Report',
@@ -281,10 +279,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
             index: currentIndex++,
           )),
     );
+    items.addAll([
+      _buildNavigationItem(
+        title: 'Top Customers Sales',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => const TopCustomer()),
+
+      ),
+    ]);
 
     // Sales Reports Section
     final salesReports = [
-      'Top Customers Sales',
+
       '5 Year Customers Sales',
     ];
 

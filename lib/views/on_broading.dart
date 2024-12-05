@@ -308,7 +308,7 @@ class _OnboardingPage extends StatelessWidget {
               shadows: [
                 Shadow(
                   color: Colors.black.withOpacity(0.5),
-                  offset: Offset(2, 2),
+                  offset: const Offset(2, 2),
                   blurRadius: 4,
                 ),
               ],
@@ -331,7 +331,7 @@ class _OnboardingPage extends StatelessWidget {
               shadows: [
                 Shadow(
                   color: Colors.black.withOpacity(0.3),
-                  offset: Offset(1, 1),
+                  offset: const Offset(1, 1),
                   blurRadius: 2,
                 ),
               ],

@@ -4,11 +4,13 @@ import '../../common/color_extension.dart';
 import '../../common_widget/round_textfield.dart';
 
 class InvoiceSettlementPage extends StatefulWidget {
+  const InvoiceSettlementPage({super.key});
+
   @override
-  _InvoiceSettlementPageState createState() => _InvoiceSettlementPageState();
+  InvoiceSettlementPageState createState() => InvoiceSettlementPageState();
 }
 
-class _InvoiceSettlementPageState extends State<InvoiceSettlementPage> {
+class InvoiceSettlementPageState extends State<InvoiceSettlementPage> {
   // Keep your existing dummy data
   final List<Map<String, dynamic>> invoices = [
     {
@@ -271,7 +273,7 @@ class _InvoiceSettlementPageState extends State<InvoiceSettlementPage> {
                             ),
                           ),
                         );
-                      }).toList(),
+                      }),
 
                       // Add extra padding at bottom for DraggableScrollableSheet
                       SizedBox(height: selectedInvoices.isEmpty ? 0 : 300),
@@ -432,7 +434,7 @@ class _InvoiceSettlementPageState extends State<InvoiceSettlementPage> {
                                     ),
                                   ),
                                 );
-                              }).toList(),
+                              }),
                             ],
                           ),
                         ),

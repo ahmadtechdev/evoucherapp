@@ -13,7 +13,7 @@ class WelcomeScreen extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Color(0xFF1976D2),
+      backgroundColor: const Color(0xFF1976D2),
       body: Stack(
         children: [
           // Background gradient
@@ -58,7 +58,7 @@ class WelcomeScreen extends StatelessWidget {
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(height: 30),
-                      Text(
+                      const Text(
                         'Welcome to Evoucher',
                         style: TextStyle(
                           color: Colors.white,

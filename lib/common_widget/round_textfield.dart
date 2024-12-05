@@ -89,7 +89,7 @@ class SearchTextField extends StatelessWidget{
       padding: const EdgeInsets.all(16),
       child: TextField(
         controller: controller,
-        onChanged: onChange as void Function(String),
+        onChanged: onChange,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(color: TColor.placeholder),

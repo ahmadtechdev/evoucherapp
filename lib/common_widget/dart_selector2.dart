@@ -28,7 +28,6 @@ class DateSelector2 extends StatelessWidget {
       final int? pickedYear = await showDialog<int>(
         context: context,
         builder: (BuildContext context) {
-          int selectedYear = selectedDate.value.year;
           return AlertDialog(
             title: Text("Select Year", style: TextStyle(color: TColor.primaryText)),
             content: SizedBox(
@@ -53,6 +52,7 @@ class DateSelector2 extends StatelessWidget {
 
       if (pickedYear != null) {
         final int? pickedMonth = await showDialog<int>(
+          // ignore: use_build_context_synchronously
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(

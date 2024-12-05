@@ -1,9 +1,28 @@
+import 'package:evoucher/views/daily_sales_report/day_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../common/color_extension.dart';
 import '../../common/drawer.dart';
 import '../../common_widget/dart_selector2.dart';
+
+// Utility class for calculations
+class SalesReportUtils {
+  static List<Map<String, dynamic>> filterData(
+      List<Map<String, dynamic>> salesData, DateTimeRange? dateRange) {
+    if (dateRange == null) return salesData;
+    return salesData.where((entry) {
+      final entryDate = DateTime.parse(entry['date']);
+      return entryDate.isAfter(dateRange.start.subtract(const Duration(days: 1))) &&
+          entryDate.isBefore(dateRange.end.add(const Duration(days: 1)));
+    }).toList();
+  }
+
+  static int calculateTotal(List<Map<String, dynamic>> data, String key) {
+    return data.fold<int>(
+        0, (sum, entry) => sum + (entry['summary'][key] as int));
+  }
+}
 
 class DailySalesReportScreen extends StatefulWidget {
   const DailySalesReportScreen({super.key});
@@ -13,8 +32,8 @@ class DailySalesReportScreen extends StatefulWidget {
 }
 
 class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
-  // Sample data structure from DailySalesReportScreen
   final List<Map<String, dynamic>> salesData = [
+    // Sample data
     {
       "date": "2024-12-01",
       "summary": {"vNo": "V123", "totalP": 1200, "totalS": 24000, "pL": 2000},
@@ -106,41 +125,19 @@ class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
     end: DateTime.now(),
   );
 
-  // Method to filter data based on date range
-  List<Map<String, dynamic>> _filterData() {
-    if (selectedDateRange == null) return salesData;
-
-    return salesData.where((entry) {
-      final entryDate = DateTime.parse(entry['date']);
-      return entryDate.isAfter(
-              selectedDateRange!.start.subtract(const Duration(days: 1))) &&
-          entryDate
-              .isBefore(selectedDateRange!.end.add(const Duration(days: 1)));
-    }).toList();
-  }
-
-  // Calculate total purchase
-  int _calculateTotalPurchase(List<Map<String, dynamic>> data) {
-    return data.fold<int>(
-        0, (sum, entry) => sum + (entry['summary']['totalP'] as int));
-  }
-
-  // Calculate total sales
-  int _calculateTotalSales(List<Map<String, dynamic>> data) {
-    return data.fold<int>(
-        0, (sum, entry) => sum + (entry['summary']['totalS'] as int));
-  }
-
-  // Calculate total profit/loss
-  int _calculateTotalProfit(List<Map<String, dynamic>> data) {
-    return data.fold<int>(
-        0, (sum, entry) => sum + (entry['summary']['pL'] as int));
+  void _updateDateRange({DateTime? start, DateTime? end}) {
+    setState(() {
+      selectedDateRange = DateTimeRange(
+        start: start ?? selectedDateRange!.start,
+        end: end ?? selectedDateRange!.end,
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Filter data based on selected date range
-    List<Map<String, dynamic>> filteredData = _filterData();
+    final filteredData =
+    SalesReportUtils.filterData(salesData, selectedDateRange);
 
     return Scaffold(
       backgroundColor: TColor.textfield,
@@ -153,28 +150,48 @@ class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
       drawer: const CustomDrawer(currentIndex: 9),
       body: Column(
         children: [
-          _buildDateSelectionSection(),
+          _DateSelectionSection(
+            selectedDateRange: selectedDateRange,
+            onDateChanged: _updateDateRange,
+          ),
           Expanded(
             child: filteredData.isEmpty
                 ? const Center(
-                    child: Text("No data available for the selected range."))
+              child: Text("No data available for the selected range."),
+            )
                 : ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      _buildSummaryCard(filteredData),
-                      const SizedBox(height: 16),
-                      ...filteredData.asMap().entries.map(
-                            (entry) => _buildDayCard(entry.key, entry.value),
-                          ),
-                    ],
+              padding: const EdgeInsets.all(16),
+              children: [
+                _SummaryCard(data: filteredData),
+                const SizedBox(height: 16),
+                ...filteredData.asMap().entries.map(
+                      (entry) => DayCard(
+                    index: entry.key,
+                    dayData: entry.value,
                   ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildDateSelectionSection() {
+// Widget: Date Selection Section
+class _DateSelectionSection extends StatelessWidget {
+  final DateTimeRange? selectedDateRange;
+  final Function({DateTime? start, DateTime? end}) onDateChanged;
+
+  const _DateSelectionSection({
+    required this.selectedDateRange,
+    required this.onDateChanged,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -201,12 +218,7 @@ class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
                   label: 'From Date',
                   initialDate: selectedDateRange?.start ??
                       DateTime.now().subtract(const Duration(days: 30)),
-                  onDateChanged: (date) => setState(() {
-                    selectedDateRange = DateTimeRange(
-                      start: date,
-                      end: selectedDateRange?.end ?? DateTime.now(),
-                    );
-                  }),
+                  onDateChanged: (date) => onDateChanged(start: date),
                 ),
               ),
               const SizedBox(width: 16),
@@ -215,32 +227,26 @@ class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
                   fontSize: 14,
                   label: 'To Date',
                   initialDate: selectedDateRange?.end ?? DateTime.now(),
-                  onDateChanged: (date) => setState(() {
-                    selectedDateRange = DateTimeRange(
-                      start: selectedDateRange?.start ??
-                          DateTime.now().subtract(const Duration(days: 30)),
-                      end: date,
-                    );
-                  }),
+                  onDateChanged: (date) => onDateChanged(end: date),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () => setState(() {}),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: TColor.secondary,
-              minimumSize: const Size(double.infinity, 45),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text(
-              'Generate Report',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
+          // ElevatedButton(
+          //   onPressed: () {},
+          //   style: ElevatedButton.styleFrom(
+          //     backgroundColor: TColor.secondary,
+          //     minimumSize: const Size(double.infinity, 45),
+          //     shape: RoundedRectangleBorder(
+          //       borderRadius: BorderRadius.circular(8),
+          //     ),
+          //   ),
+          //   child: const Text(
+          //     'Generate Report',
+          //     style: TextStyle(color: Colors.white),
+          //   ),
+          // ),
           Text(
             selectedDateRange == null
                 ? 'No date range selected'
@@ -254,8 +260,20 @@ class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
       ),
     );
   }
+}
 
-  Widget _buildSummaryCard(List<Map<String, dynamic>> data) {
+// Widget: Summary Card
+class _SummaryCard extends StatelessWidget {
+  final List<Map<String, dynamic>> data;
+
+  const _SummaryCard({required this.data, Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final totalPurchase = SalesReportUtils.calculateTotal(data, 'totalP');
+    final totalSales = SalesReportUtils.calculateTotal(data, 'totalS');
+    final totalProfit = SalesReportUtils.calculateTotal(data, 'pL');
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -267,7 +285,7 @@ class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Total Entries: ${salesData.length}',
+            'Total Entries: ${data.length}',
             style: TextStyle(
               color: TColor.primaryText,
               fontSize: 18,
@@ -277,93 +295,25 @@ class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
           const SizedBox(height: 8),
           Row(
             children: [
-              Expanded(
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.shopping_bag_outlined,
-                      color: TColor.primary.withOpacity(0.8),
-                      size: 24,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Purchases',
-                      style: TextStyle(
-                        color: TColor.secondaryText.withOpacity(0.8),
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Rs.${NumberFormat('#,###').format(_calculateTotalPurchase(data))}',
-                      style: TextStyle(
-                        color: TColor.primaryText,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+              _SummaryItem(
+                icon: Icons.shopping_bag_outlined,
+                label: 'Purchases',
+                value: 'Rs.${NumberFormat('#,###').format(totalPurchase)}',
               ),
-              Expanded(
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.attach_money,
-                      color: TColor.primary.withOpacity(0.8),
-                      size: 24,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Sales',
-                      style: TextStyle(
-                        color: TColor.secondaryText.withOpacity(0.8),
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Rs.${NumberFormat('#,###').format(_calculateTotalSales(data))}',
-                      style: TextStyle(
-                        color: TColor.primaryText,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+              _SummaryItem(
+                icon: Icons.attach_money,
+                label: 'Sales',
+                value: 'Rs.${NumberFormat('#,###').format(totalSales)}',
               ),
-              Expanded(
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.trending_up,
-                      color: TColor.primary.withOpacity(0.8),
-                      size: 24,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'P/L',
-                      style: TextStyle(
-                        color: TColor.secondaryText.withOpacity(0.8),
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Rs.${NumberFormat('#,###').format(_calculateTotalProfit(data))}',
-                      style: TextStyle(
-                        color: _calculateTotalProfit(data) > 0
-                            ? TColor.secondary
-                            : _calculateTotalProfit(data) < 0
-                                ? TColor.third
-                                : TColor.primaryText,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+              _SummaryItem(
+                icon: Icons.trending_up,
+                label: 'P/L',
+                value: 'Rs.${NumberFormat('#,###').format(totalProfit)}',
+                valueColor: totalProfit > 0
+                    ? TColor.secondary
+                    : totalProfit < 0
+                    ? TColor.third
+                    : TColor.primaryText,
               ),
             ],
           ),
@@ -371,267 +321,48 @@ class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
       ),
     );
   }
+}
 
-  Widget _buildDayCard(int index, Map<String, dynamic> dayData) {
-    final summary = dayData['summary'];
-    final details = dayData['details'];
-    bool isExpanded = false;
+// Widget: Summary Item
+class _SummaryItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color? valueColor;
 
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+  const _SummaryItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.valueColor,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Icon(icon, color: TColor.primary),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: TColor.primaryText.withOpacity(0.7),
+              fontSize: 14,
+            ),
           ),
-          child: Column(
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: TColor.primary.withOpacity(0.1),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Entry #${index + 1}',
-                          style: TextStyle(
-                            color: TColor.secondary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          DateFormat('EEEE, dd MMM yyyy')
-                              .format(DateTime.parse(dayData['date'])),
-                          style: TextStyle(
-                            color: TColor.primary,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isExpanded = !isExpanded;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: TColor.primary,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          isExpanded ? 'Hide' : 'Detail',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (isExpanded) ...[
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey.withOpacity(0.2),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'V#: ${summary['vNo']}',
-                            style: TextStyle(
-                              color: TColor.primaryText,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            'V.Date: ${details['vDate']}',
-                            style: TextStyle(
-                              color: TColor.primaryText,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8,)
-                      ,
-                      Text(
-                        'Customer Account: ${details['cAccount']}',
-                        style: TextStyle(
-                          color: TColor.secondary,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        // 'Pax Name: ${details['paxName']}',
-                        'Supplier Account: ${details['sAccount']}',
-                        style: TextStyle(
-                          color: TColor.third,
-                          fontSize: 14,
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Pax Name: ${details['paxName']}',
-                            style: TextStyle(
-                              color: TColor.primaryText,
-                              fontSize: 14,
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.visibility,
-                              color: TColor.primary,
-                            ),
-                            onPressed: () {},
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Colors.grey.withOpacity(0.2),
-                      width: 1,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      // 'V#: ${summary['vNo']}',
-                      'Total Purchases:',
-                      style: TextStyle(
-                        color: TColor.primaryText,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Rs.${NumberFormat('#,###').format(summary['totalP'])}',
-                      style: TextStyle(
-                        color: TColor.secondaryText,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                      color: Colors.grey.withOpacity(0.2),
-                      width: 1,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Total Sales',
-                      style: TextStyle(
-                        color: TColor.primaryText,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Rs.${NumberFormat('#,###').format(summary['totalS'])}',
-                      style: TextStyle(
-                        color: TColor.secondaryText,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                      color: Colors.grey.withOpacity(0.2),
-                      width: 1,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Profit/Loss',
-                      style: TextStyle(
-                        color: TColor.primaryText,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Rs.${NumberFormat('#,###').format(summary['pL'])}',
-                      style: TextStyle(
-                        color:
-                            summary['pL'] >= 0 ? TColor.secondary : Colors.red,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              color: valueColor ?? TColor.primaryText,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

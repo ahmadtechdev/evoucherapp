@@ -58,7 +58,7 @@ class ChartOfAccountsScreen extends StatelessWidget {
     return SafeArea(
       child: Column(
         children: [
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Expanded(

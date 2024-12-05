@@ -6,12 +6,10 @@ import 'dart:math' as math;
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/round_textfield.dart';
-import '../../common_widget/snackbar.dart';
-import '../../service/api_service.dart';
 
 
 class SignUpView extends StatefulWidget {
-  const SignUpView({Key? key}) : super(key: key);
+  const SignUpView({super.key});
 
   @override
   State<SignUpView> createState() => _SignUpViewState();
@@ -25,15 +23,12 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController txtPassword = TextEditingController();
   TextEditingController txtConfirmPassword = TextEditingController();
 
-  final ApiService _apiService = ApiService();
   final _formKey = GlobalKey<FormState>();
 
   bool isLoading = false;
-  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(

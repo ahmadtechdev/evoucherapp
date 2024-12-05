@@ -1,10 +1,8 @@
 import 'package:evoucher/views/accounts/accounts/account_controller.dart';
-import 'package:evoucher/views/accounts/accounts_ledger/ledger_controller.dart';
 import 'package:evoucher/views/finance_voucher/entry_controller.dart';
-import 'package:evoucher/views/on_broading.dart';
+import 'package:evoucher/views/incomes_report/controller/income_controller.dart';
 import 'package:evoucher/views/welcome_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 
 import 'common/color_extension.dart';
@@ -25,6 +23,7 @@ class MyApp extends StatelessWidget {
     // Get.put( VoucherController());
     Get.lazyPut(() => AccountsController(), fenix: true);
     Get.lazyPut(() => VoucherController(), fenix: true);
+    Get.lazyPut(() => IncomesReportController(), fenix: true);
 
     return GetMaterialApp(
       title: 'Flutter Demo',

@@ -2,21 +2,25 @@ import 'dart:io';
 
 import 'package:evoucher/common_widget/date_selecter.dart';
 import 'package:evoucher/common_widget/round_textfield.dart';
+import 'package:evoucher/views/recovery_list/recovery_list_card.dart';
+import 'package:evoucher/views/recovery_list/recovery_list_modal_class.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
-import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import '../../common/color_extension.dart';
 import '../../common/drawer.dart';
+import 'pdf_preview.dart';
 
 class RecoveryListsScreen extends StatefulWidget {
+  const RecoveryListsScreen({super.key});
+
   @override
-  _RecoveryListsScreenState createState() => _RecoveryListsScreenState();
+  RecoveryListsScreenState createState() => RecoveryListsScreenState();
 }
 
-class _RecoveryListsScreenState extends State<RecoveryListsScreen> {
+class RecoveryListsScreenState extends State<RecoveryListsScreen> {
   List<RecoveryListItem> _recoveryList = [
     RecoveryListItem(
       rlName: 'Ali Ameen',
@@ -160,10 +164,6 @@ class _RecoveryListsScreenState extends State<RecoveryListsScreen> {
     ),
   ];
 
-  Future<void> _generatePDF(BuildContext context) async {
-
-  }
-
   void _previewPDF(File file) {
     Navigator.push(
       context,
@@ -172,8 +172,6 @@ class _RecoveryListsScreenState extends State<RecoveryListsScreen> {
       ),
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -223,8 +221,10 @@ class _RecoveryListsScreenState extends State<RecoveryListsScreen> {
                       final pdf = pw.Document();
 
                       // Load the logo
-                      final logoImage = await rootBundle.load('assets/img/logo.png');
-                      final logo = pw.MemoryImage(logoImage.buffer.asUint8List());
+                      final logoImage =
+                          await rootBundle.load('assets/img/logo.png');
+                      final logo =
+                          pw.MemoryImage(logoImage.buffer.asUint8List());
 
                       pdf.addPage(
                         pw.MultiPage(
@@ -232,7 +232,8 @@ class _RecoveryListsScreenState extends State<RecoveryListsScreen> {
                             return pw.Column(
                               children: [
                                 pw.Row(
-                                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      pw.MainAxisAlignment.spaceBetween,
                                   children: [
                                     pw.Image(logo, width: 100, height: 100),
                                     pw.Text(
@@ -259,30 +260,46 @@ class _RecoveryListsScreenState extends State<RecoveryListsScreen> {
                             pw.Table(
                               border: pw.TableBorder.all(),
                               columnWidths: {
-                                0: pw.FlexColumnWidth(2),
-                                1: pw.FlexColumnWidth(1),
-                                2: pw.FlexColumnWidth(1),
-                                3: pw.FlexColumnWidth(1),
-                                4: pw.FlexColumnWidth(1),
+                                0: const pw.FlexColumnWidth(1),
+                                1: const pw.FlexColumnWidth(1),
+                                2: const pw.FlexColumnWidth(1),
+                                3: const pw.FlexColumnWidth(1),
+                                4: const pw.FlexColumnWidth(1),
                               },
                               children: [
                                 pw.TableRow(
-                                  decoration: pw.BoxDecoration(color: PdfColors.grey300),
+                                  decoration:  pw.BoxDecoration(
+                                      color: PdfColors.grey300,
+
+                                  ),
                                   children: [
-                                    pw.Text('Name', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                                    pw.Text('Date Created', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                                    pw.Text('Total Amount', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                                    pw.Text('Received', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                                    pw.Text('Remaining', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                                    pw.Text('Name',
+                                        style: pw.TextStyle(
+                                            fontWeight: pw.FontWeight.bold)),
+                                    pw.Text('Date Created',
+                                        style: pw.TextStyle(
+                                            fontWeight: pw.FontWeight.bold)),
+                                    pw.Text('Total Amount',
+                                        style: pw.TextStyle(
+                                            fontWeight: pw.FontWeight.bold)),
+                                    pw.Text('Received',
+                                        style: pw.TextStyle(
+                                            fontWeight: pw.FontWeight.bold)),
+                                    pw.Text('Remaining',
+                                        style: pw.TextStyle(
+                                            fontWeight: pw.FontWeight.bold)),
                                   ],
                                 ),
                                 pw.TableRow(
                                   children: [
                                     pw.Text(item.rlName),
                                     pw.Text(item.dateCreated),
-                                    pw.Text('\$${item.totalAmount.toStringAsFixed(2)}'),
-                                    pw.Text('\$${item.received.toStringAsFixed(2)}'),
-                                    pw.Text('\$${item.remaining.toStringAsFixed(2)}'),
+                                    pw.Text(
+                                        '\$${item.totalAmount.toStringAsFixed(2)}'),
+                                    pw.Text(
+                                        '\$${item.received.toStringAsFixed(2)}'),
+                                    pw.Text(
+                                        '\$${item.remaining.toStringAsFixed(2)}'),
                                   ],
                                 ),
                               ],
@@ -293,39 +310,64 @@ class _RecoveryListsScreenState extends State<RecoveryListsScreen> {
 
                       // Save PDF to downloads folder
                       try {
-                        final output = await getDownloadsDirectory();
-                        final file = File('${output?.path}/recovery_list_${DateTime.now().millisecondsSinceEpoch}.pdf');
+                        final output = await getExternalStorageDirectory();
+                        final file = File(
+                            '${output?.path}/recovery_list_${DateTime.now().millisecondsSinceEpoch}.pdf');
                         await file.writeAsBytes(await pdf.save());
 
-                      // Show preview and save confirmation
-                      await showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                      title: Text('PDF Generated'),
-                      content: Text('PDF saved to: ${file.path}'),
-                      actions: [
-                      TextButton(
-                      onPressed: () {
-                      Navigator.of(context).pop();
-                      },
-                      child: Text('Close'),
-                      ),
-                      TextButton(
-                      onPressed: () {
-                      Navigator.of(context).pop();
-                      _previewPDF(file);
-                      },
-                      child: Text('Preview'),
-                      ),
-                      ],
-                      ),
-                      );
+                        // Show preview and save confirmation
+                        await showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: TColor.white,
+                            title: Row(
+                              children: [
+                                Icon(Icons.check_circle, color: TColor.secondary, size: 28),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'PDF Generated',
+                                  style: TextStyle(color: TColor.primaryText, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Your PDF has been successfully generated and saved at the following location:',
+                                  style: TextStyle(color: TColor.secondaryText),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  file.path,
+                                  style: TextStyle(color: TColor.primary, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Close', style: TextStyle(color: TColor.primary)),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  _previewPDF(File(file.path)); // Implement this preview method
+                                },
+                                child: Text('Preview', style: TextStyle(color: TColor.secondary)),
+                              ),
+                            ],
+                          ),
+                        );
                       } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to generate PDF: $e')),
-                      );
+                        // ignore: use_build_context_synchronously
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to generate PDF: $e')),
+                        );
                       }
-
                     },
                   );
                 },
@@ -441,19 +483,19 @@ class _RecoveryListsScreenState extends State<RecoveryListsScreen> {
                     existingItem == null
                         ? 'Add Recovery List'
                         : 'Edit Recovery List',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Account Name TextField
                   RoundTextfield(
                     hintText: "Account Name",
                     controller: nameController,
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
                   // Date Selector
                   DateSelector(
@@ -463,25 +505,25 @@ class _RecoveryListsScreenState extends State<RecoveryListsScreen> {
                       dateController = date as TextEditingController;
                     },
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
                   // Total Amount TextField
                   RoundTextfield(
                     hintText: "Total Amount",
                     keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
+                        const TextInputType.numberWithOptions(decimal: true),
                     controller: totalAmountController,
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
                   // Received Amount TextField
                   RoundTextfield(
                     hintText: "Received Amount",
                     keyboardType:
-                        TextInputType.numberWithOptions(decimal: true),
+                        const TextInputType.numberWithOptions(decimal: true),
                     controller: receivedController,
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -490,11 +532,11 @@ class _RecoveryListsScreenState extends State<RecoveryListsScreen> {
                         onPressed: () => Navigator.of(context).pop(),
                         style: TextButton.styleFrom(
                           foregroundColor: TColor.third,
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        child: Text('Cancel'),
+                        child: const Text('Cancel'),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -525,13 +567,13 @@ class _RecoveryListsScreenState extends State<RecoveryListsScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: TColor.secondary,
                           foregroundColor: TColor.white,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 10),
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        child: Text('Save'),
+                        child: const Text('Save'),
                       ),
                     ],
                   ),
@@ -555,165 +597,5 @@ class _RecoveryListsScreenState extends State<RecoveryListsScreen> {
         .where(
             (item) => item.rlName.toLowerCase().contains(query.toLowerCase()))
         .toList();
-  }
-}
-
-// Rest of the code remains the same as in the original file
-// (RecoveryListCard and RecoveryListItem classes)
-
-class RecoveryListCard extends StatelessWidget {
-  final String rlName;
-  final String dateCreated;
-  final double totalAmount;
-  final double received;
-  final double remaining;
-  final VoidCallback onDetailsPressed;
-  final VoidCallback onUpdatePressed;
-  final VoidCallback onDeletePressed;
-  final VoidCallback onGetPdfPressed;
-
-  RecoveryListCard({
-    required this.rlName,
-    required this.dateCreated,
-    required this.totalAmount,
-    required this.received,
-    required this.remaining,
-    required this.onDetailsPressed,
-    required this.onUpdatePressed,
-    required this.onDeletePressed,
-    required this.onGetPdfPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      color: TColor.white,
-      shadowColor: TColor.primary.withOpacity(0.3),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: Colors.blue.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              rlName,
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-                color: TColor.primaryText,
-              ),
-            ),
-            SizedBox(height: 8.0),
-            Text(
-              'Date Created: $dateCreated',
-              style: TextStyle(
-                fontSize: 14.0,
-                color: TColor.secondaryText,
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildCardItem('Total Amount', totalAmount.toStringAsFixed(2)),
-                _buildCardItem('Received', received.toStringAsFixed(2)),
-                _buildCardItem('Remaining', remaining.toStringAsFixed(2)),
-              ],
-            ),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildActionButton('Details', onDetailsPressed, TColor.primary),
-                _buildActionButton('Update', onUpdatePressed, TColor.secondary),
-                _buildActionButton('Delete', onDeletePressed, TColor.third),
-                _buildActionButton('Get PDF', onGetPdfPressed, TColor.fourth),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCardItem(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14.0,
-            color: TColor.secondaryText,
-          ),
-        ),
-        SizedBox(height: 4.0),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.bold,
-            color: TColor.primaryText,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionButton(String label, VoidCallback onPressed, Color color) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        foregroundColor: TColor.white,
-        backgroundColor: color,
-        padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-      ),
-      child: Text(label),
-    );
-  }
-}
-
-class RecoveryListItem {
-  final String rlName;
-  final String dateCreated;
-  final double totalAmount;
-  final double received;
-  final double remaining;
-
-  RecoveryListItem({
-    required this.rlName,
-    required this.dateCreated,
-    required this.totalAmount,
-    required this.received,
-    required this.remaining,
-  });
-}
-class PDFPreviewScreen extends StatelessWidget {
-  final File pdfFile;
-
-  const PDFPreviewScreen({Key? key, required this.pdfFile}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('PDF Preview'),
-      ),
-      body: PdfPreview(
-        build: (format) => pdfFile.readAsBytesSync(),
-        allowSharing: true,
-        allowPrinting: true,
-      ),
-    );
   }
 }

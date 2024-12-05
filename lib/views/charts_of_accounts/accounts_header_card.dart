@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../common/color_extension.dart';
-import 'charts_of_accounts.dart';
 import 'modal.dart';
 import 'sub_header_tile.dart';
 import 'total_section.dart';
@@ -11,9 +10,9 @@ class AccountHeaderCard extends StatelessWidget {
   final AccountHeader header;
 
   const AccountHeaderCard({
-    Key? key,
+    super.key,
     required this.header,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

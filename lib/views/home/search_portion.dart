@@ -78,7 +78,7 @@ class _SearchWidgetState extends State<SearchWidget> with SingleTickerProviderSt
             _buildSearchRow(
               leftWidget: CustomDropdown(
                 hint: 'Select An Account',
-                items: ['Account 1', 'Account 2', 'Account 3'], // Dummy data
+                items: const ['Account 1', 'Account 2', 'Account 3'], // Dummy data
                 onChanged: (value) {},
               ),
               rightButtonLabel: 'Search',
@@ -88,7 +88,7 @@ class _SearchWidgetState extends State<SearchWidget> with SingleTickerProviderSt
             _buildSearchRow(
               leftWidget: CustomDropdown(
                 hint: 'Select Foreign Account',
-                items: ['Foreign Account 1', 'Foreign Account 2'], // Dummy data
+                items: const ['Foreign Account 1', 'Foreign Account 2'], // Dummy data
                 onChanged: (value) {},
               ),
               rightButtonLabel: 'View',
@@ -98,7 +98,7 @@ class _SearchWidgetState extends State<SearchWidget> with SingleTickerProviderSt
             _buildSearchRow(
               leftWidget: CustomDropdown(
                 hint: 'Search by Voucher No',
-                items: ['Voucher 1', 'Voucher 2', 'Voucher 3'], // Dummy data
+                items: const ['Voucher 1', 'Voucher 2', 'Voucher 3'], // Dummy data
                 onChanged: (value) {},
               ),
               rightButtonLabel: 'View',
@@ -108,7 +108,7 @@ class _SearchWidgetState extends State<SearchWidget> with SingleTickerProviderSt
             _buildSearchRow(
               leftWidget: CustomDropdown(
                 hint: 'Consultant Sales',
-                items: ['Consultant A', 'Consultant B'], // Dummy data
+                items: const ['Consultant A', 'Consultant B'], // Dummy data
                 onChanged: (value) {},
               ),
               rightButtonLabel: 'Cons Wise',
@@ -118,7 +118,7 @@ class _SearchWidgetState extends State<SearchWidget> with SingleTickerProviderSt
             _buildSearchRow(
               leftWidget: CustomDropdown(
                 hint: 'Select Users',
-                items: ['User 1', 'User 2'], // Dummy data
+                items: const ['User 1', 'User 2'], // Dummy data
                 onChanged: (value) {},
               ),
               rightButtonLabel: 'User Wise',
@@ -128,7 +128,7 @@ class _SearchWidgetState extends State<SearchWidget> with SingleTickerProviderSt
             _buildSearchRow(
               leftWidget: CustomDropdown(
                 hint: 'Select Multi Invoice',
-                items: ['Invoice 1', 'Invoice 2'], // Dummy data
+                items: const ['Invoice 1', 'Invoice 2'], // Dummy data
                 onChanged: (value) {},
               ),
               rightButtonLabel: 'Invoice',

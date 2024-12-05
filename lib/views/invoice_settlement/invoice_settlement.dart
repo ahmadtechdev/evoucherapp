@@ -5,7 +5,6 @@ import 'package:evoucher/common_widget/dart_selector2.dart';
 import 'package:evoucher/views/invoice_settlement/single_invoice_settlement_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 class InvoiceSettlement extends StatelessWidget {
   const InvoiceSettlement({super.key});
@@ -161,7 +160,7 @@ class InvoiceSettlement extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: GestureDetector(
         onTap: (){
-          Get.to(()=> InvoiceSettlementPage());
+          Get.to(()=> const InvoiceSettlementPage());
         },
         child: Card(
           elevation: 4,

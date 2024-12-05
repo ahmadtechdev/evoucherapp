@@ -9,9 +9,9 @@ class AccountTypeExpansionTile extends StatelessWidget {
   final AccountType accountType;
 
   const AccountTypeExpansionTile({
-    Key? key,
+    super.key,
     required this.accountType,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +30,8 @@ class AccountTypeExpansionTile extends StatelessWidget {
               },
             ),
             // This is the default expansion arrow icon
-            RotationTransition(
-              turns: const AlwaysStoppedAnimation(0.0),
+            const RotationTransition(
+              turns: AlwaysStoppedAnimation(0.0),
               child: Icon(Icons.expand_more),
             ),
           ],

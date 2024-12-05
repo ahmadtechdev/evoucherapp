@@ -1,41 +1,13 @@
-import 'package:evoucher/common_widget/dart_selector2.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
+import 'package:evoucher/common_widget/dart_selector2.dart';
 import '../../common/color_extension.dart';
 import '../../common/drawer.dart';
+import 'controller/daily_activity_controller.dart';
 
-class DailyActivityReport extends StatefulWidget {
-  const DailyActivityReport({super.key});
-
-  @override
-  DailyActivityReportState createState() => DailyActivityReportState();
-}
-
-class DailyActivityReportState extends State<DailyActivityReport> {
-  DateTime fromDate = DateTime.now();
-  DateTime toDate = DateTime.now();
-
-  // Dummy data
-  final List<Map<String, dynamic>> activities = [
-    {
-      'voucherNo': 'CV 877',
-      'date': DateTime.now(),
-      'account': 'Afaq Travels',
-      'description': 'TEST',
-      'debit': 25.00,
-      'credit': 0.00,
-    },
-    {
-      'voucherNo': 'CV 877',
-      'date': DateTime.now(),
-      'account': 'Cash',
-      'description': 'TEST',
-      'debit': 0.00,
-      'credit': 25.00,
-    },
-    // Add more dummy data as needed
-  ];
+class DailyActivityReport extends StatelessWidget {
+  final DailyActivityReportController controller = Get.put(DailyActivityReportController());
 
   @override
   Widget build(BuildContext context) {
@@ -69,18 +41,26 @@ class DailyActivityReportState extends State<DailyActivityReport> {
                   Row(
                     children: [
                       Expanded(
-                          child: DateSelector2(
-                              label: "From: ",
-                              fontSize: 12,
-                              initialDate: fromDate,
-                              onDateChanged: (date) {})),
+                        child: DateSelector2(
+                          label: "From: ",
+                          fontSize: 12,
+                          initialDate: controller.fromDate.value,
+                          onDateChanged: (date) {
+                            controller.fromDate.value = date;
+                          },
+                        ),
+                      ),
                       const SizedBox(width: 16),
                       Expanded(
-                          child: DateSelector2(
-                              label: "  To: ",
-                              fontSize: 12,
-                              initialDate: toDate,
-                              onDateChanged: (date) {})),
+                        child: DateSelector2(
+                          label: "To: ",
+                          fontSize: 12,
+                          initialDate: controller.toDate,
+                          onDateChanged: (date) {
+                            controller.toDate = date;
+                          },
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -88,17 +68,20 @@ class DailyActivityReportState extends State<DailyActivityReport> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // Implement Submit functionality
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: TColor.primary,
                           foregroundColor: TColor.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                         ),
                         child: const Text('Submit'),
                       ),
                       ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          // Implement Print Report functionality
+                        },
                         icon: const Icon(Icons.print),
                         label: const Text('Print Report'),
                         style: ElevatedButton.styleFrom(
@@ -110,152 +93,146 @@ class DailyActivityReportState extends State<DailyActivityReport> {
                   ),
                   const SizedBox(height: 8),
                   Center(
-                    child: Text(
-                      'From ${DateFormat('E, dd MMM yyyy').format(fromDate)} To ${DateFormat('E, dd MMM yyyy').format(toDate)}',
-                      style: TextStyle(
-                        color: TColor.primaryText,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    child: Obx(() {
+                      return Text(
+                        'From ${DateFormat('E, dd MMM yyyy').format(controller.fromDate.value)} To ${DateFormat('E, dd MMM yyyy').format(controller.toDate)}',
+                        style: TextStyle(
+                          color: TColor.primaryText,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    }),
                   ),
                 ],
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: activities.length,
-                itemBuilder: (context, index) {
-                  final activity = activities[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    decoration: BoxDecoration(
-                      color: TColor.white,
-                      border: Border.all(
-                        color: TColor.primary.withOpacity(0.2),
-                        width: 1.0,
+              child: Obx(() {
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: controller.activities.length,
+                  itemBuilder: (context, index) {
+                    final activity = controller.activities[index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: TColor.white,
+                        border: Border.all(
+                          color: TColor.primary.withOpacity(0.2),
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color:TColor.primary.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: TColor.primary.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    activity.voucherNo,
+                                    style: TextStyle(
+                                      color: TColor.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
-                                child: Text(
-                                  activity['voucherNo'],
+                                Text(
+                                  controller.formatDate(activity.date),
                                   style: TextStyle(
-                                    color: TColor.primary,
-                                    fontWeight: FontWeight.bold,
+                                    color: TColor.secondaryText,
                                   ),
                                 ),
-                              ),
-                              Text(
-                                DateFormat('dd MMM yyyy')
-                                    .format(activity['date']),
-                                style: TextStyle(
-                                  color: TColor.secondaryText,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                activity['account'],
-                                style: TextStyle(
-                                  color: TColor.primaryText,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color:TColor.third.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Debit',
-                                          style: TextStyle(
-                                              color: TColor.secondaryText),
-                                        ),
-                                        Text(
-                                          'Rs ${activity['debit'].toStringAsFixed(2)}',
-                                          style: TextStyle(
-                                            color: TColor.third,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 8,
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color:TColor.secondary.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Credit',
-                                          style:
-                                          TextStyle(color: TColor.secondaryText),
-                                        ),
-                                        Text(
-                                          'Rs ${activity['credit'].toStringAsFixed(2)}',
-                                          style: TextStyle(
-                                            color: TColor.secondary,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            activity['description'],
-                            style: TextStyle(
-                              color: TColor.secondaryText,
-                              fontSize: 14,
+                              ],
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  activity.account,
+                                  style: TextStyle(
+                                    color: TColor.primaryText,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: TColor.third.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Debit',
+                                            style: TextStyle(color: TColor.secondaryText),
+                                          ),
+                                          Text(
+                                            'Rs ${activity.debit.toStringAsFixed(2)}',
+                                            style: TextStyle(
+                                              color: TColor.third,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: TColor.secondary.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Credit',
+                                            style: TextStyle(color: TColor.secondaryText),
+                                          ),
+                                          Text(
+                                            'Rs ${activity.credit.toStringAsFixed(2)}',
+                                            style: TextStyle(
+                                              color: TColor.secondary,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              activity.description,
+                              style: TextStyle(
+                                color: TColor.secondaryText,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                );
+              }),
             ),
           ],
         ),
