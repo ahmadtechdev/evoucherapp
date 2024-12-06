@@ -1,245 +1,341 @@
-import 'package:evoucher/views/accounts/accounts_ledger/view_accounts_ledger.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:intl/intl.dart';
 
-import '../../common/color_extension.dart';
-import '../../common/drawer.dart';
+  import 'package:evoucher/common_widget/round_textfield.dart';
+  import 'package:flutter/material.dart';
+  import 'package:intl/intl.dart';
 
-class TopCustomer extends StatefulWidget {
-  const TopCustomer({Key? key}) : super(key: key);
+  import '../../common/color_extension.dart';
+  import '../../common/drawer.dart';
 
-  @override
-  State<TopCustomer> createState() => _TopCustomerState();
-}
+  class CustomerReportScreen extends StatefulWidget {
+    const CustomerReportScreen({super.key});
 
-class _TopCustomerState extends State<TopCustomer> {
-  String? selectedYear; // Changed to nullable String
-  String searchQuery = "";
-
-  final List<String> years = ["2020", "2021", "2022", "2023", "2024"];
-  final List<Map<String, dynamic>> salesData = [
-    {"name": "ALI AMEEN", "2020": 0.0, "2021": 0.0, "2022": 0.0, "2023": 775000.00, "2024": 135000.00, "total": 910000.00},
-    {"name": "MOHSIN ALI", "2020": 0.0, "2021": 0.0, "2022": 301766.00, "2023": 0.0, "2024": 385000.00, "total": 686766.00},
-    {"name": "AHMED KHAN", "2020": 100000.00, "2021": 200000.00, "2022": 150000.00, "2023": 300000.00, "2024": 400000.00, "total": 1150000.00},
-    {"name": "USMAN SAEED", "2020": 50000.00, "2021": 0.0, "2022": 100000.00, "2023": 200000.00, "2024": 250000.00, "total": 600000.00},
-    {"name": "KASHIF ALI", "2020": 0.0, "2021": 75000.00, "2022": 125000.00, "2023": 175000.00, "2024": 250000.00, "total": 625000.00},
-    {"name": "FAHAD RAZA", "2020": 25000.00, "2021": 50000.00, "2022": 75000.00, "2023": 100000.00, "2024": 150000.00, "total": 400000.00},
-    {"name": "ASIF IQBAL", "2020": 0.0, "2021": 0.0, "2022": 200000.00, "2023": 300000.00, "2024": 350000.00, "total": 850000.00},
-    {"name": "SAQIB JAVED", "2020": 100000.00, "2021": 150000.00, "2022": 0.0, "2023": 200000.00, "2024": 300000.00, "total": 750000.00},
-    {"name": "TANVIR HUSSAIN", "2020": 0.0, "2021": 50000.00, "2022": 100000.00, "2023": 150000.00, "2024": 250000.00, "total": 550000.00},
-    {"name": "HASSAN SHAH", "2020": 75000.00, "2021": 100000.00, "2022": 125000.00, "2023": 150000.00, "2024": 175000.00, "total": 625000.00},
-  ];
-
-  List<Map<String, dynamic>> get filteredData {
-    var filtered = salesData
-        .where((sale) =>
-        sale["name"].toString().toLowerCase().contains(searchQuery.toLowerCase()))
-        .toList();
-
-    // Only sort if a year is selected
-    if(selectedYear != null) {
-      filtered.sort((a, b) {
-        double valueA = a[selectedYear] as double;
-        double valueB = b[selectedYear] as double;
-
-        if ((valueA == 0 && valueB == 0) || (valueA != 0 && valueB != 0)) {
-          return 0;
-        }
-        if (valueA == 0) {
-          return -1;
-        }
-        return 1;
-      });
-    }
-
-    return filtered;
+    @override
+    State<CustomerReportScreen> createState() => _CustomerReportScreenState();
   }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: TColor.white,
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: TColor.primary,
-        foregroundColor: TColor.white,
-        title: const Text('Top Customer Sale Report'),
-      ),
-      drawer: const CustomDrawer(currentIndex: 15),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: TColor.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: TColor.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+
+  class _CustomerReportScreenState extends State<CustomerReportScreen> {
+    int selectedYear = 2024;
+    final searchController = TextEditingController();
+
+    final List<Map<String, dynamic>> activeCustomers = [
+      {
+        'rank': 1,
+        'name': 'MOHSIN ALI',
+        'ticket': 0.00,
+        'hotel': 385000.00,
+        'visa': 0.00,
+        'transport': 0.00,
+        'other': 0.00,
+        'total': 385000.00,
+        'percentage': 42.2524
+      },
+      {
+        'rank': 2,
+        'name': 'AHMED C/O MUNIR',
+        'ticket': 60000.00,
+        'hotel': 100000.00,
+        'visa': 50480.00,
+        'transport': 0.00,
+        'other': 0.00,
+        'total': 210480.00,
+        'percentage': 23.0995
+      },
+      {
+        'rank': 3,
+        'name': 'HUSSNAIN ALI',
+        'ticket': 23860.00,
+        'hotel': 124000.00,
+        'visa': 32850.00,
+        'transport': 0.00,
+        'other': 0.00,
+        'total': 180710.00,
+        'percentage': 19.8323
+      },
+      {
+        'rank': 4,
+        'name': 'ALI AMEEN',
+        'ticket': 80000.00,
+        'hotel': 25000.00,
+        'visa': 30000.00,
+        'transport': 0.00,
+        'other': 0.00,
+        'total': 135000.00,
+        'percentage': 14.8158
+      },
+    ];
+    final List<Map<String, dynamic>> zeroSaleCustomers = [
+      {
+        'rank': 5,
+        'name': 'MR Afaq',
+        'ticket': 0.00,
+        'hotel': 0.00,
+        'visa': 0.00,
+        'transport': 0.00,
+        'other': 0.00,
+        'total': 0.00,
+        'percentage': 0.0000
+      },
+      {
+        'rank': 6,
+        'name': 'Mr. Adnan',
+        'ticket': 0.00,
+        'hotel': 0.00,
+        'visa': 0.00,
+        'transport': 0.00,
+        'other': 0.00,
+        'total': 0.00,
+        'percentage': 0.0000
+      },
+      {
+        'rank': 7,
+        'name': 'Mr. Adnan Kashif',
+        'ticket': 0.00,
+        'hotel': 0.00,
+        'visa': 0.00,
+        'transport': 0.00,
+        'other': 0.00,
+        'total': 0.00,
+        'percentage': 0.0000
+      },
+      {
+        'rank': 8,
+        'name': 'MEHRAN WALKING CUSTOMER',
+        'ticket': 0.00,
+        'hotel': 0.00,
+        'visa': 0.00,
+        'transport': 0.00,
+        'other': 0.00,
+        'total': 0.00,
+        'percentage': 0.0000
+      },
+    ];
+
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        backgroundColor: TColor.white,
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: TColor.primary,
+          foregroundColor: TColor.white,
+          title: const Text('Top Customer Sale Report'),
+        ),
+        drawer: const CustomDrawer(currentIndex: 15),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: TColor.textfield,
-                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: TColor.secondaryText.withOpacity(0.2)),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      child: TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            searchQuery = value;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Search accounts...",
-                          hintStyle: TextStyle(color: TColor.placeholder),
-                          border: InputBorder.none,
-                          icon: Icon(Icons.search, color: TColor.secondary),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: TColor.textfield,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: selectedYear, // Now can be null
-                        hint: const Text("Select Year"), // Shows when no year is selected
-                        items: years.map((year) {
+                      child: DropdownButton<int>(
+                        value: selectedYear,
+                        underline: const SizedBox(),
+                        items: List.generate(5, (index) => 2024 - index).map((year) {
                           return DropdownMenuItem(
                             value: year,
-                            child: Text(year),
+                            child: Text('YEAR - $year'),
                           );
                         }).toList(),
                         onChanged: (value) {
-                          setState(() {
-                            selectedYear = value;
-                          });
+                          setState(() => selectedYear = value!);
                         },
                       ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Spacer(),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.print),
+                      label: const Text('Print Report'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: TColor.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                      ),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+
+                SearchTextField(hintText: "Search...", onChange: (date) {}),
+
+                Expanded(
+                  child: ListView(
+                    children: [
+                      // Active Customers Section
+                      ...activeCustomers.map((customer) => _buildCustomerCard(customer)),
+
+                      // Zero Sales Section Header
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade700,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Accounts with Zero Sales',
+                          style: TextStyle(
+                            color: TColor.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+
+                      // Zero Sales Customers
+                      ...zeroSaleCustomers.map((customer) => _buildCustomerCard(customer)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    Widget _buildCustomerCard(Map<String, dynamic> customer) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: TColor.white,
+          border: Border.all(
+            color: TColor.primary.withOpacity(0.2),
+            width: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: TColor.black.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'Rank ${customer['rank']}',
+                      style: TextStyle(
+                        color: TColor.primaryText,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      customer['name'],
+                      style: TextStyle(
+                        color: TColor.primaryText,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '${customer['percentage'].toStringAsFixed(2)}%',
+                    style: TextStyle(
+                      color: TColor.secondary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                childAspectRatio: 2.5,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                children: [
+                  _buildSaleItem('Ticket Sale', customer['ticket'], TColor.primary),
+                  _buildSaleItem('Hotel Sale', customer['hotel'], TColor.secondary),
+                  _buildSaleItem('Visa Sale', customer['visa'], TColor.third),
+                  _buildSaleItem('Transport Sale', customer['transport'], TColor.fourth),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: TColor.black.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Total Sale',
+                      style: TextStyle(
+                        color: TColor.primaryText,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'Rs. ${NumberFormat('#,##0.00').format(customer['total'])}',
+                      style: TextStyle(
+                        color: TColor.primaryText,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    Widget _buildSaleItem(String title, double amount, Color color) {
+      return Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: TColor.primaryText,
+                fontSize: 12,
+              ),
             ),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: filteredData.length,
-                itemBuilder: (context, index) {
-                  final sale = filteredData[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: TColor.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: TColor.primary.withOpacity(0.08),
-                          blurRadius: 15,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                        // onTap: () => Get.to(() => const LedgerScreen(accountId: '',))
-                        //
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: TColor.primary.withOpacity(0.1),
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(16),
-                                topRight: Radius.circular(16),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    sale["name"],
-                                    style: TextStyle(
-                                      color: TColor.primaryText,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: TColor.primary,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    "${sale["total"].toStringAsFixed(2)}",
-                                    style: TextStyle(
-                                      color: TColor.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            children: years.map((year) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      year,
-                                      style: TextStyle(
-                                        color: TColor.secondaryText,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    Text(
-                                      NumberFormat('#,##0.00').format(sale[year]),
-                                      style: TextStyle(
-                                        color: TColor.primaryText,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+            const SizedBox(height: 4),
+            Text(
+              'Rs. ${NumberFormat('#,##0.00').format(amount)}',
+              style: TextStyle(
+                color: color,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
         ),
-      ),
-    );
+      );
+    }
   }
-}

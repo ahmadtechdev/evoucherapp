@@ -1,4 +1,4 @@
-import 'package:evoucher/views/accounts/accounts/account_controller.dart';
+import 'package:evoucher/views/accounts/accounts/controller/account_controller.dart';
 import 'package:evoucher/views/finance_voucher/entry_controller.dart';
 import 'package:evoucher/views/incomes_report/controller/income_controller.dart';
 import 'package:evoucher/views/welcome_view.dart';

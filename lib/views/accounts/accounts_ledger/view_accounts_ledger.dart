@@ -10,8 +10,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../common/color_extension.dart';
 import '../../../common_widget/round_textfield.dart';
 
-import 'ledger_controller.dart';
-import 'ledger_modal.dart';
+import 'controller/ledger_controller.dart';
+import 'models/ledger_modal.dart';
 import 'package:flutter/material.dart';
 
 class LedgerScreen extends StatelessWidget {

@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../common/color_extension.dart';
 import '../../common/drawer.dart';
 import '../../common_widget/dart_selector2.dart';
+import 'controller/daily_cash_controller.dart';
+import 'models/daily_cash_activity_model.dart';
 
-class DailyCashActivity extends StatefulWidget {
+class DailyCashActivity extends StatelessWidget {
   const DailyCashActivity({super.key});
 
   @override
-  State<DailyCashActivity> createState() => _DailyCashActivityState();
-}
-
-class _DailyCashActivityState extends State<DailyCashActivity> {
-  DateTime selectedDate = DateTime.now();
-
-  @override
   Widget build(BuildContext context) {
+    final DailyCashController controller = Get.put(DailyCashController());
+
     return Scaffold(
       backgroundColor: TColor.white,
       appBar: AppBar(
@@ -30,173 +28,95 @@ class _DailyCashActivityState extends State<DailyCashActivity> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: TColor.white,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width/2.5,
-                    child: DateSelector2(
-                      label: "Select Date:",
-                        fontSize: 12,
-                        initialDate: selectedDate,
-                        onDateChanged: (date) {}),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.print, color: Colors.white),
-                    label: const Text('Print Report',
-                        style: TextStyle(color: Colors.white)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: TColor.secondary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Center(
-              child: Text(
-                'Date: ${DateFormat('E, dd MMM yyyy').format(selectedDate)}',
-                style: TextStyle(
-                  color: TColor.primaryText,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1.5,
-                children: [
-                  _buildSummaryCard(
-                    'Opening Balance',
-                    'PKR 39,901 Cr',
-                    TColor.primary,
-                    Icons.account_balance,
-                  ),
-                  _buildSummaryCard(
-                    'Total Cash Received',
-                    'Rs. 25.00',
-                    TColor.secondary,
-                    Icons.arrow_downward,
-                  ),
-                  _buildSummaryCard(
-                    'Total Cash Paid',
-                    'Rs. 25.00',
-                    TColor.third,
-                    Icons.arrow_upward,
-                  ),
-                  _buildSummaryCard(
-                    'Closing Balance',
-                    'Rs. -39,901',
-                    TColor.fourth,
-                    Icons.account_balance_wallet,
-                  ),
-                ],
-              ),
-            ),
-            _buildSection(
-              'Cash Received',
-              TColor.secondary,
-              [
-                _Transaction(
-                  voucherNo: 'CV 877',
-                  account: 'Afaq Travels',
-                  description: 'TEST',
-                  status: 'Posted',
-                  amount: '25.00',
-                ),_Transaction(
-                  voucherNo: 'CV 877',
-                  account: 'Afaq Travels',
-                  description: 'TEST',
-                  status: 'Posted',
-                  amount: '25.00',
-                ),_Transaction(
-                  voucherNo: 'CV 877',
-                  account: 'Afaq Travels',
-                  description: 'TEST',
-                  status: 'Posted',
-                  amount: '25.00',
-                ),
-              ],
-            ),
-            _buildSection(
-              'Cash Paid',
-              TColor.third,
-              [
-                _Transaction(
-                  voucherNo: 'CV 877',
-                  account: 'Afaq Travels',
-                  description: 'TEST',
-                  status: 'Posted',
-                  amount: '25.00',
-                ),_Transaction(
-                  voucherNo: 'CV 877',
-                  account: 'Afaq Travels',
-                  description: 'TEST',
-                  status: 'Posted',
-                  amount: '25.00',
-                ),_Transaction(
-                  voucherNo: 'CV 877',
-                  account: 'Afaq Travels',
-                  description: 'TEST',
-                  status: 'Posted',
-                  amount: '25.00',
-                ),
-              ],
-            ),
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildTotalItem('Total Received', '25', TColor.secondary),
-                  _buildTotalItem('Total Paid', '25', TColor.third),
-                  _buildTotalItem('Closing Balance', '-39901', TColor.fourth),
-                ],
-              ),
-            ),
+            _buildDateSelector(controller, context),
+            _buildDateDisplay(controller),
+            _buildSummaryGrid(),
+            _buildSection('Cash Received', TColor.secondary, controller.receivedTransactions),
+            _buildSection('Cash Paid', TColor.third, controller.paidTransactions),
+            _buildTotalSummary(controller),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSummaryCard(
-      String title, String amount, Color color, IconData icon) {
+  Widget _buildDateSelector(DailyCashController controller, BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: TColor.white,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width / 2.5,
+            child: DateSelector2(
+              label: "Select Date:",
+              fontSize: 12,
+              initialDate: controller.selectedDate.value,
+              onDateChanged: (date) => controller.updateSelectedDate(date),
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: () => controller.printReport(),
+            icon: const Icon(Icons.print, color: Colors.white),
+            label: const Text('Print Report', style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: TColor.secondary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateDisplay(DailyCashController controller) {
+    return Center(
+      child: Obx(() {
+        return Text(
+            'Date: ${DateFormat('E, dd MMM yyyy').format(controller.selectedDate.value)}',
+            style: TextStyle(
+              color: TColor.primaryText,
+              fontWeight: FontWeight.w500,
+            ));
+      }),
+    );
+  }
+
+  Widget _buildSummaryGrid() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 1.5,
+        children: [
+          _buildSummaryCard('Opening Balance', 'PKR 39,901 Cr', TColor.primary, Icons.account_balance),
+          _buildSummaryCard('Total Cash Received', 'Rs. 25.00', TColor.secondary, Icons.arrow_downward),
+          _buildSummaryCard('Total Cash Paid', 'Rs. 25.00', TColor.third, Icons.arrow_upward),
+          _buildSummaryCard('Closing Balance', 'Rs. -39,901', TColor.fourth, Icons.account_balance_wallet),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard(String title, String amount, Color color, IconData icon) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       decoration: BoxDecoration(
         color: TColor.white,
-        borderRadius: BorderRadius.circular(12,),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: color.withOpacity(0.1),
@@ -239,8 +159,7 @@ class _DailyCashActivityState extends State<DailyCashActivity> {
     );
   }
 
-  Widget _buildSection(
-      String title, Color color, List<_Transaction> transactions) {
+  Widget _buildSection(String title, Color color, List<DailyCashModel> transactions) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
@@ -255,21 +174,18 @@ class _DailyCashActivityState extends State<DailyCashActivity> {
             ),
           ),
           const SizedBox(height: 12),
-          ...transactions.map((transaction) => _buildTransactionCard(
-                transaction,
-                color,
-              )),
+          ...transactions.map((transaction) => _buildTransactionCard(transaction, color)),
         ],
       ),
     );
   }
 
-  Widget _buildTransactionCard(_Transaction transaction, Color color) {
+  Widget _buildTransactionCard(DailyCashModel transaction, Color color) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 4,
       color: TColor.white,
-      shadowColor:TColor.primary.withOpacity(0.3),
+      shadowColor: TColor.primary.withOpacity(0.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
@@ -292,8 +208,7 @@ class _DailyCashActivityState extends State<DailyCashActivity> {
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -349,6 +264,32 @@ class _DailyCashActivityState extends State<DailyCashActivity> {
     );
   }
 
+  Widget _buildTotalSummary(DailyCashController controller) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildTotalItem('Total Received', '${controller.totalReceived}', TColor.secondary),
+          _buildTotalItem('Total Paid', '${controller.totalPaid}', TColor.third),
+          _buildTotalItem('Closing Balance', '${controller.closingBalance}', TColor.fourth),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTotalItem(String label, String value, Color color) {
     return Column(
       children: [
@@ -371,20 +312,4 @@ class _DailyCashActivityState extends State<DailyCashActivity> {
       ],
     );
   }
-}
-
-class _Transaction {
-  final String voucherNo;
-  final String account;
-  final String description;
-  final String status;
-  final String amount;
-
-  _Transaction({
-    required this.voucherNo,
-    required this.account,
-    required this.description,
-    required this.status,
-    required this.amount,
-  });
 }

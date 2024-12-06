@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 
 import '../../common/color_extension.dart';
-import 'accounts_header_card.dart';
-import 'modal.dart';
+import 'widgets/accounts_header_card.dart';
+import 'models/modal.dart';
 
 
 class ChartOfAccountsScreen extends StatelessWidget {

@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../common/accounts_dropdown.dart';
-import '../accounts/accounts/account_controller.dart';
+import '../accounts/accounts/controller/account_controller.dart';
 import 'entry_controller.dart';
 
 class EntryCardData {

@@ -117,7 +117,7 @@ class _BankEntryVoucherState extends State<BankEntryVoucher> {
 // import '../../../common/color_extension.dart';
 // import '../../../common_widget/date_selecter.dart';
 // import '../entry_card.dart';
-// import 'bank_voucher_provider.dart';
+// import 'not_used_bank_voucher_provider.dart';
 //
 // class BankEntryVoucher extends ConsumerStatefulWidget {
 //   const BankEntryVoucher({super.key});

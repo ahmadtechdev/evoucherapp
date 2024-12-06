@@ -1,6 +1,6 @@
 import 'package:evoucher/views/accounts/accounts/accounts.dart';
 import 'package:evoucher/views/home/home.dart';
-import 'package:evoucher/views/invoice_settlement/invoice_settlement.dart';
+import 'package:evoucher/views/invoice_settlement/invoice_settlement/invoice_settlement.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../views/daily_acitvity_report/daily_activity_report.dart';
@@ -11,8 +11,9 @@ import '../views/expense_report/expense_report.dart';
 import '../views/incomes_report/income_report_view.dart';
 import '../views/monthly_sale_report/monthly_sale_report.dart';
 import '../views/recovery_list/recovery_list.dart';
+import '../views/5_year_customers_sales/5_year_customers_sale.dart';
 import '../views/top_customer_sale/top_customer_sale.dart';
-import '../views/trial_balance/charts_of_accounts.dart';
+import '../views/trial_balance/trial_balance.dart';
 import 'color_extension.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -212,8 +213,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         title: 'Daily Cash Activity',
         icon: Icons.analytics_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => const DailyCashActivity()),
-
+        onTap: () => Get.to(() =>  DailyCashActivity()),
       ),
       _buildNavigationItem(
         title: 'Monthly Sale Report',
@@ -243,7 +243,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         title: 'Recovery List',
         icon: Icons.analytics_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => const RecoveryListsScreen()),
+        onTap: () => Get.to(() => RecoveryListsScreen()),
 
       ),
     ]);
@@ -261,7 +261,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         title: 'Trial Balance',
         icon: Icons.analytics_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => const TrialOfBalanceScreen()),
+        onTap: () => Get.to(() => TrialOfBalanceScreen()),
 
       ),
     ]);
@@ -284,27 +284,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
         title: 'Top Customers Sales',
         icon: Icons.analytics_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => const TopCustomer()),
+        onTap: () => Get.to(() => const CustomerReportScreen()),
+
+      ),_buildNavigationItem(
+        title: '5 Year Customers Sales',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => const FiveYearsCustomerSale()),
 
       ),
     ]);
-
-    // Sales Reports Section
-    final salesReports = [
-
-      '5 Year Customers Sales',
-    ];
-
-    items.addAll(
-      salesReports.map((title) => _buildNavigationItem(
-            title: title,
-            icon: Icons.trending_up_rounded,
-            index: currentIndex++,
-            textColor: TColor.third,
-            iconColor: TColor.third,
-          )),
-    );
-
     return items;
   }
 
