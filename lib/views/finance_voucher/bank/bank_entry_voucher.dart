@@ -1,8 +1,16 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../common/color_extension.dart';
 import '../../../common_widget/date_selecter.dart';
-import '../entry_card.dart';
+import '../../../common_widget/snackbar.dart';
+import '../../../service/api_service.dart';
+import '../widgets/entry_card.dart';
+import '../controller/entry_controller.dart';
 
 class BankEntryVoucher extends StatefulWidget {
   const BankEntryVoucher({super.key});
@@ -13,10 +21,22 @@ class BankEntryVoucher extends StatefulWidget {
 
 class _BankEntryVoucherState extends State<BankEntryVoucher> {
   DateTime selectedDate = DateTime.now();
-
+  late final VoucherController _voucherController;
+  bool _isSaving = false;
+  final ApiService _apiService = ApiService();
   double totalDebit = 0.0;
   double totalCredit = 0.0;
   final FocusNode _mainFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // Use Get.find instead of Get.put to ensure the controller is already registered
+    _voucherController = Get.find<VoucherController>();
+
+    // Clear any existing entries when the page is first loaded
+    _voucherController.clearEntries();
+  }
 
   @override
   void dispose() {
@@ -25,6 +45,97 @@ class _BankEntryVoucherState extends State<BankEntryVoucher> {
     super.dispose();
   }
 
+  Future<void> _saveVoucher() async {
+    // Validate that entries exist
+    if (_voucherController.entries.isEmpty) {
+      CustomSnackBar(
+          message: 'Please add at least one voucher entry',
+          backgroundColor: TColor.third
+      ).show();
+      return;
+    }
+
+    // Validate total debit and credit balance
+    if (_voucherController.totalDebit.value != _voucherController.totalCredit.value) {
+      CustomSnackBar(
+          message: 'Total Debit and Total Credit must be equal to save',
+          backgroundColor: TColor.third
+      ).show();
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
+    try {
+      // API Service Implementation
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
+
+      final payload = {
+        "voucher_date": selectedDate.toIso8601String().split('T')[0],
+        "voucher_detail": _voucherController.entries.map((entry) {
+          return {
+            "cheque_number": entry.cheque,
+            "description": entry.description,
+            "account_id": entry.account,
+            "debit": entry.debit.toString(),
+            "credit": entry.credit.toString(),
+          };
+        }).toList(),
+      };
+
+      var request = http.Request('POST', Uri.parse('https://evoucher.pk/api-new/bankVoucher'));
+      request.body = json.encode(payload);
+      request.headers.addAll(headers);
+
+      http.StreamedResponse response = await request.send();
+
+      // Parse the response
+      final responseBody = await response.stream.bytesToString();
+      final responseData = json.decode(responseBody);
+
+      // Check for successful response
+      if (response.statusCode == 200) {
+        // Assuming the API returns a status and message
+        if (responseData['status'] == 'success') {
+          CustomSnackBar(
+              message: responseData['message'] ?? 'Voucher saved successfully',
+              backgroundColor: TColor.secondary
+          ).show();
+
+          // Clear entries after saving
+          _voucherController.clearEntries();
+
+          // Navigate back or clear the form
+          Navigator.pop(context);
+        } else {
+          CustomSnackBar(
+              message: responseData['message'] ?? 'Failed to save voucher',
+              backgroundColor: TColor.third
+          ).show();
+        }
+      } else {
+        // Handle non-200 status codes
+        CustomSnackBar(
+            message: 'Error: ${responseData['message'] ?? 'Server error'}',
+            backgroundColor: TColor.third
+        ).show();
+      }
+    } catch (e) {
+      // Handle any network or parsing errors
+      CustomSnackBar(
+          message: 'Error: ${e.toString()}',
+          backgroundColor: TColor.third
+      ).show();
+    } finally {
+      setState(() => _isSaving = false);
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -68,6 +179,7 @@ class _BankEntryVoucherState extends State<BankEntryVoucher> {
                   textFieldColor: TColor.textfield,
                   textColor: TColor.white,
                   placeholderColor: TColor.placeholder,
+                  showChequeField: true,
                   onTotalChanged: (totalDebit, totalCredit) {
                     // Optional: Handle total changes in parent widget
                     print('Total Debit: \$totalDebit, Total Credit: \$totalCredit');
@@ -77,22 +189,23 @@ class _BankEntryVoucherState extends State<BankEntryVoucher> {
                 Center(
                   child: SizedBox(
                     width: screenWidth * 0.6, // 60% of screen width
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Implement save functionality
-                      },
+                    child: // In your build method, update the Save button:
+                    ElevatedButton(
+                      onPressed: _isSaving ? null : _saveVoucher,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: TColor.secondary,
-                        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015), // Scaled vertical padding
+                        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100),
                         ),
                       ),
-                      child: Text(
+                      child: _isSaving
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
                         'Save',
                         style: TextStyle(
                           color: TColor.white,
-                          fontSize: screenHeight * 0.02, // Scaled font size
+                          fontSize: screenHeight * 0.02,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -108,207 +221,3 @@ class _BankEntryVoucherState extends State<BankEntryVoucher> {
   }
 }
 
-
-// // bank_entry_voucher.dart
-// import 'package:evoucher/common_widget/snackbar.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-//
-// import '../../../common/color_extension.dart';
-// import '../../../common_widget/date_selecter.dart';
-// import '../entry_card.dart';
-// import 'not_used_bank_voucher_provider.dart';
-//
-// class BankEntryVoucher extends ConsumerStatefulWidget {
-//   const BankEntryVoucher({super.key});
-//
-//   @override
-//   ConsumerState<BankEntryVoucher> createState() => _BankEntryVoucherState();
-// }
-//
-// class _BankEntryVoucherState extends ConsumerState<BankEntryVoucher> {
-//   bool _isSaving = false;
-//   late final ReusableEntryCard _entryCard;
-//   DateTime selectedDate = DateTime.now();
-//   double totalDebit = 0.0;
-//   double totalCredit = 0.0;
-//   final FocusNode _mainFocusNode = FocusNode();
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     _entryCard = ReusableEntryCard(
-//       showImageUpload: true,
-//       showChequeField: true,
-//       primaryColor: TColor.primary,
-//       textFieldColor: TColor.textfield,
-//       textColor: TColor.white,
-//       placeholderColor: TColor.placeholder,
-//       onTotalChanged: (debit, credit) {
-//         setState(() {
-//           totalDebit = debit;
-//           totalCredit = credit;
-//         });
-//       },
-//     );
-//   }
-//
-//   @override
-//   void dispose() {
-//     _mainFocusNode.dispose();
-//     super.dispose();
-//   }
-//
-//   Future<void> _saveVoucher() async {
-//     if (_isSaving) return;
-//
-//     // Validate totals match
-//     if ((totalDebit - totalCredit).abs() > 0.001) {
-//       // _showErrorSnackbar('Debit and Credit must be equal');
-//       CustomSnackBar(
-//         message: 'Debit and Credit must be equal',
-//         backgroundColor: TColor.third,
-//       ).show(context);
-//       return;
-//     }
-//
-//     // Get entries from provider
-//     final entries = ref.read(entriesProvider);
-//
-//     // Validate entries
-//     if (entries.isEmpty) {
-//       // _showErrorSnackbar('Please add at least one entry');
-//       CustomSnackBar(
-//         message: 'Please add at least one entry',
-//         backgroundColor: TColor.third,
-//       ).show(context);
-//       return;
-//     }
-//
-//     // Transform entries to API format
-//     final formattedEntries = entries.map((entry) {
-//       final Map<String, dynamic> entryMap = {
-//         'account_id': entry.account,
-//         'description': entry.descriptionController?.text ?? '',
-//         'debit': entry.debit,
-//         'credit': entry.credit,
-//       };
-//
-//       // Add optional fields
-//       if (entry.chequeController?.text.isNotEmpty ?? false) {
-//         entryMap['cheque_no'] = entry.chequeController!.text;
-//       }
-//
-//       // Handle image if present
-//       if (entry.imageFile != null) {
-//         // You would implement image upload logic here
-//         // entryMap['image'] = await uploadImage(entry.imageFile!);
-//       }
-//
-//       return entryMap;
-//     }).toList();
-//
-//     setState(() => _isSaving = true);
-//
-//     try {
-//       // Submit using provider
-//       await ref.read(bankVoucherProvider.notifier).submitVoucher(
-//             date: selectedDate.toString(),
-//             entries: formattedEntries,
-//           );
-//
-//       // _showSuccessSnackbar('Bank Voucher saved successfully');
-//       CustomSnackBar(
-//         message: "Bank Voucher saved successfully",
-//         backgroundColor: TColor.secondary,
-//       ).show(context);
-//       if (mounted) {
-//         Navigator.pop(context);
-//       }
-//     } catch (e) {
-//       // _showErrorSnackbar('Failed to save voucher: $e');
-//       CustomSnackBar(
-//         message: "Failed to save voucher: $e",
-//         backgroundColor: TColor.third,
-//       ).show(context);
-//     } finally {
-//       if (mounted) {
-//         setState(() => _isSaving = false);
-//       }
-//     }
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     // Watch bank voucher state for loading
-//     final bankVoucherState = ref.watch(bankVoucherProvider);
-//     final isLoading = bankVoucherState is AsyncLoading;
-//
-//     return GestureDetector(
-//       onTap: () => FocusScope.of(context).requestFocus(_mainFocusNode),
-//       child: Scaffold(
-//         appBar: AppBar(
-//           title: const Text('Bank Voucher'),
-//           backgroundColor: TColor.primary,
-//           foregroundColor: TColor.white,
-//         ),
-//         body: SingleChildScrollView(
-//           child: Padding(
-//             padding: const EdgeInsets.all(24),
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 DateSelector(
-//                   fontSize: 16,
-//                   initialDate: selectedDate,
-//                   label: "DATE:",
-//                   onDateChanged: (newDate) {
-//                     setState(() {
-//                       selectedDate = newDate;
-//                     });
-//                   },
-//                 ),
-//                 const SizedBox(height: 24),
-//                 _entryCard,
-//                 const SizedBox(height: 24),
-//                 Center(
-//                   child: SizedBox(
-//                     width: MediaQuery.of(context).size.width / 1.5,
-//                     child: ElevatedButton(
-//                       onPressed: isLoading ? null : _saveVoucher,
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: TColor.secondary,
-//                         padding: const EdgeInsets.symmetric(vertical: 12),
-//                         shape: RoundedRectangleBorder(
-//                           borderRadius: BorderRadius.circular(100),
-//                         ),
-//                       ),
-//                       child: isLoading
-//                           ? SizedBox(
-//                               height: 20,
-//                               width: 20,
-//                               child: CircularProgressIndicator(
-//                                 strokeWidth: 2,
-//                                 valueColor:
-//                                     AlwaysStoppedAnimation<Color>(TColor.white),
-//                               ),
-//                             )
-//                           : Text(
-//                               'Save',
-//                               style: TextStyle(
-//                                 color: TColor.white,
-//                                 fontSize: 16,
-//                                 fontWeight: FontWeight.bold,
-//                               ),
-//                             ),
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

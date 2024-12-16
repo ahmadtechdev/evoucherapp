@@ -9,12 +9,7 @@ class AccountsRepository {
   AccountsRepository({required this.api});
 
   Future<List<AccountModel>> getAccounts({String? subheadName}) async {
-    final Map<String, String> queryParams = {};
-    if (subheadName != null) {
-      queryParams['subhead_name'] = subheadName;
-    }
-
-    final response = await api.get('fetch-accounts', queryParams: queryParams);
+    final response = await api.fetchAccounts(subheadName: subheadName);
 
     if (response['status'] == 'success' && response['data'] != null) {
       return (response['data'] as List)
@@ -25,6 +20,7 @@ class AccountsRepository {
     throw Exception('Failed to fetch accounts');
   }
 }
+
 class AccountsController extends GetxController {
   // Instantiate the repository directly in the controller
   late final AccountsRepository repository;
@@ -48,7 +44,8 @@ class AccountsController extends GetxController {
   Future<void> fetchAccounts({String? subheadName}) async {
     try {
       isLoading.value = true;
-      final fetchedAccounts = await repository.getAccounts(subheadName: subheadName);
+      final fetchedAccounts =
+          await repository.getAccounts(subheadName: subheadName);
       accounts.assignAll(fetchedAccounts);
       filteredAccounts.assignAll(fetchedAccounts);
     } catch (error) {

@@ -34,7 +34,7 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
                       _buildUnsettledInvoicesHeader(),
                       ...controller.invoices.map((invoice) {
                         return _buildUnsettledInvoiceCard(controller, invoice);
-                      }).toList(),
+                      }),
                       SizedBox(height: controller.selectedInvoices.isEmpty ? 0 : 300),
                     ],
                   ),
@@ -45,7 +45,7 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
               if (controller.selectedInvoices.isNotEmpty) {
                 return _buildSelectedInvoicesSheet(controller);
               } else {
-                return SizedBox.shrink(); // Return an empty widget if no invoices are selected
+                return const SizedBox.shrink(); // Return an empty widget if no invoices are selected
               }
             }),
           ],
@@ -277,7 +277,7 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
                     ),
                     ...controller.selectedInvoices.map((invoice) {
                       return _buildSelectedInvoiceCard(controller, invoice);
-                    }).toList(),
+                    }),
                   ],
                 ),
               ),

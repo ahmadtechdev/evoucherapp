@@ -5,12 +5,14 @@ class EntryModel {
   String description;
   double debit;
   double credit;
+  String cheque;
 
   EntryModel({
     required this.account,
     required this.description,
     this.debit = 0.0,
     this.credit = 0.0,
+    this.cheque = '',
   });
 }
 
@@ -31,11 +33,12 @@ class VoucherController extends GetxController {
     }
   }
 
-  void updateEntryData(int index, String account, String description, double debit, double credit) {
+  void updateEntryData(int index, String account, String description, double debit, double credit, String cheque) {
     if (index >= 0 && index < entries.length) {
       entries[index] = EntryModel(
         account: account,
         description: description,
+        cheque: cheque,
         debit: debit,
         credit: credit,
       );

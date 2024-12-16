@@ -8,16 +8,16 @@ class DayCard extends StatefulWidget {
   final Map<String, dynamic> dayData;
 
   const DayCard({
-    Key? key,
+    super.key,
     required this.index,
     required this.dayData,
-  }) : super(key: key);
+  });
 
   @override
-  _DayCardState createState() => _DayCardState();
+  DayCardState createState() => DayCardState();
 }
 
-class _DayCardState extends State<DayCard> {
+class DayCardState extends State<DayCard> {
   bool isExpanded = false;
 
   @override

@@ -9,7 +9,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../common/color_extension.dart';
 import '../../../common_widget/round_textfield.dart';
-
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:flutter/services.dart';
 import 'controller/ledger_controller.dart';
 import 'models/ledger_modal.dart';
 import 'package:flutter/material.dart';
@@ -24,15 +27,118 @@ class LedgerScreen extends StatelessWidget {
     required this.accountName,
   });
 
+  Future<void> _exportToPDF(BuildContext context, LedgerController controller) async {
+    final pdf = pw.Document();
+
+    try {
+      // Load the logo
+      final ByteData logoData = await rootBundle.load('assets/img/logo.png');
+      final Uint8List logoBytes = logoData.buffer.asUint8List();
+      final logo = pw.MemoryImage(logoBytes);
+
+      pdf.addPage(
+        pw.MultiPage(
+          header: (context) => pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Image(logo, width: 100, height: 100),
+                  pw.Text(
+                    'Journey Online',
+                    style: pw.TextStyle(
+                      fontSize: 24,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              pw.Divider(),
+              pw.Text(
+                'Account Ledger Report',
+                style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.Text(
+                'Account: ${controller.accountName} (${controller.accountId})',
+                style: pw.TextStyle(fontSize: 14),
+              ),
+              pw.Text(
+                'Period: ${DateFormat('dd-MMM-yyyy').format(controller.fromDate.value)} to ${DateFormat('dd-MMM-yyyy').format(controller.toDate.value)}',
+                style: pw.TextStyle(fontSize: 14),
+              ),
+              pw.SizedBox(height: 20),
+            ],
+          ),
+          build: (context) => [
+            pw.TableHelper.fromTextArray(
+              context: context,
+              data: <List<String>>[
+                <String>[
+                  'Voucher',
+                  'Date',
+                  'Description',
+                  'Debit',
+                  'Credit',
+                  'Balance'
+                ],
+                ...controller.filteredVouchers.map((voucher) => [
+                  voucher.voucher,
+                  DateFormat('dd-MMM-yyyy').format(DateTime.parse(voucher.date)),
+                  voucher.description,
+                  voucher.debit.toStringAsFixed(2),
+                  voucher.credit.toStringAsFixed(2),
+                  voucher.balance,
+                ]),
+              ],
+              headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+              cellStyle: const pw.TextStyle(),
+              headerAlignment: pw.Alignment.centerLeft,
+              cellAlignment: pw.Alignment.centerLeft,
+
+            ),
+            pw.SizedBox(height: 20),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text(
+                  'Total Debit: ${NumberFormat('#,##0.00').format(controller.calculateTotalDebit())}',
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                ),
+                pw.Text(
+                  'Total Credit: ${NumberFormat('#,##0.00').format(controller.calculateTotalCredit())}',
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                ),
+              ],
+            ),
+            pw.SizedBox(height: 10),
+            pw.Text(
+              'Closing Balance: ${controller.masterData.value?.closing ?? ""}',
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+            ),
+          ],
+        ),
+      );
+
+      // Show the PDF print preview
+      await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async => pdf.save(),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error generating PDF: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Initialize the controller with dependency injection
     final LedgerController controller = Get.put(
-        LedgerController(
-            accountId: accountId,
-            accountName: accountName
-        )
-    );
+        LedgerController(accountId: accountId, accountName: accountName));
 
     return Scaffold(
       appBar: _buildAppBar(),
@@ -65,7 +171,7 @@ class LedgerScreen extends StatelessWidget {
                 'FROM: ${DateFormat('EEE, dd-MMM-yyyy').format(controller.fromDate.value)} | TO: ${DateFormat('EEE, dd-MMM-yyyy').format(controller.toDate.value)}',
                 style: TextStyle(
                   fontSize: 12,
-                  color: TColor.secondary,
+                  color: TColor.primaryText,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -73,7 +179,7 @@ class LedgerScreen extends StatelessWidget {
                 'Opening Balance ${masterData.opening}',
                 style: TextStyle(
                   fontSize: 12,
-                  color: TColor.secondary,
+                  color: TColor.primaryText,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -97,10 +203,11 @@ class LedgerScreen extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Text(
           'Ledger of $accountId | $accountName',
-          style: TextStyle(color: TColor.primaryText),
+          style: TextStyle(color: TColor.white),
         ),
       ),
-      backgroundColor: TColor.white,
+      backgroundColor: TColor.primary,
+      foregroundColor: TColor.white,
       elevation: 0.5,
     );
   }
@@ -134,23 +241,25 @@ class LedgerScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, LedgerController controller) {
+  Widget _buildActionButtons(
+      BuildContext context, LedgerController controller) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 16),
       child: Row(
         children: [
-          _buildActionButton(
-              MdiIcons.microsoftExcel, 'Excel', TColor.primary,
-                  () => _exportToExcel(context, controller.filteredVouchers)),
-          _buildActionButton(MdiIcons.printer, 'Print', TColor.third, () {}),
-          _buildActionButton(
-              MdiIcons.whatsapp, 'Whatsapp', TColor.secondary, launchWhatsappWithMobileNumber),
+          _buildActionButton(MdiIcons.microsoftExcel, 'Excel', TColor.primary,
+              () => _exportToExcel(context, controller.filteredVouchers)),
+          _buildActionButton(MdiIcons.printer, 'Print', TColor.third,
+              () => _exportToPDF(context, controller)),
+          _buildActionButton(MdiIcons.whatsapp, 'Whatsapp', TColor.secondary,
+              launchWhatsappWithMobileNumber),
         ],
       ),
     );
   }
 
-  void _exportToExcel(BuildContext context, List<LedgerVoucher> vouchers) async {
+  void _exportToExcel(
+      BuildContext context, List<LedgerVoucher> vouchers) async {
     // Excel export logic remains the same as in the original file
     var excel = Excel.createExcel();
     Sheet sheet = excel['Sheet1'];
@@ -237,7 +346,6 @@ class LedgerScreen extends StatelessWidget {
     );
   }
 
-
   Widget _buildTransactionDetails(LedgerVoucher voucher) {
     bool isCredit = voucher.balance.toLowerCase().contains('cr');
 
@@ -268,7 +376,7 @@ class LedgerScreen extends StatelessWidget {
                       DateFormat('dd MMM yyyy')
                           .format(DateTime.parse(voucher.date)),
                       style:
-                      TextStyle(color: TColor.secondaryText, fontSize: 12),
+                          TextStyle(color: TColor.secondaryText, fontSize: 12),
                     ),
                   ],
                 ),
@@ -307,7 +415,6 @@ class LedgerScreen extends StatelessWidget {
     );
   }
 
-
   Widget _buildTransactionAmounts(LedgerVoucher voucher) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -320,7 +427,6 @@ class LedgerScreen extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildAmountBox(String label, num amount) {
     return Container(
@@ -417,7 +523,6 @@ class LedgerScreen extends StatelessWidget {
     );
   }
 
-
   Widget _buildWOAccountButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -438,7 +543,6 @@ class LedgerScreen extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildSummaryDetails(LedgerMasterData masterData) {
     return Container(

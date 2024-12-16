@@ -9,13 +9,13 @@ class IncomeCardWidget extends StatelessWidget {
   final bool isLast;
 
   const IncomeCardWidget({
-    Key? key,
+    super.key,
     required this.title,
     required this.amount,
     required this.icon,
     required this.color,
     this.isLast = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -4,9 +4,9 @@ import 'package:evoucher/views/finance_voucher/expense/view_edit_e_voucher.dart'
 import 'package:evoucher/views/finance_voucher/journal/view_unposted_vouchers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../common/color_extension.dart';
-import 'cash/view_edit_c_voucher.dart';
-import 'journal/view_edit_j_voucher.dart';
+import '../../../common/color_extension.dart';
+import '../cash/view_edit_c_voucher.dart';
+import '../journal/view_edit_j_voucher.dart';
 
 class EntryVoucherCard extends StatelessWidget {
   final Map<String, dynamic> voucher;

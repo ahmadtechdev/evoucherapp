@@ -5,6 +5,7 @@ import '../../../common_widget/date_selecter.dart';
 
 import 'package:get/get.dart';
 
+import 'all_ticket_sales_report/all_ticket_sales_report.dart';
 import 'controller/dashboard_controller.dart';
 
 class SalesDashboardWidget extends StatefulWidget {
@@ -25,7 +26,10 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
   void initState() {
     super.initState();
     _setupAnimation();
-    _loadInitialData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Your state update logic here
+      _controller.fetchDashboardData(selectedDate); // Example of a state update
+    });
   }
 
   void _setupAnimation() {
@@ -37,10 +41,6 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
     _animationController.forward();
-  }
-
-  Future<void> _loadInitialData() async {
-    await _controller.fetchDashboardData(selectedDate);
   }
 
   @override
@@ -94,10 +94,11 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
           DateSelector(
             fontSize: fontSize,
             initialDate: selectedDate,
-            onDateChanged: (newDate) async {
-              setState(() => selectedDate = newDate);
-              await _controller.fetchDashboardData(newDate);
-            },
+              onDateChanged: (newDate) async {
+                selectedDate = newDate; // Update local state
+                await Future.delayed(Duration.zero); // Ensure this happens after the build
+                _controller.fetchDashboardData(newDate); // Fetch data without interfering with the build phase
+              },
           ),
           const SizedBox(height: 20),
           _buildSalesGrid(constraints, cardPadding, fontSize, iconSize),
@@ -139,6 +140,9 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
           padding,
           fontSize,
           iconSize,
+            (){
+            Get.to(()=>const TransactionReportScreen());
+            }
         ),
         _buildSalesCard(
           'Hotel Sales',
@@ -148,6 +152,7 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
           padding,
           fontSize,
           iconSize,
+                (){}
         ),
         _buildSalesCard(
           'Visa Sales',
@@ -157,6 +162,7 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
           padding,
           fontSize,
           iconSize,
+                (){}
         ),
         _buildSalesCard(
           'Grand Total',
@@ -166,6 +172,7 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
           padding,
           fontSize,
           iconSize,
+                (){}
         ),
       ],
     );
@@ -173,14 +180,15 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
 
   // Keep the existing _buildSalesCard method as is
   Widget _buildSalesCard(
-    String title,
-    String amount,
-    IconData iconData,
-    Color color,
-    double padding,
-    double fontSize,
-    double iconSize,
-  ) {
+      String title,
+      String amount,
+      IconData iconData,
+      Color color,
+      double padding,
+      double fontSize,
+      double iconSize,
+      VoidCallback onViewMorePressed, // Add the function parameter
+      ) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: const Duration(milliseconds: 500),
@@ -201,80 +209,70 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
             ),
             child: Material(
               color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: () {
-                  // Handle card tap
-                },
-                child: Padding(
-                  padding: EdgeInsets.all(padding),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min, // Add this
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12), // Reduced padding
-                        decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          iconData,
-                          color: color,
-                          size: iconSize,
-                        ),
+              child: Padding(
+                padding: EdgeInsets.all(padding),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12), // Reduced padding
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      const SizedBox(height: 15), // Reduced spacing
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: fontSize,
-                          fontWeight: FontWeight.w600,
-                          color: TColor.primaryText,
-                        ),
+                      child: Icon(
+                        iconData,
+                        color: color,
+                        size: iconSize,
                       ),
-                      const SizedBox(height: 4), // Reduced spacing
-                      Text(
-                        amount,
-                        style: TextStyle(
-                          fontSize: fontSize * 1.2,
-                          fontWeight: FontWeight.bold,
-                          color: color,
-                        ),
+                    ),
+                    const SizedBox(height: 15), // Reduced spacing
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w600,
+                        color: TColor.primaryText,
                       ),
-                      const SizedBox(height: 4), // Reduced spacing
-                      TextButton(
-                        onPressed: () {
-                          // Handle view more action
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: color,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          // Reduced padding
-                          minimumSize: Size.zero,
-                          // Allow button to be smaller
-                          tapTargetSize: MaterialTapTargetSize
-                              .shrinkWrap, // Reduce tap target
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'View More',
-                              style: TextStyle(
-                                  fontSize:
-                                      fontSize * 0.85), // Slightly smaller font
+                    ),
+                    const SizedBox(height: 4), // Reduced spacing
+                    Text(
+                      amount,
+                      style: TextStyle(
+                        fontSize: fontSize * 1.2,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(height: 4), // Reduced spacing
+                    TextButton(
+                      onPressed: onViewMorePressed, // Use the callback here
+                      style: TextButton.styleFrom(
+                        foregroundColor: color,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'View More',
+                            style: TextStyle(
+                              fontSize: fontSize * 0.85, // Slightly smaller font
                             ),
-                            const SizedBox(width: 4),
-                            // Add small spacing
-                            Icon(Icons.arrow_forward, size: fontSize * 0.85),
-                            // Match text size
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.arrow_forward,
+                            size: fontSize * 0.85,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -283,4 +281,5 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
       },
     );
   }
+
 }

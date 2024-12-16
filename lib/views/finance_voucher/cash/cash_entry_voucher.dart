@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../common/color_extension.dart';
 import '../../../common_widget/date_selecter.dart';
-import '../entry_card.dart';
-import '../entry_controller.dart';
+import '../../../common_widget/snackbar.dart';
+import '../../../service/api_service.dart';
+import '../widgets/entry_card.dart';
+import '../controller/entry_controller.dart';
 
 class CashEntryVoucher extends StatefulWidget {
   const CashEntryVoucher({super.key});
@@ -19,6 +25,7 @@ class _CashEntryVoucherState extends State<CashEntryVoucher> {
   double totalDebit = 0.0;
   double totalCredit = 0.0;
   final FocusNode _mainFocusNode = FocusNode();
+  bool _isSaving = false;
 
   late final VoucherController voucherController;
 
@@ -38,63 +45,97 @@ class _CashEntryVoucherState extends State<CashEntryVoucher> {
     super.dispose();
   }
 
-  void _handleSave() {
-    // Get all entries from the controller
-    final entries = voucherController.entries;
 
-    // Validate entries
-    if (entries.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'No entries to save',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+  Future<void> _saveVoucher() async {
+    // Validate that entries exist
+    if (voucherController.entries.isEmpty) {
+      CustomSnackBar(
+          message: 'Please add at least one voucher entry',
+          backgroundColor: TColor.third
+      ).show();
       return;
     }
 
-    // Check if debits and credits are equal
-    double totalDebit = 0.0;
-    double totalCredit = 0.0;
-
-    for (var entry in entries) {
-      totalDebit += entry.debit;
-      totalCredit += entry.credit;
-    }
-
-    if (totalDebit != totalCredit) {
-      Get.snackbar(
-        'Error',
-        'Total debit and credit must be equal',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+    // Validate total debit and credit balance
+    if (voucherController.totalDebit.value != voucherController.totalCredit.value) {
+      CustomSnackBar(
+          message: 'Total Debit and Total Credit must be equal to save',
+          backgroundColor: TColor.third
+      ).show();
       return;
     }
 
-    // Print entries for debugging
-    print('Date: $selectedDate');
-    print('Entries:');
-    for (var entry in entries) {
-      print('Account: ${entry.account}');
-      print('Description: ${entry.description}');
-      print('Debit: ${entry.debit}');
-      print('Credit: ${entry.credit}');
-      print('-------------------');
+    setState(() => _isSaving = true);
+
+    try {
+      // API Service Implementation
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
+
+      final payload = {
+        "voucher_date": selectedDate.toIso8601String().split('T')[0],
+        "voucher_detail": voucherController.entries.map((entry) {
+          return {
+            "cheque_number": entry.cheque,
+            "description": entry.description,
+            "account_id": entry.account,
+            "debit": entry.debit.toString(),
+            "credit": entry.credit.toString(),
+          };
+        }).toList(),
+      };
+
+      var request = http.Request('POST', Uri.parse('https://evoucher.pk/api-new/cashVoucher'));
+      request.body = json.encode(payload);
+      request.headers.addAll(headers);
+
+      http.StreamedResponse response = await request.send();
+
+      // Parse the response
+      final responseBody = await response.stream.bytesToString();
+      final responseData = json.decode(responseBody);
+
+      // Check for successful response
+      if (response.statusCode == 200) {
+        // Assuming the API returns a status and message
+        if (responseData['status'] == 'success') {
+          CustomSnackBar(
+              message: responseData['message'] ?? 'Voucher saved successfully',
+              backgroundColor: TColor.secondary
+          ).show();
+
+          // Clear entries after saving
+          voucherController.clearEntries();
+
+          // Navigate back or clear the form
+          Navigator.pop(context);
+        } else {
+          CustomSnackBar(
+              message: responseData['message'] ?? 'Failed to save voucher',
+              backgroundColor: TColor.third
+          ).show();
+        }
+      } else {
+        // Handle non-200 status codes
+        CustomSnackBar(
+            message: 'Error: ${responseData['message'] ?? 'Server error'}',
+            backgroundColor: TColor.third
+        ).show();
+      }
+    } catch (e) {
+      // Handle any network or parsing errors
+      CustomSnackBar(
+          message: 'Error: ${e.toString()}',
+          backgroundColor: TColor.third
+      ).show();
+    } finally {
+      setState(() => _isSaving = false);
     }
-    print('Total Debit: $totalDebit');
-    print('Total Credit: $totalCredit');
-
-    // Show success message
-    Get.snackbar(
-      'Success',
-      'Journal entry saved successfully',
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-    );
-
-    // Clear entries after saving
-    voucherController.clearEntries();
   }
 
 
@@ -147,20 +188,22 @@ class _CashEntryVoucherState extends State<CashEntryVoucher> {
                 Center(
                   child: SizedBox(
                     width: screenWidth * 0.6, // 60% of screen width
-                    child: ElevatedButton(
-                      onPressed: _handleSave,
+                    child:  ElevatedButton(
+                      onPressed: _isSaving ? null : _saveVoucher,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: TColor.secondary,
-                        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015), // Scaled vertical padding
+                        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100),
                         ),
                       ),
-                      child: Text(
+                      child: _isSaving
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
                         'Save',
                         style: TextStyle(
                           color: TColor.white,
-                          fontSize: screenHeight * 0.02, // Scaled font size
+                          fontSize: screenHeight * 0.02,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

@@ -2,8 +2,8 @@ import 'package:evoucher/views/finance_voucher/finance.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../voucher_header.dart';
-import '../voucher_widgets.dart';
+import '../widgets/voucher_header.dart';
+import '../widgets/voucher_widgets.dart';
 
 class JournalViewVoucher extends StatefulWidget {
   const JournalViewVoucher({super.key});

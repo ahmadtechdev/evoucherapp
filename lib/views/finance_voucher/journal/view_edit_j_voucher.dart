@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../common/color_extension.dart';
 import '../../../common_widget/date_selecter.dart';
-import '../entry_card.dart';
+import '../widgets/entry_card.dart';
 import 'package:intl/intl.dart';
 
-import '../entry_controller.dart';
+import '../controller/entry_controller.dart';
 
 class JournalVoucherDetail extends StatefulWidget {
   final Map<String, dynamic> voucherData;

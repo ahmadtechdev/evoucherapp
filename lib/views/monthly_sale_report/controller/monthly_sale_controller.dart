@@ -3,13 +3,13 @@ import 'package:get/get.dart';
 import 'dart:math';
 import 'package:intl/intl.dart';
 
-import 'monthly_sales_data.dart';
+import '../models/monthly_sales_data.dart';
 
 class MonthlySalesController extends GetxController {
   final Rx<DateTime> fromDate = DateTime(2023, 12).obs;
   final Rx<DateTime> toDate = DateTime(2024, 12).obs;
   final RxList<DateTime> months = <DateTime>[].obs;
-  final RxMap<String, MonthlySalesData> salesData = <String, MonthlySalesData>{}.obs;
+  final RxMap<String, MonthlySalesModel> salesData = <String, MonthlySalesModel>{}.obs;
 
   @override
   void onInit() {
@@ -19,10 +19,10 @@ class MonthlySalesController extends GetxController {
 
 
   // Method to generate or fetch sales data for a specific month
-  MonthlySalesData getSalesData(DateTime month) {
+  MonthlySalesModel getSalesData(DateTime month) {
     final key = '${month.year}-${month.month}';
     if (!salesData.containsKey(key)) {
-      salesData[key] = MonthlySalesData(
+      salesData[key] = MonthlySalesModel(
         ticketSales: Random().nextInt(300000),
         hotelBookings: Random().nextInt(300000),
         visaServices: Random().nextInt(300000),
@@ -32,7 +32,7 @@ class MonthlySalesController extends GetxController {
   }
 
   // Method to get total sales data
-  MonthlySalesData get totalSalesData {
+  MonthlySalesModel get totalSalesData {
     int totalTickets = 0;
     int totalHotels = 0;
     int totalVisas = 0;
@@ -43,7 +43,7 @@ class MonthlySalesController extends GetxController {
       totalVisas += data.visaServices;
     }
 
-    return MonthlySalesData(
+    return MonthlySalesModel(
       ticketSales: totalTickets,
       hotelBookings: totalHotels,
       visaServices: totalVisas,

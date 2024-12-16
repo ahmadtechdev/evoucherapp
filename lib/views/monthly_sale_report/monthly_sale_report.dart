@@ -10,7 +10,7 @@ import 'controller/monthly_sale_controller.dart';
 
 
 class MonthlySalesReport extends StatelessWidget {
-  MonthlySalesReport({Key? key}) : super(key: key);
+  MonthlySalesReport({super.key});
 
   final MonthlySalesController controller = Get.put(MonthlySalesController());
 

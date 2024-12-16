@@ -5,7 +5,6 @@ import '../../../../service/api_service.dart';
 import '../models/ledger_modal.dart';
 
 class LedgerController extends GetxController {
-
   final String accountId;
   final String accountName;
 
@@ -30,18 +29,16 @@ class LedgerController extends GetxController {
     super.onInit();
     fetchLedgerData();
   }
+
   Future<void> fetchLedgerData() async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final response = await apiService.get(
-        'account-ledger',
-        queryParams: {
-          'account_id': accountId,
-          'from_date': DateFormat('yyyy-MM-dd').format(fromDate.value),
-          'to_date': DateFormat('yyyy-MM-dd').format(toDate.value),
-        },
+      final response = await apiService.fetchAccountLedger(
+        accountId: accountId,
+        fromDate: DateFormat('yyyy-MM-dd').format(fromDate.value),
+        toDate: DateFormat('yyyy-MM-dd').format(toDate.value),
       );
 
       if (response['status'] == 'success') {

@@ -1,14 +1,106 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:evoucher/common_widget/dart_selector2.dart';
+import 'package:pdf/pdf.dart';
 import '../../common/color_extension.dart';
 import '../../common/drawer.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+
 import 'controller/daily_activity_controller.dart';
 
 class DailyActivityReport extends StatelessWidget {
   final DailyActivityReportController controller = Get.put(DailyActivityReportController());
 
+  DailyActivityReport({super.key});
+
+  Future<void> _exportToPDF(BuildContext context) async {
+    final pdf = pw.Document();
+
+    // Load the logo
+    final logoImage = await rootBundle.load('assets/img/logo.png');
+    final logo = pw.MemoryImage(logoImage.buffer.asUint8List());
+
+    // Add logo and company name to the header
+    pdf.addPage(
+      pw.MultiPage(
+        header: (context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Image(logo, width: 100, height: 100),
+                pw.Text(
+                  'Journey Online',
+                  style: pw.TextStyle(
+                    fontSize: 24,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            pw.Divider(),
+            pw.Text(
+              'Daily Activity Report',
+              style: pw.TextStyle(
+                fontSize: 18,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
+            pw.Text(
+              'Date: From ${controller.formatDate(controller.fromDate.value)} '
+                  'To ${controller.formatDate(controller.toDate)}',
+              style: const pw.TextStyle(fontSize: 14),
+            ),
+            pw.SizedBox(height: 20),
+          ],
+        ),
+        build: (context) => [
+          pw.TableHelper.fromTextArray(
+            context: context,
+            data: <List<String>>[
+              <String>['V#', 'Date', 'Account', 'Description', 'Debit', 'Credit'],
+              ...controller.activities.map((activity) => [
+                activity.voucherNo,
+                controller.formatDate(activity.date),
+                activity.account,
+                activity.description,
+                'Rs ${activity.debit.toStringAsFixed(2)}',
+                'Rs ${activity.credit.toStringAsFixed(2)}',
+              ]),
+            ],
+            headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+            cellStyle: const pw.TextStyle(),
+            headerAlignment: pw.Alignment.centerLeft,
+            cellAlignment: pw.Alignment.centerLeft,
+          ),
+          pw.SizedBox(height: 20),
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text(
+                'Total Debit: Rs ${controller.activities.fold<double>(0, (sum, item) => sum + item.debit).toStringAsFixed(2)}',
+              ),
+              pw.Text(
+                'Total Credit: Rs ${controller.activities.fold<double>(0, (sum, item) => sum + item.credit).toStringAsFixed(2)}',
+              ),
+              pw.Text(
+                'Closing Balance: Rs ${(controller.activities.fold<double>(0, (sum, item) => sum + item.debit) - controller.activities.fold<double>(0, (sum, item) => sum + item.credit)).toStringAsFixed(2)}',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+
+    // Save and print the PDF
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,7 +172,7 @@ class DailyActivityReport extends StatelessWidget {
                       ),
                       ElevatedButton.icon(
                         onPressed: () {
-                          // Implement Print Report functionality
+                          _exportToPDF(context);
                         },
                         icon: const Icon(Icons.print),
                         label: const Text('Print Report'),

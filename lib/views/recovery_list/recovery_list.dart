@@ -11,6 +11,8 @@ import 'controller/recovery_list_controller.dart';
 class RecoveryListsScreen extends StatelessWidget {
   final RecoveryListController controller = Get.put(RecoveryListController());
 
+  RecoveryListsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,7 +67,7 @@ class RecoveryListsScreen extends StatelessWidget {
     );
   }
 
-  void _showDetailsDialog(BuildContext context, RecoveryListItem item) {
+  void _showDetailsDialog(BuildContext context, RecoveryListModel item) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -137,7 +139,7 @@ class RecoveryListsScreen extends StatelessWidget {
       ),
     );
   }
-  void _showAddEditDialog(BuildContext context, {RecoveryListItem? existingItem, int? index}) {
+  void _showAddEditDialog(BuildContext context, {RecoveryListModel? existingItem, int? index}) {
     final nameController = TextEditingController(text: existingItem?.rlName ?? '');
     final dateController = TextEditingController(text: existingItem?.dateCreated ?? '');
     final totalAmountController = TextEditingController(text: existingItem?.totalAmount.toStringAsFixed(2) ?? '');
@@ -162,9 +164,9 @@ class RecoveryListsScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   RoundTextfield(hintText: "Date Created", controller: dateController), // Use DateSelector as needed
                   const SizedBox(height: 12),
-                  RoundTextfield(hintText: "Total Amount", keyboardType: TextInputType.numberWithOptions(decimal: true), controller: totalAmountController),
+                  RoundTextfield(hintText: "Total Amount", keyboardType: const TextInputType.numberWithOptions(decimal: true), controller: totalAmountController),
                   const SizedBox(height: 12),
-                  RoundTextfield(hintText: "Received Amount", keyboardType: TextInputType.numberWithOptions(decimal: true), controller: receivedController),
+                  RoundTextfield(hintText: "Received Amount", keyboardType: const TextInputType.numberWithOptions(decimal: true), controller: receivedController),
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -176,7 +178,7 @@ class RecoveryListsScreen extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          final newItem = RecoveryListItem(
+                          final newItem = RecoveryListModel(
                             rlName: nameController.text,
                             dateCreated: dateController.text,
                             totalAmount: double.parse(totalAmountController.text),

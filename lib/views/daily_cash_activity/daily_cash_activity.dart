@@ -13,7 +13,7 @@ class DailyCashActivity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DailyCashController controller = Get.put(DailyCashController());
+    final DailyCashActivityController controller = Get.put(DailyCashActivityController());
 
     return Scaffold(
       backgroundColor: TColor.white,
@@ -21,7 +21,7 @@ class DailyCashActivity extends StatelessWidget {
         centerTitle: true,
         backgroundColor: TColor.primary,
         foregroundColor: TColor.white,
-        title: const Text('Daily Cash Report'),
+        title: const Text('Daily Cash Activity'),
       ),
       drawer: const CustomDrawer(currentIndex: 5),
       body: SingleChildScrollView(
@@ -40,7 +40,7 @@ class DailyCashActivity extends StatelessWidget {
     );
   }
 
-  Widget _buildDateSelector(DailyCashController controller, BuildContext context) {
+  Widget _buildDateSelector(DailyCashActivityController controller, BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -78,7 +78,7 @@ class DailyCashActivity extends StatelessWidget {
     );
   }
 
-  Widget _buildDateDisplay(DailyCashController controller) {
+  Widget _buildDateDisplay(DailyCashActivityController controller) {
     return Center(
       child: Obx(() {
         return Text(
@@ -149,7 +149,7 @@ class DailyCashActivity extends StatelessWidget {
           Text(
             amount,
             style: TextStyle(
-              color: color,
+              color: TColor.primaryText,
               fontSize: 15,
               fontWeight: FontWeight.bold,
             ),
@@ -159,7 +159,7 @@ class DailyCashActivity extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(String title, Color color, List<DailyCashModel> transactions) {
+  Widget _buildSection(String title, Color color, List<DailyCashActivityModel> transactions) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
@@ -180,7 +180,7 @@ class DailyCashActivity extends StatelessWidget {
     );
   }
 
-  Widget _buildTransactionCard(DailyCashModel transaction, Color color) {
+  Widget _buildTransactionCard(DailyCashActivityModel transaction, Color color) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 4,
@@ -264,7 +264,7 @@ class DailyCashActivity extends StatelessWidget {
     );
   }
 
-  Widget _buildTotalSummary(DailyCashController controller) {
+  Widget _buildTotalSummary(DailyCashActivityController controller) {
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),

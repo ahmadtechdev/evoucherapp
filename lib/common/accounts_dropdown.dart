@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../common_widget/custom_dropdown.dart';
 import '../views/accounts/accounts/controller/account_controller.dart';
 
-
 class AccountDropdown extends StatelessWidget {
   final Color primaryColor;
   final bool isEnabled;
@@ -25,13 +24,21 @@ class AccountDropdown extends StatelessWidget {
 
     return Obx(() {
       final accountsList = accountsController.accounts;
-      final accountNames = accountsList.map((account) => account.name).toList();
+
+      // Create a map of account IDs to account names
+      final accountsMap = {
+        for (var account in accountsList)
+          account.id.toString(): account.name
+      };
 
       return CustomDropdown(
         hint: 'Select an account',
-        items: accountNames,
-        selectedItem: initialValue?.isEmpty ?? true ? null : initialValue,
-        onChanged: onChanged,
+        items: accountsMap, // Pass the map instead of just names
+        selectedItemId: initialValue, // Use selectedItemId with the account ID
+        onChanged: (selectedAccountId) {
+          // When an account is selected, the ID will be passed to the onChanged callback
+          onChanged?.call(selectedAccountId);
+        },
         enabled: isEnabled,
       );
     });

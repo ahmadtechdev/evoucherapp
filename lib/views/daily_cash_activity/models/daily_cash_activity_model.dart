@@ -1,12 +1,12 @@
 
-class DailyCashModel {
+class DailyCashActivityModel {
   final String voucherNo;
   final String account;
   final String description;
   final String status;
   final String amount;
 
-  DailyCashModel({
+  DailyCashActivityModel({
     required this.voucherNo,
     required this.account,
     required this.description,

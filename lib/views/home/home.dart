@@ -1,7 +1,10 @@
 import 'package:evoucher/views/home/report_grid_section.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../common_widget/bottom_navigation.dart';
 import '../../common/drawer.dart';
+import '../../service/session_manager.dart';
 import 'top_report_section.dart';
 import 'home_dashboard/home_sales_dashboard.dart';
 
@@ -15,6 +18,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
+  final SessionManager sessionManager = Get.find<SessionManager>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,8 +34,8 @@ class _HomeState extends State<Home> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              // Add logout functionality
+            onPressed: () async {
+              await sessionManager.logout();
             },
           ),
         ],

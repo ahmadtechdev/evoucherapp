@@ -9,7 +9,7 @@ import 'controller/income_controller.dart';
 
 
 class IncomesComparisonReport extends GetView<IncomesReportController> {
-  const IncomesComparisonReport({Key? key}) : super(key: key);
+  const IncomesComparisonReport({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +114,7 @@ class IncomesComparisonReport extends GetView<IncomesReportController> {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -142,7 +142,7 @@ class IncomesComparisonReport extends GetView<IncomesReportController> {
             ],
           ),
           const SizedBox(height: 16),
-          Row(
+          const Row(
             children: [
               Expanded(
                 child: TotalItemWidget(
@@ -168,7 +168,7 @@ class IncomesComparisonReport extends GetView<IncomesReportController> {
             ],
           ),
           const SizedBox(height: 16),
-          Row(
+          const Row(
             children: [
               Expanded(
                 child: TotalItemWidget(
@@ -184,7 +184,7 @@ class IncomesComparisonReport extends GetView<IncomesReportController> {
                   icon: Icons.devices_other,
                 ),
               ),
-              const Expanded(child: SizedBox()),
+              Expanded(child: SizedBox()),
             ],
           ),
         ],

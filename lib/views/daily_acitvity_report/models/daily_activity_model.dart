@@ -1,4 +1,4 @@
-class Activity {
+class DailyActivityReportModel {
   final String voucherNo;
   final DateTime date;
   final String account;
@@ -6,7 +6,7 @@ class Activity {
   final double debit;
   final double credit;
 
-  Activity({
+  DailyActivityReportModel({
     required this.voucherNo,
     required this.date,
     required this.account,

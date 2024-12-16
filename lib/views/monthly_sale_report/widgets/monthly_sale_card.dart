@@ -9,10 +9,10 @@ class MonthlySalesCard extends StatelessWidget {
   final MonthlySalesController controller;
 
   const MonthlySalesCard({
-    Key? key,
+    super.key,
     required this.month,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

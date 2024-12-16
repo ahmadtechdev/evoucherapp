@@ -7,11 +7,11 @@ class TotalItemWidget extends StatelessWidget {
   final IconData icon;
 
   const TotalItemWidget({
-    Key? key,
+    super.key,
     required this.label,
     required this.amount,
     required this.icon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

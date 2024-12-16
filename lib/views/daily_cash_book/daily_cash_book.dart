@@ -1,3 +1,4 @@
+import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -11,12 +12,12 @@ import 'controller/daily_cash_book_controller.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:excel/excel.dart' as ex;
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 
 class DailyCashBook extends StatelessWidget {
   final DailyCashBookController controller = Get.put(DailyCashBookController());
+
+  DailyCashBook({super.key});
 
   // PDF Export Method
   Future<void> _exportToPDF(BuildContext context) async {
@@ -58,7 +59,7 @@ class DailyCashBook extends StatelessWidget {
                 pw.Text(
                   'Date: ${controller.formatDate(
                       controller.selectedDate.value)}',
-                  style: pw.TextStyle(fontSize: 14),
+                  style: const pw.TextStyle(fontSize: 14),
                 ),
                 pw.SizedBox(height: 20),
               ],
@@ -87,7 +88,7 @@ class DailyCashBook extends StatelessWidget {
               ]),
             ],
             headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-            cellStyle: pw.TextStyle(),
+            cellStyle: const pw.TextStyle(),
             headerAlignment: pw.Alignment.centerLeft,
             cellAlignment: pw.Alignment.centerLeft,
           ),
@@ -115,62 +116,73 @@ class DailyCashBook extends StatelessWidget {
     );
   }
 
-  // Excel Export Method
   Future<void> _exportToExcel(BuildContext context) async {
     // Create a new Excel file
-    final ex.Excel excel = ex.Excel.createExcel();
-    final ex.Sheet sheet = excel['Daily Cash Book'];
+    final excel = Excel.createExcel();
+    final sheet = excel['Daily Cash Book'];
 
     // Add headers
     sheet.appendRow([
-      'V#' as ex.CellValue,
-      'Date' as ex.CellValue,
-      'Description' as ex.CellValue,
-      'Receipt' as ex.CellValue,
-      'Payment' as ex.CellValue,
-      'Balance' as ex.CellValue
+      TextCellValue('V#'),
+      TextCellValue('Date'),
+      TextCellValue('Description'),
+      TextCellValue('Receipt'),
+      TextCellValue('Payment'),
+      TextCellValue('Balance')
     ]);
 
     // Add transaction data
     for (var transaction in controller.transactions) {
       sheet.appendRow([
-        transaction.id.toString() as ex.CellValue,
-        controller.formatDate(transaction.date) as ex.CellValue,
-        transaction.description as ex.CellValue,
-        transaction.receipt.toStringAsFixed(2) as ex.CellValue,
-        transaction.payment.toStringAsFixed(2) as ex.CellValue,
-        transaction.balance.toStringAsFixed(2) as ex.CellValue
+        TextCellValue(transaction.id.toString()),
+        TextCellValue(controller.formatDate(transaction.date)),
+        TextCellValue(transaction.description),
+        DoubleCellValue(transaction.receipt),
+        DoubleCellValue(transaction.payment),
+        DoubleCellValue(transaction.balance)
       ]);
     }
 
     // Add summary rows
     sheet.appendRow([]);
     sheet.appendRow([
-      'Total Receipt' as ex.CellValue,
-      controller.totalReceipt.toStringAsFixed(2) as ex.CellValue
+      TextCellValue('Total Receipt'),
+      DoubleCellValue(controller.totalReceipt)
     ]);
     sheet.appendRow([
-      'Total Payment' as ex.CellValue,
-      controller.totalPayment.toStringAsFixed(2) as ex.CellValue
+      TextCellValue('Total Payment'),
+      DoubleCellValue(controller.totalPayment)
     ]);
     sheet.appendRow([
-      'Closing Balance' as ex.CellValue,
-      controller.closingBalance.toStringAsFixed(2) as ex.CellValue
+      TextCellValue('Closing Balance'),
+      DoubleCellValue(controller.closingBalance)
     ]);
 
     // Save the file
-    final directory = await getExternalStorageDirectory();
-    final file = File('${directory?.path}/daily_cash_book_${DateTime
-        .now()
-        .millisecondsSinceEpoch}.xlsx');
-    await file.writeAsBytes(excel.save()!);
+    String downloadsPath = '/storage/emulated/0/Download';
+    String filePath = '$downloadsPath/daily_cash_book_${DateTime.now().millisecondsSinceEpoch}.xlsx';
 
-    // Show a snackbar to confirm export
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Excel file saved to ${file.path}')),
-    );
+    List<int>? fileBytes = excel.save();
+    if (fileBytes != null) {
+      try {
+        File(filePath)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(fileBytes);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Excel file exported to $filePath')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving file: ${e.toString()}')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to export Excel file')),
+      );
+    }
   }
-
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery
@@ -262,10 +274,7 @@ class DailyCashBook extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 8),
                       decoration: BoxDecoration(
                         color: TColor.white,
-                        border: Border.all(
-                          color: TColor.primary.withOpacity(0.2),
-                          width: 1.0,
-                        ),
+
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Padding(
@@ -277,11 +286,18 @@ class DailyCashBook extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  'V# ${transaction.id}',
-                                  style: TextStyle(
-                                    color: TColor.primaryText,
-                                    fontWeight: FontWeight.bold,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: TColor.primary.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    'V# ${transaction.id}',
+                                    style: TextStyle(
+                                      color: TColor.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                                 Text(
@@ -316,7 +332,7 @@ class DailyCashBook extends StatelessWidget {
                                       'Rs ${transaction.receipt.toStringAsFixed(
                                           2)}',
                                       style: TextStyle(
-                                        color: TColor.secondary,
+                                        color: TColor.primaryText,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -334,7 +350,7 @@ class DailyCashBook extends StatelessWidget {
                                       'Rs ${transaction.payment.toStringAsFixed(
                                           2)}',
                                       style: TextStyle(
-                                        color: TColor.third,
+                                        color: TColor.primaryText,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -352,7 +368,7 @@ class DailyCashBook extends StatelessWidget {
                                       'Rs ${transaction.balance.toStringAsFixed(
                                           2)}',
                                       style: TextStyle(
-                                        color: TColor.primary,
+                                        color: TColor.primaryText,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),

@@ -1,4 +1,4 @@
-class Transaction {
+class DailyCashBookModel {
   final String id;
   final DateTime date;
   final String description;
@@ -6,7 +6,7 @@ class Transaction {
   final double payment;
   final double balance;
 
-  Transaction({
+  DailyCashBookModel({
     required this.id,
     required this.date,
     required this.description,

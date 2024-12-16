@@ -27,7 +27,7 @@ class RoundButton extends StatelessWidget {
         ? TColor.white
         : (color ?? TColor.primary);
 
-    return InkWell(
+    return GestureDetector(
       onTap: onPressed,
       child: Container(
         height: 56,

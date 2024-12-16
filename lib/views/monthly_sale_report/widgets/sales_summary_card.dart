@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../common/color_extension.dart';
 
 class SalesSummaryCard extends StatelessWidget {
-  const SalesSummaryCard({Key? key}) : super(key: key);
+  const SalesSummaryCard({super.key});
 
   Widget _buildTotalItem(String label, String amount, IconData icon) {
     return Column(

@@ -1,4 +1,5 @@
-import 'dart:io';
+
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,7 @@ import '../models/recovery_list_modal_class.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class RecoveryListController extends GetxController {
-  var recoveryList = <RecoveryListItem>[].obs;
+  var recoveryList = <RecoveryListModel>[].obs;
   var searchQuery = ''.obs;
 
   @override
@@ -22,139 +23,139 @@ class RecoveryListController extends GetxController {
 
   void loadInitialData() {
     recoveryList.addAll([
-      RecoveryListItem(rlName: 'Ali Ameen',
+      RecoveryListModel(rlName: 'Ali Ameen',
           dateCreated: 'Fri, 23 Feb 2024',
           totalAmount: 250000.00,
           received: 150000.00,
           remaining: 100000.00),
       // Add other items...
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Vendors',
         dateCreated: 'Mon, 11 Sep 2023',
         totalAmount: 142000.00,
         received: 10000.00,
         remaining: 132000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'John Doe',
         dateCreated: 'Wed, 15 Mar 2023',
         totalAmount: 120000.00,
         received: 80000.00,
         remaining: 40000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Jane Smith',
         dateCreated: 'Thu, 10 Aug 2023',
         totalAmount: 180000.00,
         received: 100000.00,
         remaining: 80000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'ABC Corp',
         dateCreated: 'Tue, 02 May 2023',
         totalAmount: 300000.00,
         received: 250000.00,
         remaining: 50000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'XYZ Pvt Ltd',
         dateCreated: 'Fri, 22 Sep 2023',
         totalAmount: 220000.00,
         received: 170000.00,
         remaining: 50000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Mike Ross',
         dateCreated: 'Mon, 06 Nov 2023',
         totalAmount: 50000.00,
         received: 20000.00,
         remaining: 30000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Harvey Specter',
         dateCreated: 'Sat, 18 Feb 2024',
         totalAmount: 80000.00,
         received: 60000.00,
         remaining: 20000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Rachel Zane',
         dateCreated: 'Wed, 12 Jul 2023',
         totalAmount: 150000.00,
         received: 75000.00,
         remaining: 75000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Donna Paulsen',
         dateCreated: 'Sun, 01 Oct 2023',
         totalAmount: 95000.00,
         received: 45000.00,
         remaining: 50000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Louis Litt',
         dateCreated: 'Fri, 29 Sep 2023',
         totalAmount: 75000.00,
         received: 25000.00,
         remaining: 50000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Pearson Hardman',
         dateCreated: 'Tue, 08 Aug 2023',
         totalAmount: 120000.00,
         received: 50000.00,
         remaining: 70000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Global Ventures',
         dateCreated: 'Thu, 25 May 2023',
         totalAmount: 200000.00,
         received: 100000.00,
         remaining: 100000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Tech Solutions',
         dateCreated: 'Mon, 20 Mar 2023',
         totalAmount: 170000.00,
         received: 120000.00,
         remaining: 50000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Innovate Ltd',
         dateCreated: 'Fri, 10 Nov 2023',
         totalAmount: 240000.00,
         received: 200000.00,
         remaining: 40000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Prime Traders',
         dateCreated: 'Wed, 16 Aug 2023',
         totalAmount: 190000.00,
         received: 90000.00,
         remaining: 100000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Smart Industries',
         dateCreated: 'Sat, 30 Sep 2023',
         totalAmount: 130000.00,
         received: 70000.00,
         remaining: 60000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Future Corp',
         dateCreated: 'Tue, 14 Feb 2023',
         totalAmount: 220000.00,
         received: 180000.00,
         remaining: 40000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Elite Group',
         dateCreated: 'Thu, 22 Jun 2023',
         totalAmount: 160000.00,
         received: 80000.00,
         remaining: 80000.00,
       ),
-      RecoveryListItem(
+      RecoveryListModel(
         rlName: 'Pioneer Inc',
         dateCreated: 'Sun, 05 Mar 2023',
         totalAmount: 145000.00,
@@ -164,7 +165,7 @@ class RecoveryListController extends GetxController {
     ]);
   }
 
-  List<RecoveryListItem> get filteredList {
+  List<RecoveryListModel> get filteredList {
     if (searchQuery.value.isEmpty) {
       return recoveryList;
     }
@@ -173,11 +174,11 @@ class RecoveryListController extends GetxController {
         .toList();
   }
 
-  void addRecoveryItem(RecoveryListItem item) {
+  void addRecoveryItem(RecoveryListModel item) {
     recoveryList.add(item);
   }
 
-  void updateRecoveryItem(int index, RecoveryListItem item) {
+  void updateRecoveryItem(int index, RecoveryListModel item) {
     recoveryList[index] = item;
   }
 
@@ -223,7 +224,7 @@ class RecoveryListController extends GetxController {
               ),
               pw.Text(
                 'Generated on: ${DateTime.now().toLocal()}',
-                style: pw.TextStyle(fontSize: 14),
+                style: const pw.TextStyle(fontSize: 14),
               ),
               pw.SizedBox(height: 20),
             ],
@@ -251,7 +252,7 @@ class RecoveryListController extends GetxController {
               ])),
             ],
             headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-            cellStyle: pw.TextStyle(),
+            cellStyle: const pw.TextStyle(),
             headerAlignment: pw.Alignment.centerLeft,
             cellAlignment: pw.Alignment.centerLeft,
           ),

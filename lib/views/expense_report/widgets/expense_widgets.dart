@@ -33,7 +33,7 @@ class ExpenseWidgets {
               controller.getColorForIndex(index),
               isLast: index == controller.expenseItems.length - 1,
             );
-          }).toList(),
+          }),
           const Divider(thickness: 2, height: 1),
           _buildExpenseItem(
             'Total',

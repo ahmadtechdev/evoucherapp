@@ -4,34 +4,39 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../../common/accounts_dropdown.dart';
-import '../accounts/accounts/controller/account_controller.dart';
-import 'entry_controller.dart';
+import '../../../common/accounts_dropdown.dart';
+import '../../accounts/accounts/controller/account_controller.dart';
+import '../controller/entry_controller.dart';
 
 class EntryCardData {
   String account;
   String description;
+  String cheque;
   double debit;
   double credit;
   File? imageFile;
   final String id;
   final TextEditingController descriptionController;
+  final TextEditingController chequeController;
   final TextEditingController debitController;
   final TextEditingController creditController;
 
   EntryCardData({
     this.account = '',
     this.description = '',
+    this.cheque = '',
     this.debit = 0.0,
     this.credit = 0.0,
     this.imageFile,
   })  : id = DateTime.now().millisecondsSinceEpoch.toString(),
         descriptionController = TextEditingController(text: ''),
+        chequeController = TextEditingController(text: ''),
         debitController = TextEditingController(text: ''),
         creditController = TextEditingController(text: '');
 
   void dispose() {
     descriptionController.dispose();
+    chequeController.dispose();
     debitController.dispose();
     creditController.dispose();
   }
@@ -50,6 +55,7 @@ class ReusableEntryCard extends StatefulWidget {
   final bool isViewMode;
   final bool showPrintButton;
   final bool showAddRowButton;
+  final bool showChequeField;
   final List<Map<String, dynamic>>? initialData;
 
   const ReusableEntryCard({
@@ -63,6 +69,7 @@ class ReusableEntryCard extends StatefulWidget {
     this.isViewMode = false,
     this.showPrintButton = false,
     this.showAddRowButton = false,
+    this.showChequeField = false,
     this.initialData,
   });
 
@@ -94,6 +101,7 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
           credit: controllerEntry.credit,
         );
         entryData.descriptionController.text = controllerEntry.description;
+        entryData.chequeController.text = controllerEntry.cheque;
         entryData.debitController.text = controllerEntry.debit.toString();
         entryData.creditController.text = controllerEntry.credit.toString();
         entries.add(entryData);
@@ -121,6 +129,7 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
         description: entryData.description,
         debit: entryData.debit,
         credit: entryData.credit,
+        cheque: entryData.cheque,
       ));
     });
   }
@@ -248,6 +257,7 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
                     entry.description,
                     entry.debit,
                     entry.credit,
+                    entry.cheque
                   );
                 });
               },
@@ -278,9 +288,41 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
                   value,
                   entry.debit,
                   entry.credit,
+                  entry.cheque,
                 );
               },
-            ),
+            ),if (widget.showChequeField)...[
+              const SizedBox(height: 4),
+              TextFormField(
+                controller: entry.chequeController,
+                readOnly: widget.isViewMode ? true : false,
+                style: const TextStyle(fontSize: 14),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: widget.textFieldColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  hintText: 'Cheque No.(Optional)',
+                  hintStyle: TextStyle(color: widget.placeholderColor),
+                  contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                ),
+                onChanged: (value) {
+                  entry.cheque = value;
+                  voucherController.updateEntryData(
+                      index,
+                      entry.account,
+                      entry.description,
+                      entry.debit,
+                      entry.credit,
+                      entry.cheque
+                  );
+                },
+              ),
+            ],
+
             const SizedBox(height: 4),
           Row(
             children: [
@@ -317,6 +359,7 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
                         entry.description,
                         entry.debit,
                         entry.credit,
+                        entry.cheque
                       );
                       _calculateTotals();
                     });
@@ -357,6 +400,7 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
                         entry.description,
                         entry.debit,
                         entry.credit,
+                        entry.cheque
                       );
                       _calculateTotals();
                     });

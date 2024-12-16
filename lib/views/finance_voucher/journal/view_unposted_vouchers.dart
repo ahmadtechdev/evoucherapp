@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../common/color_extension.dart';
-import '../entry_card.dart';
+import '../widgets/entry_card.dart';
 
 class ViewUnPostedVouchers extends StatefulWidget {
   const ViewUnPostedVouchers({super.key});
@@ -23,7 +23,7 @@ class _ViewUnPostedVouchersState extends State<ViewUnPostedVouchers> {
         foregroundColor: TColor.white,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 0),
         child: Column(
           children: [
             const SizedBox(height: 24),
@@ -42,7 +42,7 @@ class _ViewUnPostedVouchersState extends State<ViewUnPostedVouchers> {
                 print('Total Debit: $totalDebit, Total Credit: $totalCredit');
               },
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 18),
             Center(
               child: SizedBox(
                 width: screenWidth/1.5,
@@ -51,8 +51,8 @@ class _ViewUnPostedVouchersState extends State<ViewUnPostedVouchers> {
                     // Implement save functionality
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: TColor.fourth,
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+                    backgroundColor: TColor.secondary,
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
@@ -60,12 +60,12 @@ class _ViewUnPostedVouchersState extends State<ViewUnPostedVouchers> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.arrow_forward_rounded, color: TColor.primaryText,),
+                      Icon(Icons.arrow_forward_rounded, color: TColor.white,),
                       Text(
                         'POST JV#862',
                         style: TextStyle(
-                          color: TColor.primaryText,
-                          fontSize: 16,
+                          color: TColor.white,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

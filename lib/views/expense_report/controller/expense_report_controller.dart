@@ -1,14 +1,14 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
-import 'expense_item_modal.dart';
+import '../models/expense_item_modal.dart';
 
 
 
 class ExpenseReportController extends GetxController {
   final fromDate = DateTime(2024, 1).obs;
   final toDate = DateTime(2024, 11).obs;
-  final expenseItems = <ExpenseItem>[].obs;
+  final expenseItems = <ExpenseItemModel>[].obs;
 
   @override
   void onInit() {
@@ -18,15 +18,15 @@ class ExpenseReportController extends GetxController {
 
   void loadInitialData() {
     expenseItems.value = [
-      ExpenseItem(name: 'Staff Salaries', amount: 0.00),
-      ExpenseItem(name: 'Bonus Allowance', amount: 0.00),
-      ExpenseItem(name: 'Fuel Allowance', amount: 8000.00),
-      ExpenseItem(name: 'Incentive Allowance', amount: 0.00),
-      ExpenseItem(name: 'Mobile Allowance', amount: 0.00),
-      ExpenseItem(name: 'Other Allowance', amount: 0.00),
-      ExpenseItem(name: 'Staff Salary Pzz', amount: 0.00),
-      ExpenseItem(name: 'Discount', amount: 0.00),
-      ExpenseItem(name: 'Hussain Ali ISB EMP', amount: 0.00),
+      ExpenseItemModel(name: 'Staff Salaries', amount: 0.00),
+      ExpenseItemModel(name: 'Bonus Allowance', amount: 0.00),
+      ExpenseItemModel(name: 'Fuel Allowance', amount: 8000.00),
+      ExpenseItemModel(name: 'Incentive Allowance', amount: 0.00),
+      ExpenseItemModel(name: 'Mobile Allowance', amount: 0.00),
+      ExpenseItemModel(name: 'Other Allowance', amount: 0.00),
+      ExpenseItemModel(name: 'Staff Salary Pzz', amount: 0.00),
+      ExpenseItemModel(name: 'Discount', amount: 0.00),
+      ExpenseItemModel(name: 'Hussain Ali ISB EMP', amount: 0.00),
     ];
   }
 

@@ -9,10 +9,13 @@ import '../views/daily_cash_book/daily_cash_book.dart';
 import '../views/daily_sales_report/daily_sales_report.dart';
 import '../views/expense_report/expense_report.dart';
 import '../views/incomes_report/income_report_view.dart';
+import '../views/monthly_profit_loss/monthly_profit_loss.dart';
 import '../views/monthly_sale_report/monthly_sale_report.dart';
 import '../views/recovery_list/recovery_list.dart';
 import '../views/5_year_customers_sales/5_year_customers_sale.dart';
 import '../views/top_customer_sale/top_customer_sale.dart';
+import '../views/total_monthly_expense/total_monthly_expenses.dart';
+import '../views/total_monthly_profit_loss/total_monthly_profit_loss.dart';
 import '../views/trial_balance/trial_balance.dart';
 import 'color_extension.dart';
 
@@ -213,7 +216,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         title: 'Daily Cash Activity',
         icon: Icons.analytics_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() =>  DailyCashActivity()),
+        onTap: () => Get.to(() =>  const DailyCashActivity()),
       ),
       _buildNavigationItem(
         title: 'Monthly Sale Report',
@@ -237,7 +240,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         title: 'Daily Sales Report',
         icon: Icons.analytics_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => const DailySalesReportScreen()),
+        onTap: () => Get.to(() => DailySalesReportScreen()),
 
       ),_buildNavigationItem(
         title: 'Recovery List',
@@ -263,28 +266,33 @@ class _CustomDrawerState extends State<CustomDrawer> {
         index: currentIndex++,
         onTap: () => Get.to(() => TrialOfBalanceScreen()),
 
+      ), _buildNavigationItem(
+        title: 'Monthly Profit Loss',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => MonthlyProfitLoss()),
+
+      ), _buildNavigationItem(
+        title: 'Total Monthly Profit Loss',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => TotalMonthlyProfitLoss()),
+
+      ),_buildNavigationItem(
+        title: 'Total Expenses Report',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => TotalMonthlyExpenses()),
+
       ),
     ]);
-    final financialReports = [
 
-      'Monthly Profit Loss',
-      'Total Monthly Profit Loss',
-      'Total Expenses Report',
-    ];
-
-    items.addAll(
-      financialReports.map((title) => _buildNavigationItem(
-            title: title,
-            icon: Icons.analytics_rounded,
-            index: currentIndex++,
-          )),
-    );
     items.addAll([
       _buildNavigationItem(
         title: 'Top Customers Sales',
         icon: Icons.analytics_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => const CustomerReportScreen()),
+        onTap: () => Get.to(() => CustomerReportScreen()),
 
       ),_buildNavigationItem(
         title: '5 Year Customers Sales',

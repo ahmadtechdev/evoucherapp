@@ -9,9 +9,9 @@ class MonthCardWidget extends GetView<IncomesReportController> {
   final DateTime month;
 
   const MonthCardWidget({
-    Key? key,
+    super.key,
     required this.month,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

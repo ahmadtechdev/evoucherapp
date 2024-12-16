@@ -8,7 +8,7 @@ class DailyActivityReportController extends GetxController {
   var toDate = DateTime.now().obs();
 
   // Dummy data
-  var activities = <Activity>[].obs;
+  var activities = <DailyActivityReportModel>[].obs;
 
   @override
   void onInit() {
@@ -18,8 +18,8 @@ class DailyActivityReportController extends GetxController {
 
   void loadDummyData() {
     activities.addAll([
-      Activity(voucherNo: 'CV 877', date: DateTime.now(), account: 'Afaq Travels', description: 'TEST', debit: 25.00, credit: 0.00),
-      Activity(voucherNo: 'CV 878', date: DateTime.now(), account: 'Cash', description: 'TEST', debit: 0.00, credit: 25.00),
+      DailyActivityReportModel(voucherNo: 'CV 877', date: DateTime.now(), account: 'Afaq Travels', description: 'TEST', debit: 25.00, credit: 0.00),
+      DailyActivityReportModel(voucherNo: 'CV 878', date: DateTime.now(), account: 'Cash', description: 'TEST', debit: 0.00, credit: 25.00),
       // Add more dummy data as needed
     ]);
   }

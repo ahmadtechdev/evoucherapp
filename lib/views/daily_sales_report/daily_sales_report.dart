@@ -179,94 +179,12 @@ class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
   }
 }
 
-// Widget: Date Selection Section
-class _DateSelectionSection extends StatelessWidget {
-  final DateTimeRange? selectedDateRange;
-  final Function({DateTime? start, DateTime? end}) onDateChanged;
-
-  const _DateSelectionSection({
-    required this.selectedDateRange,
-    required this.onDateChanged,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: TColor.white,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: DateSelector2(
-                  fontSize: 14,
-                  label: 'From Date',
-                  initialDate: selectedDateRange?.start ??
-                      DateTime.now().subtract(const Duration(days: 30)),
-                  onDateChanged: (date) => onDateChanged(start: date),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: DateSelector2(
-                  fontSize: 14,
-                  label: 'To Date',
-                  initialDate: selectedDateRange?.end ?? DateTime.now(),
-                  onDateChanged: (date) => onDateChanged(end: date),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // ElevatedButton(
-          //   onPressed: () {},
-          //   style: ElevatedButton.styleFrom(
-          //     backgroundColor: TColor.secondary,
-          //     minimumSize: const Size(double.infinity, 45),
-          //     shape: RoundedRectangleBorder(
-          //       borderRadius: BorderRadius.circular(8),
-          //     ),
-          //   ),
-          //   child: const Text(
-          //     'Generate Report',
-          //     style: TextStyle(color: Colors.white),
-          //   ),
-          // ),
-          Text(
-            selectedDateRange == null
-                ? 'No date range selected'
-                : 'From ${DateFormat('E, dd MMM yyyy').format(selectedDateRange!.start)} To ${DateFormat('E, dd MMM yyyy').format(selectedDateRange!.end)}',
-            style: TextStyle(
-              color: TColor.primaryText,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // Widget: Summary Card
 class _SummaryCard extends StatelessWidget {
   final List<Map<String, dynamic>> data;
 
-  const _SummaryCard({required this.data, Key? key}) : super(key: key);
+  const _SummaryCard({required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -335,8 +253,7 @@ class _SummaryItem extends StatelessWidget {
     required this.label,
     required this.value,
     this.valueColor,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -359,6 +276,89 @@ class _SummaryItem extends StatelessWidget {
               color: valueColor ?? TColor.primaryText,
               fontSize: 16,
               fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+// Widget: Date Selection Section
+class _DateSelectionSection extends StatelessWidget {
+  final DateTimeRange? selectedDateRange;
+  final Function({DateTime? start, DateTime? end}) onDateChanged;
+
+  const _DateSelectionSection({
+    required this.selectedDateRange,
+    required this.onDateChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: TColor.white,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: DateSelector2(
+                  fontSize: 14,
+                  label: 'From Date',
+                  initialDate: selectedDateRange?.start ??
+                      DateTime.now().subtract(const Duration(days: 30)),
+                  onDateChanged: (date) => onDateChanged(start: date),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: DateSelector2(
+                  fontSize: 14,
+                  label: 'To Date',
+                  initialDate: selectedDateRange?.end ?? DateTime.now(),
+                  onDateChanged: (date) => onDateChanged(end: date),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // ElevatedButton(
+          //   onPressed: () {},
+          //   style: ElevatedButton.styleFrom(
+          //     backgroundColor: TColor.secondary,
+          //     minimumSize: const Size(double.infinity, 45),
+          //     shape: RoundedRectangleBorder(
+          //       borderRadius: BorderRadius.circular(8),
+          //     ),
+          //   ),
+          //   child: const Text(
+          //     'Generate Report',
+          //     style: TextStyle(color: Colors.white),
+          //   ),
+          // ),
+          Text(
+            selectedDateRange == null
+                ? 'No date range selected'
+                : 'From ${DateFormat('E, dd MMM yyyy').format(selectedDateRange!.start)} To ${DateFormat('E, dd MMM yyyy').format(selectedDateRange!.end)}',
+            style: TextStyle(
+              color: TColor.primaryText,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

@@ -1,11 +1,11 @@
-class RecoveryListItem {
+class RecoveryListModel {
   String rlName;
   String dateCreated;
   double totalAmount;
   double received;
   double remaining;
 
-  RecoveryListItem({
+  RecoveryListModel({
     required this.rlName,
     required this.dateCreated,
     required this.totalAmount,

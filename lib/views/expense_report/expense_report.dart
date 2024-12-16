@@ -8,7 +8,7 @@ import 'controller/expense_report_controller.dart';
 import 'widgets/expense_widgets.dart';
 
 class ExpenseComparisonReport extends StatelessWidget {
-  ExpenseComparisonReport({Key? key}) : super(key: key);
+  ExpenseComparisonReport({super.key});
 
   final ExpenseReportController controller = Get.put(ExpenseReportController());
 
