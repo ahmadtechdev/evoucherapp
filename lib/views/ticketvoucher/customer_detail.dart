@@ -1,3 +1,4 @@
+import 'package:evoucher/common_widget/round_textfield.dart';
 import 'package:evoucher/views/ticketvoucher/ticketvoucherControler.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -39,6 +40,7 @@ class CustomerDetail extends StatelessWidget {
                           child: _buildTextField(
                             controller: controller.ticketNumberController,
                             text: 'Ticket(Optional)',
+
                           ),
                         ),
                         SizedBox(width: 10),
@@ -393,7 +395,7 @@ class CustomerDetail extends StatelessWidget {
                           ],
                         );
                       } else {
-                        return SizedBox(); // If not visible, return empty SizedBox
+                        return const SizedBox(); // If not visible, return empty SizedBox
                       }
                     }),
                   ],
@@ -409,32 +411,8 @@ class CustomerDetail extends StatelessWidget {
   // TextField widget
   Widget _buildTextField(
       {required TextEditingController controller, required String text}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          text,
-          style: TextStyle(
-              color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 5),
-        Container(
-          height: 50,
-          child: TextFormField(
-            controller: controller,
-            style: TextStyle(color: Colors.black),
-            decoration: InputDecoration(
-              labelStyle: TextStyle(color: Colors.white),
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+    return RoundTitleTextfield(title: text, controller: controller,) ;
+
   }
 
   // Dropdown field widget

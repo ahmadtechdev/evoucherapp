@@ -131,7 +131,7 @@ class RoundTitleTextfield extends StatelessWidget {
   const RoundTitleTextfield({
     super.key,
     required this.title,
-    required this.hintText,
+    this.hintText ="",
     this.controller,
     this.keyboardType,
     this.bgColor,

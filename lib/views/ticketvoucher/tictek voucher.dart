@@ -1,5 +1,5 @@
-import 'package:evoucher/views/ticketvoucher/Supplier.dart';
-import 'package:evoucher/views/ticketvoucher/customer_D.dart';
+import 'package:evoucher/views/ticketvoucher/Supplier_detail.dart';
+import 'package:evoucher/views/ticketvoucher/customer_detail.dart';
 import 'package:flutter/material.dart';
 import '../../common/color_extension.dart';
 import '../../common_widget/dart_selector2.dart';
