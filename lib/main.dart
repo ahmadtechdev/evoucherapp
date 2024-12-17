@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
     Get.lazyPut(() => IncomesReportController(), fenix: true);
 
     return GetMaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: TColor.primary),
         useMaterial3: true,
