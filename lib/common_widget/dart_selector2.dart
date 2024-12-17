@@ -10,6 +10,7 @@ class DateSelector2 extends StatelessWidget {
   final ValueChanged<DateTime> onDateChanged;
   final String label;
   final bool selectMonthOnly; // New parameter for selecting only the month
+  final bool readonly; // New parameter for selecting only the month
 
   DateSelector2({
     super.key,
@@ -18,6 +19,7 @@ class DateSelector2 extends StatelessWidget {
     required this.onDateChanged,
     this.label = "",
     this.selectMonthOnly = false, // Default value is false
+    this.readonly = false, // Default value is false
   });
 
   final Rx<DateTime> selectedDate = DateTime.now().obs; // Observable for state management

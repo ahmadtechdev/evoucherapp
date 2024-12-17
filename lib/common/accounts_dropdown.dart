@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../common_widget/custom_dropdown.dart';
-import '../views/accounts/accounts/controller/account_controller.dart';
+import '../views/side_bar/accounts/accounts/controller/account_controller.dart';
 
 class AccountDropdown extends StatelessWidget {
   final Color primaryColor;

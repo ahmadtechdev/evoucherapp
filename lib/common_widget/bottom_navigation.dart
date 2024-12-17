@@ -4,6 +4,8 @@ import 'package:evoucher/views/finance_voucher/finance.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../views/hotel_voucher/entry_hotel_voucher.dart';
+
 class CustomBottomNavigationBar extends StatelessWidget {
   // Optional parameter - only pass when on a bottom nav page
   final int? selectedIndex;
@@ -23,7 +25,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
         // Navigator.pushNamed(context, '/ticket');
         break;
       case 2:
-        Navigator.pushNamed(context, '/hotel');
+        // Navigator.pushNamed(context, '/hotel');
+        Get.to(()=>const HotelBookingForm());
         break;
       case 3:
         Navigator.pushNamed(context, '/visa');
