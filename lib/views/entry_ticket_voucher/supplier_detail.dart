@@ -1,4 +1,4 @@
-import 'package:evoucher/views/ticketvoucher/ticketvoucherControler.dart';
+import 'package:evoucher/views/entry_ticket_voucher/ticketvoucher_controler.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

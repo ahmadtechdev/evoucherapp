@@ -1,7 +1,8 @@
 // bottom_navigation.dart
 import 'package:evoucher/common/color_extension.dart';
 import 'package:evoucher/views/finance_voucher/finance.dart';
-import 'package:evoucher/views/ticketvoucher/tictek%20voucher.dart';
+import 'package:evoucher/views/entry_ticket_voucher/tictek_voucher.dart';
+import 'package:evoucher/views/view_ticket_voucher/view_ticket_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -20,20 +21,22 @@ class CustomBottomNavigationBar extends StatelessWidget {
     // Navigate based on index
     switch (index) {
       case 0:
-        Get.to(()=>const Finance());
+        Get.to(() => const Finance());
         break;
       case 1:
-        Get.to(()=>const TictekVoucher());
+        Get.to(() => const TictekVoucher());
 
         // Navigator.pushNamed(context, '/ticket');
-        
+
         break;
       case 2:
         // Navigator.pushNamed(context, '/hotel');
-        Get.to(()=>const HotelBookingForm());
+        Get.to(() => const HotelBookingForm());
         break;
       case 3:
-        Navigator.pushNamed(context, '/visa');
+        // Navigator.pushNamed(context, '/visa');
+        Get.to(() => ViewTicketVoucher());
+
         break;
       case 4:
         Navigator.pushNamed(context, '/package');
@@ -54,15 +57,18 @@ class CustomBottomNavigationBar extends StatelessWidget {
       child: Theme(
         // Override the theme to show unselected items when no index is provided
         data: Theme.of(context).copyWith(
-          bottomNavigationBarTheme: BottomNavigationBarTheme.of(context).copyWith(
-            selectedItemColor: selectedIndex != null ? TColor.secondary : TColor.white,
+          bottomNavigationBarTheme:
+              BottomNavigationBarTheme.of(context).copyWith(
+            selectedItemColor:
+                selectedIndex != null ? TColor.secondary : TColor.white,
           ),
         ),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           backgroundColor: TColor.primary,
           unselectedItemColor: TColor.white,
-          currentIndex: selectedIndex ?? 0, // Use 0 as default but style all items as unselected when null
+          currentIndex: selectedIndex ??
+              0, // Use 0 as default but style all items as unselected when null
           onTap: (index) => _handleNavigation(context, index),
           items: const [
             BottomNavigationBarItem(
