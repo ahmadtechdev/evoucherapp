@@ -73,14 +73,27 @@ class HotelBookingForm extends StatelessWidget {
                     ],
                   ),
                 ),
-
+                const SizedBox(height: 10),
+                RoundTitleTextfield(
+                  title: 'Total Debit',
+                  hintText: 'Debit Amount',
+                  readOnly: true,
+                  initialValue: controller.profit.value.toStringAsFixed(2),
+                ),
+                const SizedBox(height: 10),
+                RoundTitleTextfield(
+                  title: 'Total Credit',
+                  hintText: 'Credit Amount',
+                  readOnly: true,
+                  initialValue: controller.profit.value.toStringAsFixed(2),
+                ),
+                const SizedBox(height: 10),
                 // Bottom Button
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.snackbar('button Click',
-                          'Save Booking');
+                      Get.snackbar('button Click', 'Save Booking');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: TColor.primary,
@@ -106,8 +119,6 @@ class HotelBookingForm extends StatelessWidget {
     );
   }
 
-
-
   // Customer Details Tab
   Widget _buildCustomerTab(
       HotelBookingController controller, BuildContext context) {
@@ -115,18 +126,12 @@ class HotelBookingForm extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          RoundTitleTextfield(
-            title: 'Customer Account',
-            hintText: 'Enter Customer Account',
-            onChanged: (value) => controller.customerAccount.value = value,
-          ),
+          // RoundTitleTextfield(
+          //   title: 'Customer Account',
+          //   hintText: 'Enter Customer Account',
+          //   onChanged: (value) => controller.customerAccount.value = value,
+          // ),
           const AccountDropdown(),
-          const SizedBox(height: 15),
-          RoundTitleTextfield(
-            title: 'Pax Name',
-            hintText: 'Enter Passenger Name',
-            onChanged: (value) => controller.paxName.value = value,
-          ),
           const SizedBox(height: 15),
           RoundTitleTextfield(
             title: 'Phone Number',
@@ -134,6 +139,13 @@ class HotelBookingForm extends StatelessWidget {
             keyboardType: TextInputType.phone,
             onChanged: (value) => controller.phoneNo.value = value,
           ),
+          const SizedBox(height: 15),
+          RoundTitleTextfield(
+            title: 'Pax Name',
+            hintText: 'Enter Passenger Name',
+            onChanged: (value) => controller.paxName.value = value,
+          ),
+
           const SizedBox(height: 15),
           RoundTitleTextfield(
             title: 'Hotel Name',
@@ -173,7 +185,6 @@ class HotelBookingForm extends StatelessWidget {
                     controller.checkInDate.value = value;
                   },
                 ),
-
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -185,7 +196,6 @@ class HotelBookingForm extends StatelessWidget {
                     controller.checkOutDate.value = value;
                   },
                 ),
-
               ),
             ],
           ),
@@ -197,27 +207,6 @@ class HotelBookingForm extends StatelessWidget {
             count: controller.nights,
             onIncrement: controller.incrementNights,
             onDecrement: controller.decrementNights,
-          ),
-          const SizedBox(height: 15),
-          _buildCounterField(
-            title: 'Adults',
-            count: controller.adultsCount,
-            onIncrement: controller.incrementAdults,
-            onDecrement: controller.decrementAdults,
-          ),
-          const SizedBox(height: 15),
-          _buildCounterField(
-            title: 'Children',
-            count: controller.childrenCount,
-            onIncrement: controller.incrementChildren,
-            onDecrement: controller.decrementChildren,
-          ),
-          const SizedBox(height: 15),
-          _buildCounterField(
-            title: 'Rooms',
-            count: controller.roomsCount,
-            onIncrement: controller.incrementRooms,
-            onDecrement: controller.decrementRooms,
           ),
           const SizedBox(height: 15),
 
@@ -233,6 +222,49 @@ class HotelBookingForm extends StatelessWidget {
             hintText: 'Select Meal Plan',
             onChanged: (value) => controller.meal.value = value,
           ),
+          const SizedBox(height: 15),
+          _buildCounterField(
+            title: 'Rooms/Beds',
+            count: controller.roomsCount,
+            onIncrement: controller.incrementRooms,
+            onDecrement: controller.decrementRooms,
+          ),
+          const SizedBox(height: 15),
+          _buildCounterField(
+            title: 'Adults',
+            count: controller.adultsCount,
+            onIncrement: controller.incrementAdults,
+            onDecrement: controller.decrementAdults,
+          ),
+          const SizedBox(height: 15),
+          _buildCounterField(
+            title: 'Children',
+            count: controller.childrenCount,
+            onIncrement: controller.incrementChildren,
+            onDecrement: controller.decrementChildren,
+          ),
+          RoundTitleTextfield(
+            title: 'Rooms Per Night sale',
+            hintText: 'Enter room per night',
+            onChanged: (value) =>
+                controller.roomPerNightBuying.value = value as double,
+          ),
+          RoundTitleTextfield(
+            title: 'Rate of Exchange',
+            hintText: 'Enter rate of exchange',
+            onChanged: (value) =>
+                controller.roeBuyingRate.value = value as double,
+          ),
+          RoundTitleTextfield(
+            title: 'Currency',
+            hintText: 'Enter currency',
+            onChanged: (value) => controller.buyingCurrency.value = value,
+          ),
+          RoundTitleTextfield(
+            title: 'PKR Total Selling',
+            hintText: 'Enter total selling',
+            onChanged: (value) => controller.buyingCurrency.value = value,
+          ),
         ],
       ),
     );
@@ -244,9 +276,7 @@ class HotelBookingForm extends StatelessWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
-        children: [
-
-        ],
+        children: [],
       ),
     );
   }
@@ -258,11 +288,12 @@ class HotelBookingForm extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          RoundTitleTextfield(
-            title: 'Supplier Detail',
-            hintText: 'Enter Supplier Detail',
-            onChanged: (value) => controller.supplierDetail.value = value,
-          ),
+          // RoundTitleTextfield(
+          //   title: 'Supplier Detail',
+          //   hintText: 'Enter Supplier Detail',
+          //   onChanged: (value) => controller.supplierDetail.value = value,
+          // ),
+          const AccountDropdown(),
           const SizedBox(height: 15),
           RoundTitleTextfield(
             title: 'Supplier Confirmation No',
@@ -289,11 +320,21 @@ class HotelBookingForm extends StatelessWidget {
             children: [
               Expanded(
                 child: RoundTitleTextfield(
-                  title: 'Room/Night Selling',
-                  hintText: 'Enter Selling Price',
+                  title: 'Room/Night Buying',
+                  hintText: 'Enter Price',
                   keyboardType: TextInputType.number,
-                  onChanged: (value) => controller.roomPerNightSelling.value =
+                  onChanged: (value) => controller.roomPerNightBuying.value =
                       double.tryParse(value) ?? 0.0,
+                ),
+              ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: RoundTitleTextfield(
+                  title: 'Total Buying Amount',
+                  hintText: 'Enter Amount',
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) => controller.totalBuying.value =
+                      double.tryParse(value) ?? 1.0,
                 ),
               ),
               const SizedBox(width: 15),
@@ -309,33 +350,18 @@ class HotelBookingForm extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 15),
-
-          // Buying Side Financials
-          Row(
-            children: [
-              Expanded(
-                child: RoundTitleTextfield(
-                  title: 'Room/Night Buying',
-                  hintText: 'Enter Buying Price',
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) => controller.roomPerNightBuying.value =
-                      double.tryParse(value) ?? 0.0,
-                ),
-              ),
-              const SizedBox(width: 15),
-              Expanded(
-                child: RoundTitleTextfield(
-                  title: 'ROE Buying',
-                  hintText: 'Rate of Exchange',
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) => controller.roeBuyingRate.value =
-                      double.tryParse(value) ?? 1.0,
-                ),
-              ),
-            ],
+          RoundTitleTextfield(
+            title: 'Currency',
+            hintText: 'Enter Currency',
+            initialValue: controller.profit.value.toStringAsFixed(2),
           ),
           const SizedBox(height: 15),
-
+          RoundTitleTextfield(
+            title: 'Total Buying',
+            hintText: 'Buying price',
+            readOnly: true,
+            initialValue: controller.profit.value.toStringAsFixed(2),
+          ),
           // Profit and Loss
           Row(
             children: [
