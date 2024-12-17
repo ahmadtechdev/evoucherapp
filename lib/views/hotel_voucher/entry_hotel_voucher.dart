@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -23,11 +22,16 @@ class HotelBookingForm extends StatelessWidget {
               children: [
                 // Date and Cancellation Date Row
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Row(
                     children: [
                       Expanded(
-                        child: DateSelector2(fontSize: 12, initialDate: DateTime.now(), onDateChanged: (DateTime value) {  },),
+                        child: DateSelector2(
+                          fontSize: 12,
+                          initialDate: DateTime.now(),
+                          onDateChanged: (DateTime value) {},
+                        ),
                         // child: _buildDateField(
                         //   label: 'Today',
                         //   dateValue: controller.todayDate,
@@ -39,7 +43,8 @@ class HotelBookingForm extends StatelessWidget {
                         child: _buildDateField(
                           label: 'Cancellation Deadline',
                           dateValue: controller.cancellationDeadlineDate,
-                          onTap: () => _selectDate(context, controller.cancellationDeadlineDate),
+                          onTap: () => _selectDate(
+                              context, controller.cancellationDeadlineDate),
                         ),
                       ),
                     ],
@@ -78,7 +83,8 @@ class HotelBookingForm extends StatelessWidget {
                         // Proceed with booking
                       } else {
                         // Show validation error
-                        Get.snackbar('Validation Error', 'Please fill all required fields');
+                        Get.snackbar('Validation Error',
+                            'Please fill all required fields');
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -113,20 +119,23 @@ class HotelBookingForm extends StatelessWidget {
     VoidCallback? onTap,
   }) {
     return Obx(() => RoundTitleTextfield(
-      title: label,
-      hintText: dateValue.value != null
-          ? DateFormat('dd MMM, yyyy').format(dateValue.value!)
-          : 'Select Date',
-      readOnly: readOnly,
-      right: !readOnly ? IconButton(
-        icon: Icon(Icons.calendar_today, color: TColor.secondary),
-        onPressed: onTap,
-      ) : null,
-    ));
+          title: label,
+          hintText: dateValue.value != null
+              ? DateFormat('dd MMM, yyyy').format(dateValue.value!)
+              : 'Select Date',
+          readOnly: readOnly,
+          right: !readOnly
+              ? IconButton(
+                  icon: Icon(Icons.calendar_today, color: TColor.secondary),
+                  onPressed: onTap,
+                )
+              : null,
+        ));
   }
 
   // Date Selection Method
-  Future<void> _selectDate(BuildContext context, Rx<DateTime?> dateValue) async {
+  Future<void> _selectDate(
+      BuildContext context, Rx<DateTime?> dateValue) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: dateValue.value ?? DateTime.now(),
@@ -139,7 +148,8 @@ class HotelBookingForm extends StatelessWidget {
   }
 
   // Customer Details Tab
-  Widget _buildCustomerTab(HotelBookingController controller, BuildContext context) {
+  Widget _buildCustomerTab(
+      HotelBookingController controller, BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -194,7 +204,8 @@ class HotelBookingForm extends StatelessWidget {
   }
 
   // Booking Details Tab
-  Widget _buildBookingTab(HotelBookingController controller, BuildContext context) {
+  Widget _buildBookingTab(
+      HotelBookingController controller, BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -269,7 +280,8 @@ class HotelBookingForm extends StatelessWidget {
   }
 
   // Supplier Details Tab
-  Widget _buildSupplierTab(HotelBookingController controller, BuildContext context) {
+  Widget _buildSupplierTab(
+      HotelBookingController controller, BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -283,7 +295,8 @@ class HotelBookingForm extends StatelessWidget {
           RoundTitleTextfield(
             title: 'Supplier Confirmation No',
             hintText: 'Enter Confirmation Number',
-            onChanged: (value) => controller.supplierConfirmationNo.value = value,
+            onChanged: (value) =>
+                controller.supplierConfirmationNo.value = value,
           ),
           const SizedBox(height: 15),
           RoundTitleTextfield(
@@ -409,12 +422,12 @@ class HotelBookingForm extends StatelessWidget {
             onPressed: onDecrement,
           ),
           Obx(() => Text(
-            '${count.value}',
-            style: TextStyle(
-              color: TColor.primaryText,
-              fontSize: 16,
-            ),
-          )),
+                '${count.value}',
+                style: TextStyle(
+                  color: TColor.primaryText,
+                  fontSize: 16,
+                ),
+              )),
           IconButton(
             icon: Icon(Icons.add, color: TColor.secondary),
             onPressed: onIncrement,

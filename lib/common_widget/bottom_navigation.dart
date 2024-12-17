@@ -1,6 +1,7 @@
 // bottom_navigation.dart
 import 'package:evoucher/common/color_extension.dart';
 import 'package:evoucher/views/finance_voucher/finance.dart';
+import 'package:evoucher/views/ticketvoucher/tictek%20voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,7 +23,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
         Get.to(()=>const Finance());
         break;
       case 1:
+        Get.to(()=>const TictekVoucher());
+
         // Navigator.pushNamed(context, '/ticket');
+        
         break;
       case 2:
         // Navigator.pushNamed(context, '/hotel');

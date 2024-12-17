@@ -22,7 +22,8 @@ class DateSelector2 extends StatelessWidget {
     this.readonly = false, // Default value is false
   });
 
-  final Rx<DateTime> selectedDate = DateTime.now().obs; // Observable for state management
+  final Rx<DateTime> selectedDate =
+      DateTime.now().obs; // Observable for state management
 
   Future<void> _selectDate(BuildContext context) async {
     if (selectMonthOnly) {
@@ -31,7 +32,8 @@ class DateSelector2 extends StatelessWidget {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Select Year", style: TextStyle(color: TColor.primaryText)),
+            title: Text("Select Year",
+                style: TextStyle(color: TColor.primaryText)),
             content: SizedBox(
               height: 200,
               child: ListView.builder(
@@ -58,7 +60,8 @@ class DateSelector2 extends StatelessWidget {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("Select Month", style: TextStyle(color: TColor.primaryText)),
+              title: Text("Select Month",
+                  style: TextStyle(color: TColor.primaryText)),
               content: SizedBox(
                 height: 300,
                 child: GridView.builder(
@@ -104,16 +107,20 @@ class DateSelector2 extends StatelessWidget {
           return Theme(
             data: Theme.of(context).copyWith(
               colorScheme: ColorScheme.light(
-                primary: TColor.primary, // Primary color for headers and selected date
+                primary: TColor
+                    .primary, // Primary color for headers and selected date
                 onPrimary: TColor.white, // Text color on primary color
-                surface: TColor.white, // Background color for the date picker surface
+                surface: TColor
+                    .white, // Background color for the date picker surface
                 onSurface: TColor.primaryText, // Text color for dates
-                secondary: TColor.secondary, // Color for the day selected by the user
+                secondary:
+                    TColor.secondary, // Color for the day selected by the user
               ),
               dialogBackgroundColor: TColor.white,
               textButtonTheme: TextButtonThemeData(
                 style: TextButton.styleFrom(
-                  foregroundColor: TColor.third, // "Cancel" and "OK" button color
+                  foregroundColor:
+                      TColor.third, // "Cancel" and "OK" button color
                 ),
               ),
             ),
@@ -131,11 +138,12 @@ class DateSelector2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    selectedDate.value = initialDate; // Initialize with the provided initial date
+    selectedDate.value =
+        initialDate; // Initialize with the provided initial date
 
     return Obx(
-          () => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      () => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(
           color: TColor.primary.withOpacity(0.05),
           borderRadius: BorderRadius.circular(12),
