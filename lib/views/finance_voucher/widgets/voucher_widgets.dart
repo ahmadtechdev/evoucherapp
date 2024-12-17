@@ -11,11 +11,13 @@ import '../journal/view_edit_j_voucher.dart';
 class EntryVoucherCard extends StatelessWidget {
   final Map<String, dynamic> voucher;
   final String type;
+  final Function(Map<String, dynamic>)? onVoucherTap;
 
   const EntryVoucherCard({
     super.key,
     required this.voucher,
     required this.type,
+    this.onVoucherTap,
   });
 
   void _handleViewPress() {
@@ -32,6 +34,10 @@ class EntryVoucherCard extends StatelessWidget {
       default:
         Get.to(() => JournalVoucherDetail(voucherData: voucher));
     }
+
+
+    // Call onVoucherTap if provided
+    onVoucherTap?.call(voucher);
   }
 
   @override
@@ -150,10 +156,14 @@ class EntryVoucherListView extends StatelessWidget {
   final List<Map<String, dynamic>> vouchers;
   final String type;
 
+  final Function(Map<String, dynamic>)? onVoucherTap;
+
   const EntryVoucherListView({
     super.key,
     required this.vouchers,
     required this.type,
+
+    this.onVoucherTap,
   });
 
   @override
@@ -164,7 +174,7 @@ class EntryVoucherListView extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: vouchers.length,
       itemBuilder: (context, index) {
-        return EntryVoucherCard(voucher: vouchers[index], type: type,);
+        return EntryVoucherCard(voucher: vouchers[index], type: type, onVoucherTap: onVoucherTap,);
       },
     );
   }

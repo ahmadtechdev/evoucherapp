@@ -57,12 +57,14 @@ class ApiService {
       debugPrint('Response Status Code: ${response.statusCode}');
       debugPrint('Response Body: ${response.body}');
 
+
       // Parse the response body
       final Map<String, dynamic> responseData;
       try {
         responseData = json.decode(response.body);
+
       } catch (e) {
-        throw FormatException('Invalid response format');
+        throw const FormatException('Invalid response format');
       }
 
       // Handle different types of errors

@@ -58,7 +58,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.primary,
                 onTap: () {
                   // Handle View Journal Voucher tap
-                  Get.to(()=>const JournalViewVoucher());
+                  Get.to(()=>JournalViewVoucher());
                 },
               ),
               VoucherOption(

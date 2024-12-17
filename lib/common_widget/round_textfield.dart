@@ -125,6 +125,8 @@ class RoundTitleTextfield extends StatelessWidget {
   final Color? bgColor;
   final Widget? left;
   final Widget? right; // Optional right-side icon or widget
+  final Function(String)? onChanged; // Optional onChanged callback
+  final String? initialValue; // Optional initial value
 
   const RoundTitleTextfield({
     super.key,
@@ -135,12 +137,21 @@ class RoundTitleTextfield extends StatelessWidget {
     this.bgColor,
     this.left,
     this.right,
+    this.onChanged,
+    this.initialValue, // Add this line
     this.obscureText = false,
     this.readOnly = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Use a controller to set the initial value if it's provided
+    final effectiveController = controller ?? TextEditingController();
+
+    if (initialValue != null && effectiveController.text.isEmpty) {
+      effectiveController.text = initialValue!;
+    }
+
     return Container(
       height: 55,
       decoration: BoxDecoration(
@@ -162,10 +173,11 @@ class RoundTitleTextfield extends StatelessWidget {
                   alignment: Alignment.topLeft,
                   child: TextField(
                     autocorrect: false,
-                    controller: controller,
+                    controller: effectiveController, // Use effective controller
                     obscureText: obscureText,
                     keyboardType: keyboardType,
                     readOnly: readOnly,
+                    onChanged: onChanged,
                     decoration: InputDecoration(
                       contentPadding:
                       const EdgeInsets.symmetric(horizontal: 20),
