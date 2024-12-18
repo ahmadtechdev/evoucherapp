@@ -1,8 +1,9 @@
-import 'package:evoucher/views/ticketvoucher/ticketvoucherControler.dart';
+import 'package:evoucher/views/ticket_voucher/entry_ticket_voucher/ticketvoucher_controler.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../common_widget/round_textfield.dart';
+import '../../../common_widget/round_textfield.dart';
+
 
 class SupplierDetail extends StatelessWidget {
   final TicketvoucherControler controller = Get.put(TicketvoucherControler());

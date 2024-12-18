@@ -1,6 +1,5 @@
 import 'package:evoucher/service/session_manager.dart';
 import 'package:evoucher/views/hotel_voucher/entry_hotel_controller.dart';
-import 'package:evoucher/views/hotel_voucher/entry_hotel_voucher.dart';
 import 'package:evoucher/views/side_bar/accounts/accounts/controller/account_controller.dart';
 import 'package:evoucher/views/finance_voucher/controller/entry_controller.dart';
 import 'package:evoucher/views/home/home.dart';
@@ -35,7 +34,7 @@ class MyApp extends StatelessWidget {
     Get.lazyPut(() => HotelBookingController(), fenix: true);
 
     return GetMaterialApp(
-      title: 'Flutter',
+      title: 'Flutter dome',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: TColor.primary),
         useMaterial3: true,
@@ -48,4 +47,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

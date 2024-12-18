@@ -1,8 +1,10 @@
-import 'package:evoucher/views/ticketvoucher/Supplier_detail.dart';
-import 'package:evoucher/views/ticketvoucher/customer_detail.dart';
+
+
+import 'package:evoucher/views/ticket_voucher/entry_ticket_voucher/supplier_detail.dart';
 import 'package:flutter/material.dart';
-import '../../common/color_extension.dart';
-import '../../common_widget/dart_selector2.dart';
+import '../../../common/color_extension.dart';
+import '../../../common_widget/dart_selector2.dart';
+import 'customer_detail.dart';
 
 class TictekVoucher extends StatelessWidget {
   const TictekVoucher({super.key});
