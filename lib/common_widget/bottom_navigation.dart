@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import '../views/hotel_voucher/entry_hotel_voucher.dart';
 import '../views/ticket_voucher/entry_ticket_voucher/tictek_voucher.dart';
 import '../views/ticket_voucher/view_ticket_voucher/view_ticket_voucher.dart';
+import '../views/visa_voucher/view_visa_voucher.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   // Optional parameter - only pass when on a bottom nav page
@@ -39,7 +40,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
         Get.to(()=> ViewTicketVoucher());
         break;
       case 4:
-        Navigator.pushNamed(context, '/package');
+        // Navigator.pushNamed(context, '/package');
+        Get.to(()=> ViewVisaVoucher());
         break;
       case 5:
         Navigator.pushNamed(context, '/other');
