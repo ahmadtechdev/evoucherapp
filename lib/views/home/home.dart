@@ -58,7 +58,9 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      bottomNavigationBar: const CustomBottomNavigationBar(),
+      bottomNavigationBar: const CustomBottomNavigationBar(
+        selectedIndex: 0,
+      ),
     );
   }
 

@@ -1,13 +1,13 @@
 // bottom_navigation.dart
 import 'package:evoucher/common/color_extension.dart';
 import 'package:evoucher/views/finance_voucher/finance.dart';
+import 'package:evoucher/views/home/home.dart';
+import 'package:evoucher/views/ticket_voucher/ticket.dart';
+import 'package:evoucher/views/visa_voucher/visa.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../views/hotel_voucher/entry_hotel_voucher.dart';
-import '../views/ticket_voucher/entry_ticket_voucher/tictek_voucher.dart';
-import '../views/ticket_voucher/view_ticket_voucher/view_ticket_voucher.dart';
-import '../views/visa_voucher/view_visa_voucher.dart';
+import '../views/hotel_voucher/hotel.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   // Optional parameter - only pass when on a bottom nav page
@@ -22,29 +22,26 @@ class CustomBottomNavigationBar extends StatelessWidget {
     // Navigate based on index
     switch (index) {
       case 0:
-        Get.to(()=>const Finance());
+        Get.to(() => const Home());
         break;
       case 1:
-        Get.to(()=>const TictekVoucher());
+        Get.to(() => const Finance());
 
         // Navigator.pushNamed(context, '/ticket');
-        
+
         break;
       case 2:
-        // Navigator.pushNamed(context, '/hotel');
-        Get.to(()=>const HotelBookingForm());
+      // Navigator.pushNamed(context, '/hotel');
+        Get.to(() => const Ticket());
 
         break;
       case 3:
-        // Navigator.pushNamed(context, '/visa');
-        Get.to(()=> ViewTicketVoucher());
+      // Navigator.pushNamed(context, '/visa');
+        Get.to(() => const Hotel());
         break;
       case 4:
-        // Navigator.pushNamed(context, '/package');
-        Get.to(()=> ViewVisaVoucher());
-        break;
-      case 5:
-        Navigator.pushNamed(context, '/other');
+      // Navigator.pushNamed(context, '/ticket');
+        Get.to(() => const Visa());
         break;
     }
   }
@@ -59,17 +56,24 @@ class CustomBottomNavigationBar extends StatelessWidget {
       child: Theme(
         // Override the theme to show unselected items when no index is provided
         data: Theme.of(context).copyWith(
-          bottomNavigationBarTheme: BottomNavigationBarTheme.of(context).copyWith(
-            selectedItemColor: selectedIndex != null ? TColor.secondary : TColor.white,
+          bottomNavigationBarTheme:
+          BottomNavigationBarTheme.of(context).copyWith(
+            selectedItemColor:
+            selectedIndex != null ? TColor.secondary : TColor.white,
           ),
         ),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           backgroundColor: TColor.primary,
           unselectedItemColor: TColor.white,
-          currentIndex: selectedIndex ?? 0, // Use 0 as default but style all items as unselected when null
+          currentIndex: selectedIndex ??
+              0, // Use 0 as default but style all items as unselected when null
           onTap: (index) => _handleNavigation(context, index),
           items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.receipt_long),
               label: 'Finance',
@@ -85,14 +89,6 @@ class CustomBottomNavigationBar extends StatelessWidget {
             BottomNavigationBarItem(
               icon: Icon(Icons.card_travel),
               label: 'Visa',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.layers),
-              label: 'Package',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.more_horiz),
-              label: 'Other',
             ),
           ],
         ),

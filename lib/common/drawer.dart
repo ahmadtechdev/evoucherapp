@@ -1,6 +1,7 @@
 import 'package:evoucher/views/side_bar/accounts/accounts/accounts.dart';
 import 'package:evoucher/views/home/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import '../views/side_bar/daily_acitvity_report/daily_activity_report.dart';
 import '../views/side_bar/daily_cash_activity/daily_cash_activity.dart';
@@ -33,11 +34,23 @@ class CustomDrawer extends StatefulWidget {
 
 class _CustomDrawerState extends State<CustomDrawer> {
   late int selectedIndex;
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _selectedItemKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     selectedIndex = widget.currentIndex;
+    // Schedule a post-frame callback to scroll to the selected item
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToSelectedItem();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -47,9 +60,68 @@ class _CustomDrawerState extends State<CustomDrawer> {
       setState(() {
         selectedIndex = widget.currentIndex;
       });
+      // Scroll to newly selected item when currentIndex changes
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToSelectedItem();
+      });
     }
   }
 
+  void _scrollToSelectedItem() {
+    if (_selectedItemKey.currentContext != null) {
+      final RenderObject? renderObject = _selectedItemKey.currentContext!.findRenderObject();
+      final RenderAbstractViewport viewport = RenderAbstractViewport.of(renderObject);
+      if (viewport != null && renderObject != null) {
+        final ScrollableState? scrollableState = Scrollable.of(_selectedItemKey.currentContext!);
+        if (scrollableState != null) {
+          scrollableState.position.ensureVisible(
+            renderObject,
+            alignment: 0.5, // Center the item
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.easeInOut,
+          );
+        }
+      }
+    }
+  }
+
+  Widget _buildNavigationItem({
+    required String title,
+    required IconData icon,
+    required int index,
+    VoidCallback? onTap,
+    Color? textColor,
+    Color? iconColor,
+  }) {
+    final isSelected = selectedIndex == index;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: ListTile(
+        key: isSelected ? _selectedItemKey : null, // Add key to selected item
+        dense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: Icon(
+          icon,
+          color: isSelected ? TColor.primary : (iconColor ?? Colors.black87),
+          size: 22,
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: isSelected ? TColor.primary : (textColor ?? Colors.black87),
+            fontSize: 14,
+          ),
+        ),
+        selected: isSelected,
+        onTap: () {
+          setState(() {
+            selectedIndex = index;
+          });
+          onTap?.call();
+        },
+      ),
+    );
+  }
   Widget _buildHeader(BuildContext context) {
     return SizedBox(
       height: 180,
@@ -125,43 +197,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
             fontWeight: FontWeight.bold,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildNavigationItem({
-    required String title,
-    required IconData icon,
-    required int index,
-    VoidCallback? onTap,
-    Color? textColor,
-    Color? iconColor,
-  }) {
-    final isSelected = selectedIndex == index;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: ListTile(
-        dense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        leading: Icon(
-          icon,
-          color: isSelected ? TColor.primary : (iconColor ?? Colors.black87),
-          size: 22,
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            color: isSelected ? TColor.primary : (textColor ?? Colors.black87),
-            fontSize: 14,
-          ),
-        ),
-        selected: isSelected,
-        onTap: () {
-          setState(() {
-            selectedIndex = index;
-          });
-          onTap?.call();
-        },
       ),
     );
   }
@@ -306,11 +341,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Drawer(
       width: MediaQuery.of(context).size.width,
       child: SafeArea(
         child: ListView(
+          controller: _scrollController,
           padding: EdgeInsets.zero,
           children: [
             _buildHeader(context),
@@ -321,3 +358,5 @@ class _CustomDrawerState extends State<CustomDrawer> {
     );
   }
 }
+
+

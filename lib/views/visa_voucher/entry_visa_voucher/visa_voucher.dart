@@ -3,15 +3,17 @@
 import 'package:evoucher/views/hotel_voucher/view_hotel_voucher/view_hotel_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../common/accounts_dropdown.dart';
-import '../../common/color_extension.dart';
-import '../../common_widget/dart_selector2.dart';
-import '../../common_widget/date_range_selector.dart';
-import '../../common_widget/round_textfield.dart';
-import 'entry_hotel_controller.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class EntryHotelVoucher extends StatelessWidget {
-  const EntryHotelVoucher({super.key});
+import '../../../common/accounts_dropdown.dart';
+import '../../../common/color_extension.dart';
+import '../../../common_widget/dart_selector2.dart';
+import '../../../common_widget/round_textfield.dart';
+import 'entry_visa_voucher_controller.dart';
+
+
+class VisaVoucher extends StatelessWidget {
+  const VisaVoucher({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,7 @@ class EntryHotelVoucher extends StatelessWidget {
       backgroundColor: TColor.primary,
       foregroundColor: TColor.white,
       title: const Text(
-        'Hotel Entry Voucher',
+        'Visa Entry Voucher',
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       bottom: TabBar(
@@ -49,29 +51,27 @@ class EntryHotelVoucher extends StatelessWidget {
 
   Widget _buildBody() {
     return SafeArea(
-      child: GetBuilder<EntryHotelController>(
-        init: EntryHotelController(),
-        builder: (controller) => Obx(
-          () => Column(
-            children: [
-              _buildTopDateSection(controller),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    _buildCustomerTab(controller),
-                    _buildSupplierTab(controller),
-                  ],
-                ),
+      child: GetBuilder<VisaVoucherControler>(
+        init: VisaVoucherControler(),
+        builder: (controller) => Column(
+          children: [
+            _buildTopDateSection(controller),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _buildCustomerTab(controller),
+                  _buildSupplierTab(controller),
+                ],
               ),
-              _buildBottomButton(controller),
-            ],
-          ),
+            ),
+            _buildBottomButton(controller),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildTopDateSection(EntryHotelController controller) {
+  Widget _buildTopDateSection(VisaVoucherControler controller) {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -110,7 +110,7 @@ class EntryHotelVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildCustomerTab(EntryHotelController controller) {
+  Widget _buildCustomerTab(VisaVoucherControler controller) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -118,6 +118,7 @@ class EntryHotelVoucher extends StatelessWidget {
         children: [
           _buildSectionTitle('Customer Information'),
           AccountDropdown(
+            hinttext: 'Select Customer Account',
             onChanged: (value) {
               if (value != null) {
                 controller.customerAccount.value = value;
@@ -128,26 +129,10 @@ class EntryHotelVoucher extends StatelessWidget {
           _buildCustomerBasicInfo(controller),
           const SizedBox(height: 20),
 
-          _buildSectionTitle('Booking Details'),
-          CustomDateRangeSelector(
-            dateRange: controller.dateRange.value,
-            onDateRangeChanged: controller.updateDateRange,
-            nights: controller.nights.value,
-            onNightsChanged: controller.updateNights,
-          ),
-          const SizedBox(height: 15),
-          _buildRoomDetails(controller),
-          const SizedBox(height: 20),
-
-          _buildSectionTitle('Guest Information'),
-          _buildGuestCounters(controller),
-          const SizedBox(height: 20),
-
           _buildSectionTitle('Financial Details'),
           _buildFinancialDetails(controller),
           // Additional Details Section
           const SizedBox(height: 20),
-          _buildSectionTitle('Debit Receiving Account'),
           Row(
             children: [
               Obx(() => Checkbox(
@@ -233,7 +218,6 @@ class EntryHotelVoucher extends StatelessWidget {
                             left:
                                 Icon(Icons.email, color: TColor.secondaryText),
                           ),
-
                         ],
                       ),
                     ),
@@ -247,7 +231,7 @@ class EntryHotelVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildSupplierTab(EntryHotelController controller) {
+  Widget _buildSupplierTab(VisaVoucherControler controller) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -255,6 +239,17 @@ class EntryHotelVoucher extends StatelessWidget {
         children: [
           _buildSectionTitle('Supplier Information'),
           AccountDropdown(
+            hinttext: 'Select Supplier Account',
+            onChanged: (value) {
+              if (value != null) {
+                controller.supplierDetail.value = value;
+              }
+            },
+          ),
+          const SizedBox(height: 15),
+          AccountDropdown(
+            showSearch: false,
+            hinttext: 'Select Consultant  Account',
             onChanged: (value) {
               if (value != null) {
                 controller.supplierDetail.value = value;
@@ -288,7 +283,7 @@ class EntryHotelVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildCustomerBasicInfo(EntryHotelController controller) {
+  Widget _buildCustomerBasicInfo(VisaVoucherControler controller) {
     return Column(
       children: [
         RoundTitleTextfield(
@@ -300,17 +295,24 @@ class EntryHotelVoucher extends StatelessWidget {
         ),
         const SizedBox(height: 15),
         RoundTitleTextfield(
-          title: 'Pax Name',
-          hintText: 'Enter Passenger Name',
-          onChanged: (value) => controller.paxName.value = value,
+          title: 'Customer Name',
+          hintText: 'Enter Customer Name',
+          onChanged: (value) => controller.CustomerName.value = value,
           left: Icon(Icons.person, color: TColor.secondaryText),
         ),
         const SizedBox(height: 15),
         RoundTitleTextfield(
-          title: 'Hotel Name',
-          hintText: 'Enter Hotel Name',
-          onChanged: (value) => controller.hotelName.value = value,
-          left: Icon(Icons.hotel, color: TColor.secondaryText),
+          title: 'Passport No',
+          hintText: 'Enter Passport No',
+          onChanged: (value) => controller.PassportNo.value = value,
+          left: Icon(MdiIcons.passport, color: TColor.secondaryText),
+        ),
+        const SizedBox(height: 15),
+        RoundTitleTextfield(
+          title: 'V. Type',
+          hintText: 'Enter V. Type',
+          onChanged: (value) => controller.Vtype.value = value,
+          left: Icon(Icons.business, color: TColor.secondaryText),
         ),
         const SizedBox(height: 15),
         Row(
@@ -326,10 +328,10 @@ class EntryHotelVoucher extends StatelessWidget {
             const SizedBox(width: 15),
             Expanded(
               child: RoundTitleTextfield(
-                title: 'City',
-                hintText: 'Enter City',
-                onChanged: (value) => controller.city.value = value,
-                left: Icon(Icons.location_city, color: TColor.secondaryText),
+                title: 'Visa No:',
+                hintText: 'Enter Visa No:',
+                onChanged: (value) => controller.Visa_No.value = value,
+                left: Icon(Icons.airplane_ticket, color: TColor.secondaryText),
               ),
             ),
           ],
@@ -338,94 +340,19 @@ class EntryHotelVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildRoomDetails(EntryHotelController controller) {
-    return Column(
-      children: [
-        RoundTitleTextfield(
-          title: 'Room Type',
-          hintText: 'Select Room Type',
-          onChanged: (value) => controller.roomType.value = value,
-          left: Icon(Icons.bed, color: TColor.secondaryText),
-        ),
-        const SizedBox(height: 15),
-        RoundTitleTextfield(
-          title: 'Meal Plan',
-          hintText: 'Select Meal Plan',
-          onChanged: (value) => controller.meal.value = value,
-          left: Icon(Icons.restaurant, color: TColor.secondaryText),
-        ),
-        const SizedBox(height: 15),
-        _buildCounterField(
-          title: 'Rooms/Beds',
-          count: controller.roomsCount,
-          onIncrement: () => controller.roomsCount.value++,
-          onDecrement: () {
-            if (controller.roomsCount.value > 1) {
-              controller.roomsCount.value--;
-            }
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGuestCounters(EntryHotelController controller) {
-    return Column(
-      children: [
-        _buildCounterField(
-          title: 'Adults',
-          count: controller.adultsCount,
-          onIncrement: () => controller.adultsCount.value++,
-          onDecrement: () {
-            if (controller.adultsCount.value > 1) {
-              controller.adultsCount.value--;
-            }
-          },
-          icon: Icons.person,
-        ),
-        const SizedBox(height: 15),
-        _buildCounterField(
-          title: 'Children',
-          count: controller.childrenCount,
-          onIncrement: () => controller.childrenCount.value++,
-          onDecrement: () {
-            if (controller.childrenCount.value > 0) {
-              controller.childrenCount.value--;
-            }
-          },
-          icon: Icons.child_care,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFinancialDetails(EntryHotelController controller) {
+  Widget _buildFinancialDetails(VisaVoucherControler controller) {
     return Column(
       children: [
         Obx(() => RoundTitleTextfield(
-              title: 'Room Per Night Rate',
-              hintText: 'Enter rate per night',
+              title: 'Foreign Sale Rate',
+              hintText: 'Foreign Sale Rate',
               keyboardType: TextInputType.number,
-              initialValue: controller.roomPerNightSelling.value == 0.0
+              initialValue: controller.Foreign_Sale_Rate.value == 0.0
                   ? ''
-                  : controller.roomPerNightSelling.value.toStringAsFixed(2),
+                  : controller.Foreign_Sale_Rate.value.toStringAsFixed(2),
               onChanged: (value) {
                 double parsedValue = double.tryParse(value) ?? 0.0;
-                controller.roomPerNightSelling.value = parsedValue;
-              },
-              left: Icon(Icons.attach_money, color: TColor.secondaryText),
-            )),
-        const SizedBox(height: 15),
-        Obx(() => RoundTitleTextfield(
-              title: 'Total Sale Amount',
-              hintText: 'Enter sale amount',
-              keyboardType: TextInputType.number,
-              initialValue: controller.totalSellingAmount.value == 0.0
-                  ? ''
-                  : controller.totalSellingAmount.value.toStringAsFixed(2),
-              onChanged: (value) {
-                double parsedValue = double.tryParse(value) ?? 0.0;
-                controller.totalSellingAmount.value = parsedValue;
+                controller.Foreign_Sale_Rate.value = parsedValue;
               },
               left: Icon(Icons.attach_money, color: TColor.secondaryText),
             )),
@@ -477,51 +404,23 @@ class EntryHotelVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildSupplierBasicInfo(EntryHotelController controller) {
+  Widget _buildSupplierBasicInfo(VisaVoucherControler controller) {
     return Column(
       children: [
         RoundTitleTextfield(
-          title: 'Supplier Confirmation',
-          hintText: 'Enter Confirmation Number',
-          onChanged: (value) => controller.supplierConfirmationNo.value = value,
+          title: 'Foreign Purchsae Rate',
+          hintText: 'Foreign Purchsae Rate',
+          onChanged: (value) => controller.Foreign_Purchsae_Rate.value = value,
           left: Icon(Icons.confirmation_number, color: TColor.secondaryText),
-        ),
-        const SizedBox(height: 15),
-        RoundTitleTextfield(
-          title: 'Hotel Confirmation',
-          hintText: 'Enter Hotel Confirmation',
-          onChanged: (value) => controller.hotelConfirmationNo.value = value,
-          left: Icon(Icons.hotel, color: TColor.secondaryText),
-        ),
-        const SizedBox(height: 15),
-        RoundTitleTextfield(
-          title: 'Consultant Name',
-          hintText: 'Enter Consultant Name',
-          onChanged: (value) => controller.consultantName.value = value,
-          left: Icon(Icons.person, color: TColor.secondaryText),
         ),
       ],
     );
   }
 
   // Similar changes for Supplier Financials
-  Widget _buildSupplierFinancials(EntryHotelController controller) {
+  Widget _buildSupplierFinancials(VisaVoucherControler controller) {
     return Column(
       children: [
-        Obx(() => RoundTitleTextfield(
-              title: 'Room/Night Buying',
-              hintText: 'Enter Price',
-              keyboardType: TextInputType.number,
-              initialValue: controller.roomPerNightBuying.value == 0.0
-                  ? ''
-                  : controller.roomPerNightBuying.value.toStringAsFixed(2),
-              onChanged: (value) {
-                double parsedValue = double.tryParse(value) ?? 0.0;
-                controller.roomPerNightBuying.value = parsedValue;
-              },
-              left: Icon(Icons.shopping_cart, color: TColor.secondaryText),
-            )),
-        const SizedBox(height: 15),
         Obx(() => RoundTitleTextfield(
               title: 'Total Buying Amount',
               hintText: 'Enter Amount',
@@ -584,7 +483,7 @@ class EntryHotelVoucher extends StatelessWidget {
   }
 
   // Update the supplier summary to be fully reactive
-  Widget _buildSupplierSummary(EntryHotelController controller) {
+  Widget _buildSupplierSummary(VisaVoucherControler controller) {
     return Column(
       children: [
         Row(
@@ -707,7 +606,7 @@ class EntryHotelVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomButton(EntryHotelController controller) {
+  Widget _buildBottomButton(VisaVoucherControler controller) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(

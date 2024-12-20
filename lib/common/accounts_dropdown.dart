@@ -8,31 +8,38 @@ class AccountDropdown extends StatelessWidget {
   final Color primaryColor;
   final bool isEnabled;
   final String? initialValue;
+  final String? subHeadName;
+  final String? hinttext;
+  final bool showSearch;
+
   final void Function(String?)? onChanged;
 
-  const AccountDropdown({
-    super.key,
-    this.primaryColor = const Color(0xFF2196F3),
-    this.isEnabled = true,
-    this.initialValue,
-    this.onChanged,
-  });
+  const AccountDropdown(
+      {super.key,
+        this.primaryColor = const Color(0xFF2196F3),
+        this.isEnabled = true,
+        this.initialValue,
+        this.subHeadName,
+        this.onChanged,
+        this.hinttext = 'Select an account',
+        this.showSearch = true});
 
   @override
   Widget build(BuildContext context) {
-    final AccountsController accountsController = Get.find<AccountsController>();
+    final AccountsController accountsController =
+    Get.find<AccountsController>();
 
     return Obx(() {
       final accountsList = accountsController.accounts;
 
       // Create a map of account IDs to account names
       final accountsMap = {
-        for (var account in accountsList)
-          account.id.toString(): account.name
+        for (var account in accountsList) account.id.toString(): account.name
       };
 
       return CustomDropdown(
-        hint: 'Select an account',
+        showSearch: showSearch,
+        hint: hinttext.toString(),
         items: accountsMap, // Pass the map instead of just names
         selectedItemId: initialValue, // Use selectedItemId with the account ID
         onChanged: (selectedAccountId) {

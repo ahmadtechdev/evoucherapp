@@ -4,10 +4,12 @@ import '../common/color_extension.dart';
 
 class CustomDropdown extends StatelessWidget {
   final String hint;
-  final Map<String, String> items; // Changed from List<String> to Map<String, String>
+  final Map<String, String>
+  items; // Changed from List<String> to Map<String, String>
   final String? selectedItemId; // Changed to store the selected item's ID
   final ValueChanged<String?>? onChanged;
   final bool enabled;
+  final bool showSearch;
 
   const CustomDropdown({
     super.key,
@@ -16,6 +18,7 @@ class CustomDropdown extends StatelessWidget {
     this.selectedItemId,
     this.onChanged,
     this.enabled = true,
+    this.showSearch = true,
   });
 
   @override
@@ -23,7 +26,7 @@ class CustomDropdown extends StatelessWidget {
     return DropdownSearch<String>(
       enabled: enabled,
       popupProps: PopupProps.menu(
-        showSearchBox: true,
+        showSearchBox: showSearch,
         searchFieldProps: TextFieldProps(
           decoration: InputDecoration(
             hintText: "Search...",
@@ -60,7 +63,8 @@ class CustomDropdown extends StatelessWidget {
             borderSide: BorderSide.none,
           ),
           hintText: hint,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
     );

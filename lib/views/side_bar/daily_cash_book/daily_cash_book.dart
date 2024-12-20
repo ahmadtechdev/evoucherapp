@@ -1,5 +1,5 @@
 import 'package:excel/excel.dart';
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:evoucher/common_widget/date_selecter.dart';
@@ -13,7 +13,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'dart:io';
-
+import 'package:flutter/material.dart';
 class DailyCashBook extends StatelessWidget {
   final DailyCashBookController controller = Get.put(DailyCashBookController());
 
@@ -271,11 +271,17 @@ class DailyCashBook extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final transaction = controller.transactions[index];
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
+                      margin:  const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: TColor.white,
-
-                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(

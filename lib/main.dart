@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
     Get.lazyPut(() => AccountsController(), fenix: true);
     Get.lazyPut(() => VoucherController(), fenix: true);
     Get.lazyPut(() => IncomesReportController(), fenix: true);
-    Get.lazyPut(() => HotelBookingController(), fenix: true);
+    Get.lazyPut(() => EntryHotelController(), fenix: true);
 
     return GetMaterialApp(
       title: 'Flutter dome',

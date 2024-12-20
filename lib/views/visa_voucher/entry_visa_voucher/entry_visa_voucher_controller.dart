@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class EntryHotelController extends GetxController {
+class VisaVoucherControler extends GetxController {
   // Date Fields (unchanged)
   final Rx<DateTime> todayDate = DateTime.now().obs;
   final Rx<DateTimeRange> dateRange = DateTimeRange(
@@ -12,11 +12,12 @@ class EntryHotelController extends GetxController {
 
   // Customer Fields (unchanged)
   final RxString customerAccount = RxString('');
-  final RxString paxName = RxString('');
+  final RxString CustomerName = RxString('');
   final RxString phoneNo = RxString('');
-  final RxString hotelName = RxString('');
+  final RxString PassportNo = RxString('');
   final RxString country = RxString('');
-  final RxString city = RxString('');
+  final RxString Visa_No = RxString('');
+  final RxString Vtype = RxString('');
 
   // Booking Details (unchanged)
   final RxInt nights = RxInt(1);
@@ -29,7 +30,7 @@ class EntryHotelController extends GetxController {
   final RxInt childrenCount = RxInt(0);
 
   // Selling Side Calculations (modified)
-  final RxDouble roomPerNightSelling = RxDouble(0.0);
+  final RxDouble Foreign_Sale_Rate = RxDouble(0.0);
   final RxDouble totalSellingAmount = RxDouble(0.0);
   final RxDouble roeSellingRate = RxDouble(1.0);
   final RxDouble pkrTotalSelling = RxDouble(0.0);
@@ -37,7 +38,7 @@ class EntryHotelController extends GetxController {
 
   // Buying Side Calculations (modified)
   final RxString supplierDetail = RxString('');
-  final RxString supplierConfirmationNo = RxString('');
+  final RxString Foreign_Purchsae_Rate = RxString('');
   final RxString hotelConfirmationNo = RxString('');
   final RxString consultantName = RxString('');
 
@@ -51,7 +52,6 @@ class EntryHotelController extends GetxController {
   final RxDouble loss = RxDouble(0.0);
   final RxDouble totalDebit = RxDouble(0.0);
   final RxDouble totalCredit = RxDouble(0.0);
-
 
   void updateDateRange(DateTimeRange newRange) {
     dateRange.value = newRange;
@@ -79,6 +79,7 @@ class EntryHotelController extends GetxController {
       updateNights(nights.value - 1);
     }
   }
+
   // Enhanced calculation methods
   void calculateCustomerSide({bool fromTotal = false}) {
     // Ensure we don't divide by zero
@@ -87,10 +88,10 @@ class EntryHotelController extends GetxController {
 
     if (fromTotal) {
       // Calculate room per night when total amount is entered
-      roomPerNightSelling.value = totalSellingAmount.value / rooms;
+      Foreign_Sale_Rate.value = totalSellingAmount.value / rooms;
     } else {
       // Calculate total selling amount when room per night is entered
-      totalSellingAmount.value = rooms * roomPerNightSelling.value;
+      totalSellingAmount.value = rooms * Foreign_Sale_Rate.value;
     }
 
     // Calculate PKR total selling
@@ -134,13 +135,15 @@ class EntryHotelController extends GetxController {
 
   // Add these to the HotelBookingController class
   final RxBool isAdditionalDetailsEnabled = false.obs;
-  final RxList<Map<String, dynamic>> additionalDetails = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> additionalDetails =
+      <Map<String, dynamic>>[].obs;
 
 // Method to add a new additional detail entry
   void addAdditionalDetail() {
     additionalDetails.add({
       'name': ''.obs,
-      'amount': ''.obs,
+      'email': ''.obs,
+      'phone': ''.obs,
     });
   }
 
@@ -157,7 +160,7 @@ class EntryHotelController extends GetxController {
 
     // Listeners for customer side calculations
     ever(roomsCount, (_) => calculateCustomerSide());
-    ever(roomPerNightSelling, (_) => calculateCustomerSide());
+    ever(Foreign_Sale_Rate, (_) => calculateCustomerSide());
     ever(totalSellingAmount, (_) => calculateCustomerSide(fromTotal: true));
     ever(roeSellingRate, (_) => calculateAll());
 

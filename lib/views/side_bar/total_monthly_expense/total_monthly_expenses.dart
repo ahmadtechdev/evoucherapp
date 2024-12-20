@@ -21,7 +21,7 @@ class TotalMonthlyExpenses extends StatelessWidget {
         foregroundColor: TColor.white,
         title: const Text('Total Monthly Expenses'),
       ),
-      drawer: const CustomDrawer(currentIndex: 9),
+      drawer: const CustomDrawer(currentIndex: 14),
       body: Column(
         children: [
           _buildDateSelectionHeader(),

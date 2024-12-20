@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../common/color_extension.dart';
+import '../../common/drawer.dart';
 import '../../common_widget/bottom_navigation.dart';
 import 'expense/unposted_e_voucher.dart';
 import 'journal/journal_view_voucher.dart';
@@ -36,6 +37,8 @@ class _FinanceState extends State<Finance> {
         backgroundColor: TColor.white,
         elevation: 1,
       ),
+
+      drawer: const CustomDrawer(currentIndex: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -58,7 +61,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.primary,
                 onTap: () {
                   // Handle View Journal Voucher tap
-                  Get.to(()=>JournalViewVoucher());
+                  Get.to(()=>const JournalViewVoucher());
                 },
               ),
               VoucherOption(
@@ -173,7 +176,7 @@ class _FinanceState extends State<Finance> {
           ],
         ),
       ),
-      bottomNavigationBar: const CustomBottomNavigationBar(selectedIndex: 0,),
+      bottomNavigationBar: const CustomBottomNavigationBar(selectedIndex: 1,),
     );
   }
 

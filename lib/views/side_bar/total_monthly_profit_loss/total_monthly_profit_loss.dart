@@ -23,7 +23,7 @@ class TotalMonthlyProfitLoss extends StatelessWidget {
         foregroundColor: TColor.white,
         title: const Text('Total Monthly Profit Loss'),
       ),
-      drawer: const CustomDrawer(currentIndex: 8),
+      drawer: const CustomDrawer(currentIndex: 13),
       body: Column(
         children: [
           _buildDateSelectionHeader(),
