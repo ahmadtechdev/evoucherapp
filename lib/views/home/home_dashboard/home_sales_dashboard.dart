@@ -1,3 +1,5 @@
+import 'package:evoucher/views/home/home_dashboard/grand_total_report.dart';
+import 'package:evoucher/views/home/home_dashboard/visa_sales_report.dart';
 import 'package:flutter/material.dart';
 
 import '../../../common/color_extension.dart';
@@ -7,6 +9,7 @@ import 'package:get/get.dart';
 
 import 'all_ticket_sales_report/all_ticket_sales_report.dart';
 import 'controller/dashboard_controller.dart';
+import 'hotel_sales_report.dart';
 
 class SalesDashboardWidget extends StatefulWidget {
   const SalesDashboardWidget({super.key});
@@ -152,7 +155,9 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
           padding,
           fontSize,
           iconSize,
-                (){}
+                (){
+                  Get.to(()=>const HotelSalesReport());
+                }
         ),
         _buildSalesCard(
           'Visa Sales',
@@ -162,7 +167,9 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
           padding,
           fontSize,
           iconSize,
-                (){}
+                (){
+                  Get.to(()=>const VisaSalesReport());
+                }
         ),
         _buildSalesCard(
           'Grand Total',
@@ -172,7 +179,9 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
           padding,
           fontSize,
           iconSize,
-                (){}
+                (){
+                  Get.to(()=>const GrandTotalReport());
+                }
         ),
       ],
     );

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class EntryHotelController extends GetxController {
-  // Date Fields (unchanged)
+  // Date Fields
   final Rx<DateTime> todayDate = DateTime.now().obs;
   final Rx<DateTimeRange> dateRange = DateTimeRange(
     start: DateTime.now(),
@@ -10,48 +10,45 @@ class EntryHotelController extends GetxController {
   ).obs;
   final Rx<DateTime?> cancellationDeadlineDate = Rx<DateTime?>(null);
 
-  // Customer Fields (unchanged)
-  final RxString customerAccount = RxString('');
-  final RxString paxName = RxString('');
-  final RxString phoneNo = RxString('');
-  final RxString hotelName = RxString('');
-  final RxString country = RxString('');
-  final RxString city = RxString('');
+  // Customer Fields
+  final customerAccount = TextEditingController();
+  final paxName = TextEditingController();
+  final phoneNo = TextEditingController();
+  final hotelName = TextEditingController();
+  final country = TextEditingController();
+  final city = TextEditingController();
 
-  // Booking Details (unchanged)
+  // Booking Details
   final RxInt nights = RxInt(1);
   final RxInt roomsCount = RxInt(1);
   final RxString roomType = RxString('');
   final RxString meal = RxString('');
 
-  // Guest Count (unchanged)
+  // Guest Count
   final RxInt adultsCount = RxInt(1);
   final RxInt childrenCount = RxInt(0);
 
-  // Selling Side Calculations (modified)
-  final RxDouble roomPerNightSelling = RxDouble(0.0);
+  // Selling Side Calculations
+  final roomPerNightSelling = TextEditingController();
   final RxDouble totalSellingAmount = RxDouble(0.0);
-  final RxDouble roeSellingRate = RxDouble(1.0);
+  final roeSellingRate = TextEditingController(text: '1');
   final RxDouble pkrTotalSelling = RxDouble(0.0);
   final RxString sellingCurrency = RxString('');
 
-  // Buying Side Calculations (modified)
-  final RxString supplierDetail = RxString('');
-  final RxString supplierConfirmationNo = RxString('');
-  final RxString hotelConfirmationNo = RxString('');
-  final RxString consultantName = RxString('');
-
-  final RxDouble roomPerNightBuying = RxDouble(0.0);
-  final RxDouble totalBuyingAmount = RxDouble(0.0);
+  // Buying Side Calculations
+  final supplierDetail = TextEditingController();
+  final supplierConfirmationNo = TextEditingController();
+  final hotelConfirmationNo = TextEditingController();
+  final consultantName = TextEditingController();
+  final roomPerNightBuying = TextEditingController();
+  final totalBuyingAmount = TextEditingController();
   final RxDouble pkrTotalBuying = RxDouble(0.0);
   final RxString buyingCurrency = RxString('');
+  final roebuyingRate = TextEditingController(text: '1');
 
-  // Summary (unchanged)
+  // Summary
   final RxDouble profit = RxDouble(0.0);
   final RxDouble loss = RxDouble(0.0);
-  final RxDouble totalDebit = RxDouble(0.0);
-  final RxDouble totalCredit = RxDouble(0.0);
-
 
   void updateDateRange(DateTimeRange newRange) {
     dateRange.value = newRange;
@@ -79,52 +76,67 @@ class EntryHotelController extends GetxController {
       updateNights(nights.value - 1);
     }
   }
+
   // Enhanced calculation methods
   void calculateCustomerSide({bool fromTotal = false}) {
-    // Ensure we don't divide by zero
-    final rooms = roomsCount.value > 0 ? roomsCount.value : 1;
-    final roeRate = roeSellingRate.value > 0 ? roeSellingRate.value : 1.0;
+    try {
+      final rooms = roomsCount.value > 0 ? roomsCount.value : 1;
+      final roeRate = double.tryParse(roeSellingRate.text) ?? 1.0;
 
-    if (fromTotal) {
-      // Calculate room per night when total amount is entered
-      roomPerNightSelling.value = totalSellingAmount.value / rooms;
-    } else {
-      // Calculate total selling amount when room per night is entered
-      totalSellingAmount.value = rooms * roomPerNightSelling.value;
+      if (fromTotal) {
+        final totalSelling =
+            double.tryParse(totalSellingAmount.value.toString()) ?? 0.0;
+        roomPerNightSelling.text = (totalSelling / rooms).toStringAsFixed(2);
+      } else {
+        final perNightSelling =
+            double.tryParse(roomPerNightSelling.text) ?? 0.0;
+        totalSellingAmount.value = rooms * perNightSelling;
+      }
+
+      pkrTotalSelling.value = totalSellingAmount.value * roeRate;
+      calculateSummary();
+    } catch (e) {
+      debugPrint('Error in calculateCustomerSide: $e');
     }
-
-    // Calculate PKR total selling
-    pkrTotalSelling.value = totalSellingAmount.value * roeRate;
-
-    calculateSummary();
   }
 
   void calculateSupplierSide({bool fromTotal = false}) {
-    // Ensure we don't divide by zero
-    final rooms = roomsCount.value > 0 ? roomsCount.value : 1;
-    final nightCount = nights.value > 0 ? nights.value : 1;
-    final roeRate = roeSellingRate.value > 0 ? roeSellingRate.value : 1.0;
+    try {
+      final rooms = roomsCount.value > 0 ? roomsCount.value : 1;
+      final nightCount = nights.value > 0 ? nights.value : 1;
+      final roeRate = double.tryParse(roebuyingRate.text) ?? 1.0;
 
-    if (fromTotal) {
-      // Calculate room per night when total buying amount is entered
-      roomPerNightBuying.value = totalBuyingAmount.value / (nightCount * rooms);
-    } else {
-      // Calculate total buying amount when room per night is entered
-      totalBuyingAmount.value = roomPerNightBuying.value * nightCount * rooms;
+      if (fromTotal) {
+        final totalBuying = double.tryParse(totalBuyingAmount.text) ?? 0;
+        roomPerNightBuying.text =
+            (totalBuying / (nightCount * rooms)).toStringAsFixed(2);
+      } else {
+        final perNightBuying = double.tryParse(roomPerNightBuying.text) ?? 0.0;
+        totalBuyingAmount.text =
+            (perNightBuying * nightCount * rooms).toStringAsFixed(2);
+      }
+
+      pkrTotalBuying.value = double.tryParse(totalBuyingAmount.text)! * roeRate;
+      calculateSummary();
+    } catch (e) {
+      debugPrint('Error in calculateSupplierSide: $e');
     }
-
-    // Calculate PKR total buying
-    pkrTotalBuying.value = totalBuyingAmount.value * roeRate;
-
-    calculateSummary();
   }
 
   void calculateSummary() {
-    // Calculate profit, loss, debit, and credit
-    profit.value = pkrTotalBuying.value - pkrTotalSelling.value;
-    loss.value = profit.value - totalSellingAmount.value;
-    totalDebit.value = pkrTotalSelling.value;
-    totalCredit.value = pkrTotalBuying.value + profit.value;
+    final pkrTotalBuyingValue = pkrTotalBuying.value;
+    final totalSellingValue = totalSellingAmount.value;
+
+    if (totalSellingValue > pkrTotalBuyingValue) {
+      profit.value = (totalSellingValue - pkrTotalBuyingValue).roundToDouble();
+      loss.value = 0.0;
+    } else if (pkrTotalBuyingValue > totalSellingValue) {
+      loss.value = (pkrTotalBuyingValue - totalSellingValue).roundToDouble();
+      profit.value = 0.0;
+    } else {
+      profit.value = 0.0;
+      loss.value = 0.0;
+    }
   }
 
   void calculateAll() {
@@ -132,11 +144,11 @@ class EntryHotelController extends GetxController {
     calculateSupplierSide();
   }
 
-  // Add these to the HotelBookingController class
+  // Additional Details Management
   final RxBool isAdditionalDetailsEnabled = false.obs;
-  final RxList<Map<String, dynamic>> additionalDetails = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> additionalDetails =
+      <Map<String, dynamic>>[].obs;
 
-// Method to add a new additional detail entry
   void addAdditionalDetail() {
     additionalDetails.add({
       'name': ''.obs,
@@ -144,7 +156,6 @@ class EntryHotelController extends GetxController {
     });
   }
 
-// Method to remove an additional detail entry
   void removeAdditionalDetail(int index) {
     if (additionalDetails.length > 1) {
       additionalDetails.removeAt(index);
@@ -154,16 +165,5 @@ class EntryHotelController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
-    // Listeners for customer side calculations
-    ever(roomsCount, (_) => calculateCustomerSide());
-    ever(roomPerNightSelling, (_) => calculateCustomerSide());
-    ever(totalSellingAmount, (_) => calculateCustomerSide(fromTotal: true));
-    ever(roeSellingRate, (_) => calculateAll());
-
-    // Listeners for supplier side calculations
-    ever(nights, (_) => calculateSupplierSide());
-    ever(roomPerNightBuying, (_) => calculateSupplierSide());
-    ever(totalBuyingAmount, (_) => calculateSupplierSide(fromTotal: true));
   }
 }

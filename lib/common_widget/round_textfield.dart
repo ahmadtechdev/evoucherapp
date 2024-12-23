@@ -124,28 +124,31 @@ class RoundTitleTextfield extends StatelessWidget {
   final bool readOnly;
   final Color? bgColor;
   final Widget? left;
-  final Widget? right; // Optional right-side icon or widget
-  final Function(String)? onChanged; // Optional onChanged callback
-  final String? initialValue; // Optional initial value
+  final Widget? right;
+  final Function(String)? onChanged;
+  final String? initialValue;
+  final VoidCallback? onEditingComplete;  // Added this line
+  final Color? textclr;
 
   const RoundTitleTextfield({
     super.key,
     required this.title,
-    this.hintText ="",
+    this.hintText = "",
     this.controller,
     this.keyboardType,
     this.bgColor,
     this.left,
     this.right,
     this.onChanged,
-    this.initialValue, // Add this line
+    this.initialValue,
     this.obscureText = false,
     this.readOnly = false,
+    this.onEditingComplete,
+    this.textclr,// Added this line
   });
 
   @override
   Widget build(BuildContext context) {
-    // Use a controller to set the initial value if it's provided
     final effectiveController = controller ?? TextEditingController();
 
     if (initialValue != null && effectiveController.text.isEmpty) {
@@ -172,12 +175,14 @@ class RoundTitleTextfield extends StatelessWidget {
                   margin: const EdgeInsets.only(top: 8),
                   alignment: Alignment.topLeft,
                   child: TextField(
+                    style: TextStyle(color: textclr ?? TColor.primaryText),
                     autocorrect: false,
-                    controller: effectiveController, // Use effective controller
+                    controller: effectiveController,
                     obscureText: obscureText,
                     keyboardType: keyboardType,
                     readOnly: readOnly,
                     onChanged: onChanged,
+                    onEditingComplete: onEditingComplete,  // Added this line
                     decoration: InputDecoration(
                       contentPadding:
                       const EdgeInsets.symmetric(horizontal: 20),

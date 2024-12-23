@@ -113,7 +113,7 @@ class EntryTicketVoucher extends StatelessWidget {
 class CustomerTab extends StatelessWidget {
   final EntryTicketController controller;
 
-  const CustomerTab({Key? key, required this.controller}) : super(key: key);
+  const CustomerTab({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -125,26 +125,13 @@ class CustomerTab extends StatelessWidget {
           _buildDateSelectors(),
           const SizedBox(height: 15),
           _buildSectionTitle('Customer Details'),
-          AccountDropdown(
-            onChanged: (value) {
-              if (value != null) controller.customerAccount.value = value;
-            },
-          ),
+          _buildCustomerDetails(),
           const SizedBox(height: 15),
-          _buildCustomerBasicInfo(),
-          const SizedBox(height: 20),
-          _buildSectionTitle('Ticket Details'),
-          _buildReactiveTicketDetails(),
-          const SizedBox(height: 20),
-          _buildSectionTitle('Add More Taxes'),
-          _buildAddMoreTaxes(),
-          _buildSectionTitle('Add More Changes'),
-          const SizedBox(height: 20),
-          _buildAddMoreCharges(),
-          const SizedBox(height: 15),
-          _buildReactiveField('PKR Total Selling', controller.pkrTotalSellingController),
-          const SizedBox(height: 15),
-          _buildReactiveField('Total', controller.totalController),
+          _buildTicketDetails(),
+          _buildTaxesSection(),
+          _buildChargesSection(),
+          _buildCommissionSection(),
+          _buildTotalsSection(),
         ],
       ),
     );
@@ -187,148 +174,246 @@ class CustomerTab extends StatelessWidget {
       ),
     );
   }
-// Update the _buildCustomerBasicInfo method:
 
-  Widget _buildCustomerBasicInfo() {
-    return Column(
-      children: [
-        _buildTextField(
-          title: 'Phone Number',
-          hintText: 'Enter Phone Number',
-          controller: controller.phoneNoController,
-          icon: Icons.phone,
-        ),
-        const SizedBox(height: 15),
-        _buildTextField(
-          title: 'Pax Name',
-          hintText: 'Enter Passenger Name',
-          controller: controller.paxNameController,
-          icon: Icons.person,
-        ),
-        const SizedBox(height: 15),
-        _buildTextField(
-          title: 'PNR',
-          hintText: 'Enter PNR',
-          controller: controller.pnrController,
-          icon: Icons.hotel,
-        ),
-      ],
+  Widget _buildCustomerDetails() {
+    return GetBuilder<EntryTicketController>(
+      id: 'customer_details',
+      builder: (_) => Column(
+        children: [
+          AccountDropdown(
+            onChanged: (value) {
+              if (value != null) controller.customerAccount.value = value;
+              controller.update(['customer_details']);
+            },
+          ),
+          const SizedBox(height: 15),
+          _buildTextField(
+            title: 'Phone Number',
+            hintText: 'Enter Phone Number',
+            controller: controller.phoneNoController,
+            icon: Icons.phone,
+          ),
+          const SizedBox(height: 15),
+          _buildTextField(
+            title: 'Pax Name',
+            hintText: 'Enter Passenger Name',
+            controller: controller.paxNameController,
+            icon: Icons.person,
+          ),
+          const SizedBox(height: 15),
+          _buildTextField(
+            title: 'PNR',
+            hintText: 'Enter PNR',
+            controller: controller.pnrController,
+            icon: Icons.confirmation_number,
+          ),
+        ],
+      ),
     );
   }
 
-// Update the _buildReactiveTicketDetails method:
-
-  Widget _buildReactiveTicketDetails() {
-    return Column(
-      children: [
-        _buildReactiveField('Ticket Number', controller.ticketNumberController),
-        _buildReactiveField('Airline', controller.airLineController),
-        _buildReactiveField('Sector', controller.sectorController),
-        _buildReactiveField('Segments', controller.segmentsController),
-        _buildReactiveField('Sector Type', controller.sectorTypeController),
-        _buildReactiveField('Basic Fare', controller.basicFareController),
-        _buildReactiveField('Other Taxes', controller.otherTaxesController),
-      ],
+  Widget _buildTicketDetails() {
+    return GetBuilder<EntryTicketController>(
+      id: 'ticket_details',
+      builder: (_) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Ticket Details'),
+          _buildTextField(
+            title: 'Ticket Number',
+            hintText: 'Enter Ticket Number',
+            controller: controller.ticketNumberController,
+            icon: Icons.airplane_ticket,
+          ),
+          const SizedBox(height: 15),
+          _buildTextField(
+            title: 'Airline',
+            hintText: 'Enter Airline',
+            controller: controller.airLineController,
+            icon: Icons.flight,
+          ),
+          const SizedBox(height: 15),
+          _buildTextField(
+            title: 'Sector',
+            hintText: 'Enter Sector',
+            controller: controller.sectorController,
+            icon: Icons.route,
+          ),
+          const SizedBox(height: 15),
+          _buildTextField(
+            title: 'Segments',
+            hintText: 'Enter Segments',
+            controller: controller.segmentsController,
+            icon: Icons.segment,
+          ),
+          const SizedBox(height: 15),
+          _buildTextField(
+            title: 'Sector Type',
+            hintText: 'Enter Sector Type',
+            controller: controller.sectorTypeController,
+            icon: Icons.category,
+          ),
+          const SizedBox(height: 15),
+          ReactiveTextField(
+            title: 'Basic Fare',
+            controller: controller.basicFareController,
+            ticketController: controller,
+            onEditingComplete: () {
+              controller.calculateBasicFareCHGS();
+              controller.calculateTotal();
+            },
+          ),
+          ReactiveTextField(
+            title: 'Other Taxes',
+            controller: controller.otherTaxesController,
+            ticketController: controller,
+            onEditingComplete: controller.calculateTotal,
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildAddMoreTaxes() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Obx(
-                  () => Checkbox(
-                value: controller.isAddMoreTaxesEnabled.value,
-                onChanged: (value) =>
-                controller.isAddMoreTaxesEnabled.value = value ?? false,
-                activeColor: TColor.primary,
-              ),
+  Widget _buildTaxesSection() {
+    return GetBuilder<EntryTicketController>(
+      id: 'taxes_section',
+      builder: (_) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Add More Taxes'),
+          CheckboxListTile(
+            title: Text('Add more Taxes',
+                style: TextStyle(color: TColor.primaryText)
             ),
-            Text(
-              'Add more Taxes',
-              style: TextStyle(color: TColor.primaryText),
-            ),
-          ],
-        ),
-        Obx(() {
-          if (!controller.isAddMoreTaxesEnabled.value) {
-            return const SizedBox.shrink();
-          }
-          return _buildTaxFields();
-        }),
-      ],
+            value: controller.isAddMoreTaxesEnabled.value,
+            onChanged: (value) {
+              controller.isAddMoreTaxesEnabled.value = value ?? false;
+              controller.update(['taxes_section']);
+            },
+            controlAffinity: ListTileControlAffinity.leading,
+            activeColor: TColor.primary,
+          ),
+          if (controller.isAddMoreTaxesEnabled.value)
+            _buildTaxFields(),
+        ],
+      ),
     );
   }
 
   Widget _buildTaxFields() {
     final taxFields = [
-      'EMD', 'CC', 'SP', 'RG', 'YD', 'E3', 'IO', 'YI', 'XZ', 'PK', 'ZR', 'YQ'
+      'EMD', 'CC', 'SP', 'RG', 'YD', 'E3',
+      'IO', 'YI', 'XZ', 'PK', 'ZR', 'YQ'
     ];
+
     return Column(
-      children: taxFields
-          .map((field) => _buildReactiveField(
-          field, controller.getTaxController(field)))
-          .toList(),
+      children: taxFields.map((field) =>
+          ReactiveTextField(
+            title: field,
+            controller: controller.getTaxController(field),
+            ticketController: controller,
+            onEditingComplete: controller.calculateTotal,
+          ),
+      ).toList(),
     );
   }
 
-  Widget _buildAddMoreCharges() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Obx(
-                  () => Checkbox(
-                value: controller.isAddMoreChangesEnabled.value,
-                onChanged: (value) =>
-                controller.isAddMoreChangesEnabled.value = value ?? false,
-                activeColor: TColor.primary,
-              ),
-            ),
-            Text(
-              'Add more Charges',
-              style: TextStyle(color: TColor.primaryText),
-            ),
-          ],
-        ),
-        Obx(() {
-          if (!controller.isAddMoreChangesEnabled.value) {
-            return const SizedBox.shrink();
-          }
-          return _buildChargeFields();
-        }),
-      ],
+  Widget _buildChargesSection() {
+    return GetBuilder<EntryTicketController>(
+      id: 'charges_section',
+      builder: (_) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Charges'),
+          ReactiveTextField(
+            title: 'Basic Fare CHGS %',
+            controller: controller.basicFareCHGSController,
+            ticketController: controller,
+            onEditingComplete: controller.calculateBasicFareCHGS,
+            isPercentage: true,
+          ),
+          ReactiveTextField(
+            title: 'Basic Fare CHGS PKR',
+            controller: controller.basicFareCHGSPKRController,
+            ticketController: controller,
+            onEditingComplete: controller.calculateBasicFareCHGS,
+          ),
+          ReactiveTextField(
+            title: 'Total Fare CHGS %',
+            controller: controller.totalFareCHGSController,
+            ticketController: controller,
+            onEditingComplete: controller.calculateTotalFareCHGS,
+            isPercentage: true,
+          ),
+          ReactiveTextField(
+            title: 'Total Fare CHGS PKR',
+            controller: controller.totalFareCHGSPKRController,
+            ticketController: controller,
+            onEditingComplete: controller.calculateTotalFareCHGS,
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildChargeFields() {
-    final chargeFields = [
-      'Basic Fare CHGS %',
-      'Basic Fare CHGS PKR',
-      'Total Fare CHGS',
-      'Total Fare CHGS PKR',
-      'Party Comm %',
-      'Party Comm PKR',
-      'Party WHT %',
-      'Party WHT PKR',
-    ];
-    return Column(
-      children: chargeFields
-          .map((field) => _buildReactiveField(
-          field, controller.getChargeController(field)))
-          .toList(),
+  Widget _buildCommissionSection() {
+    return GetBuilder<EntryTicketController>(
+      id: 'commission_section',
+      builder: (_) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Commission'),
+          ReactiveTextField(
+            title: 'Party Comm %',
+            controller: controller.partyCommController,
+            ticketController: controller,
+            onEditingComplete: controller.calculatePartyComm,
+            isPercentage: true,
+          ),
+          ReactiveTextField(
+            title: 'Party Comm PKR',
+            controller: controller.partyCommPKRController,
+            ticketController: controller,
+            onEditingComplete: controller.calculatePartyComm,
+          ),
+          ReactiveTextField(
+            title: 'Party WHT %',
+            controller: controller.partyWHTController,
+            ticketController: controller,
+            onEditingComplete: controller.calculatePartyWHT,
+            isPercentage: true,
+          ),
+          ReactiveTextField(
+            title: 'Party WHT PKR',
+            controller: controller.partyWHTPKRController,
+            ticketController: controller,
+            readOnly: true,
+          ),
+        ],
+      ),
     );
   }
-  Widget _buildReactiveField(String title, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: RoundTitleTextfield(
-        title: title,
-        hintText: 'Enter $title',
-        controller: controller,
-        keyboardType: TextInputType.number,
-        left: Icon(Icons.price_change, color: TColor.secondaryText),
+
+  Widget _buildTotalsSection() {
+    return GetBuilder<EntryTicketController>(
+      id: 'totals_section',
+      builder: (_) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Totals'),
+          ReactiveTextField(
+            title: 'PKR Total Selling',
+            controller: controller.pkrTotalSellingController,
+            ticketController: controller,
+
+          ),
+          ReactiveTextField(
+            title: 'Total',
+            controller: controller.totalController,
+            ticketController: controller,
+            readOnly: true,
+          ),
+        ],
       ),
     );
   }
@@ -349,6 +434,7 @@ class CustomerTab extends StatelessWidget {
   }
 }
 
+// Updated SupplierTab class
 class SupplierTab extends StatelessWidget {
   final EntryTicketController controller;
 
@@ -361,84 +447,201 @@ class SupplierTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildDateSection(),
+          const SizedBox(height: 15),
+          _buildSupplierDetailSection(),
+          const SizedBox(height: 15),
+          _buildCommissionsSection(),
+          const SizedBox(height: 15),
+          _buildFinancialsSection(),
+          const SizedBox(height: 15),
+          _buildSummarySection(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateSection() {
+    return Row(
+      children: [
+        Expanded(
+          child: DateSelector2(
+            fontSize: 12,
+            label: "Travel Date & Time",
+            initialDate: DateTime.now(),
+            onDateChanged: (value) => controller.travelDateTime.value = value,
+          ),
+        ),
+        const SizedBox(width: 15),
+        Expanded(
+          child: DateSelector2(
+            fontSize: 12,
+            label: "Return Date & Time",
+            initialDate: DateTime.now(),
+            onDateChanged: (value) => controller.returnDateTime.value = value,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSupplierDetailSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Supplier Detail'),
+        AccountDropdown(
+          onChanged: (value) {
+            if (value != null) controller.supplierDetail.value = value;
+          },
+        ),
+        const SizedBox(height: 15),
+        _buildTextField(
+          title: 'Issue From',
+          hintText: 'Enter Issue From',
+          controller: controller.issueFromController,
+          icon: Icons.business,
+        ),
+        const SizedBox(height: 15),
+        _buildTextField(
+          title: 'Consultant Name',
+          hintText: 'Enter Consultant Name',
+          controller: controller.consultantNameController,
+          icon: Icons.person,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCommissionsSection() {
+    return GetBuilder<EntryTicketController>(
+      id: 'supplier_commissions',
+      builder: (_) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Commissions'),
+          CheckboxListTile(
+            title: Text('Add more Commissions',
+                style: TextStyle(color: TColor.primaryText)),
+            value: controller.isAddMoreCommissionsEnabled.value,
+            onChanged: (value) {
+              controller.isAddMoreCommissionsEnabled.value = value ?? false;
+              controller.update(['supplier_commissions']);
+            },
+            controlAffinity: ListTileControlAffinity.leading,
+            activeColor: TColor.primary,
+          ),
+          if (controller.isAddMoreCommissionsEnabled.value) ...[
+            ReactiveTextField(
+              title: 'Airline Comm %',
+              controller: controller.airLineCommController,
+              ticketController: controller,
+              onEditingComplete: controller.calculateAirlineComm,
+              isPercentage: true,
+            ),
+            ReactiveTextField(
+              title: 'Airline Comm PKR',
+              controller: controller.airLineCommPKRController,
+              ticketController: controller,
+              onEditingComplete: controller.calculateAirlineComm,
+            ),
+            ReactiveTextField(
+              title: 'Airline WHT %',
+              controller: controller.airLineWHTController,
+              ticketController: controller,
+              onEditingComplete: controller.calculateAirlineWHT,
+              isPercentage: true,
+              readOnly: controller.isAirlineWHTReadOnly.value,
+            ),
+            ReactiveTextField(
+              title: 'Airline WHT PKR',
+              controller: controller.airLineWHTPKRController,
+              ticketController: controller,
+              readOnly: true,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinancialsSection() {
+    return GetBuilder<EntryTicketController>(
+      id: 'supplier_financials',
+      builder: (_) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Financial Details'),
+          ReactiveTextField(
+            title: 'PSF %',
+            controller: controller.psfController,
+            ticketController: controller,
+            onEditingComplete: controller.calculatePSF,
+            isPercentage: true,
+          ),
+          ReactiveTextField(
+            title: 'PSF PKR',
+            controller: controller.psfPKRController,
+            ticketController: controller,
+            onEditingComplete: controller.calculatePSF,
+          ),
+          ReactiveTextField(
+            title: 'Total Buying',
+            controller: controller.totalBuyingController,
+            ticketController: controller,
+            readOnly: true,
+          ),
+          ReactiveTextField(
+            title: 'Profit',
+            controller: controller.profitController,
+            ticketController: controller,
+            readOnly: true,
+          ),
+          ReactiveTextField(
+            title: 'Loss',
+            controller: controller.lossController,
+            ticketController: controller,
+            readOnly: true,
+          ),
+          _buildTextField(
+            title: 'Remarks',
+            hintText: 'Enter Remarks',
+            controller: controller.remarksController,
+            icon: Icons.notes,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummarySection() {
+    return GetBuilder<EntryTicketController>(
+      id: 'supplier_summary',
+      builder: (_) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Summary'),
           Row(
             children: [
               Expanded(
-                child: DateSelector2(
-                  fontSize: 12,
-                  label: "Travel Date & Time",
-                  initialDate: DateTime.now(),
-                  onDateChanged: (value) =>
-                  controller.travelDateTime.value = value,
+                child: ReactiveTextField(
+                  title: 'Total Debit',
+                  controller: controller.totalDebitController,
+                  ticketController: controller,
+                  readOnly: true,
                 ),
               ),
               const SizedBox(width: 15),
               Expanded(
-                child: DateSelector2(
-                  fontSize: 12,
-                  label: "Return Date & Time",
-                  initialDate: DateTime.now(),
-                  onDateChanged: (value) =>
-                  controller.returnDateTime.value = value,
+                child: ReactiveTextField(
+                  title: 'Total Credit',
+                  controller: controller.totalCreditController,
+                  ticketController: controller,
+                  readOnly: true,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 15),
-          _buildSectionTitle('Supplier Detail'),
-          AccountDropdown(
-            onChanged: (value) {
-              if (value != null) {
-                controller.supplierDetail.value = value;
-              }
-            },
-          ),
-          const SizedBox(height: 15),
-          _buildSupplierBasicInfo(),
-          const SizedBox(height: 20),
-          _buildSectionTitle('Add More Commissions'),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Obx(() => Checkbox(
-                value: controller.isAddMoreCommissionsEnabled.value,
-                onChanged: (bool? value) {
-                  controller.isAddMoreCommissionsEnabled.value =
-                      value ?? false;
-                },
-                activeColor: TColor.primary,
-              )),
-              Text(
-                'Add more Commissions',
-                style: TextStyle(color: TColor.primaryText),
-              ),
-            ],
-          ),
-          Obx(() {
-            if (controller.isAddMoreCommissionsEnabled.value) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Column(
-                  children: [
-                    _buildReactiveField('Airline Comm %',
-                        controller.airLineCommController),
-                    _buildReactiveField('Airline Comm PKR',
-                        controller.airLineCommPKRController),
-                    _buildReactiveField('Airline WHT',
-                        controller.airLineWHTController),
-                    _buildReactiveField('Airline WHT PKR',
-                        controller.airLineWHTPKRController),
-                  ],
-                ),
-              );
-            }
-            return const SizedBox.shrink();
-          }),
-          _buildSectionTitle('Financial Details'),
-          _buildSupplierFinancials(),
-          const SizedBox(height: 20),
-          _buildSectionTitle('Summary'),
-          _buildSupplierSummary(),
         ],
       ),
     );
@@ -458,68 +661,6 @@ class SupplierTab extends StatelessWidget {
     );
   }
 
-  Widget _buildSupplierBasicInfo() {
-    return Column(
-      children: [
-        _buildTextField(
-          title: 'Issue From',
-          hintText: 'Enter Issue From',
-          icon: Icons.remove_from_queue, controller: controller.issueFromController,
-        ),
-        const SizedBox(height: 15),
-        _buildTextField(
-          title: 'Consultant Name',
-          hintText: 'Enter Consultant Name',
-          controller: controller.consultantNameController,
-          icon: Icons.person,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSupplierFinancials() {
-    return Column(
-      children: [
-        _buildReactiveField('PSF %', controller.psfController),
-        _buildReactiveField('PSF PKR', controller.psfPKRController),
-        _buildReactiveField('Total Buying', controller.totalBuyingController),
-        _buildReactiveField('Profit', controller.profitController),
-        _buildReactiveField('Loss', controller.lossController),
-        _buildTextField(
-          title: 'Remarks',
-          hintText: 'Enter Remarks',
-          icon: Icons.notes, controller: controller.remarksController,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSupplierSummary() {
-    return Row(
-      children: [
-        Expanded(
-          child: RoundTitleTextfield(
-            title: 'Total Debit',
-            hintText: 'Debit Amount',
-            readOnly: true,
-            controller: controller.totalDebitController,
-            left: Icon(Icons.add_card, color: TColor.secondaryText),
-          ),
-        ),
-        const SizedBox(width: 15),
-        Expanded(
-          child: RoundTitleTextfield(
-            title: 'Total Credit',
-            hintText: 'Credit Amount',
-            readOnly: true,
-            controller: controller.totalCreditController,
-            left: Icon(Icons.credit_card, color: TColor.secondaryText),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildTextField({
     required String title,
     required String hintText,
@@ -534,17 +675,105 @@ class SupplierTab extends StatelessWidget {
       left: Icon(icon, color: TColor.secondaryText),
     );
   }
+}
 
-  Widget _buildReactiveField(String title, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: RoundTitleTextfield(
-        title: title,
-        hintText: 'Enter $title',
-        controller: controller,
-        keyboardType: TextInputType.number,
-        left: Icon(Icons.price_change, color: TColor.secondaryText),
+// Improved ReactiveTextField widget with fixed input validation
+class ReactiveTextField extends StatelessWidget {
+  final String title;
+  final TextEditingController controller;
+  final VoidCallback? onEditingComplete;
+  final bool readOnly;
+  final bool isPercentage;
+  final EntryTicketController ticketController;
+
+  const ReactiveTextField({
+    super.key,
+    required this.title,
+    required this.controller,
+    required this.ticketController,
+    this.onEditingComplete,
+    this.readOnly = false,
+    this.isPercentage = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<EntryTicketController>(
+      id: 'reactive_field_$title',
+      builder: (_) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: RoundTitleTextfield(
+          title: title,
+          hintText: 'Enter $title',
+          controller: controller,
+          bgColor: _isReadOnly() ? TColor.secondaryText.withOpacity(0.4) : TColor.textfield,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          readOnly: _isReadOnly(),
+          onChanged: _handleOnChanged,
+          onEditingComplete: _handleEditingComplete,
+          left: Icon(
+            isPercentage ? Icons.percent : Icons.price_change,
+            color: TColor.secondaryText,
+          ),
+        ),
       ),
     );
+  }
+
+  void _handleOnChanged(String value) {
+    if (value.isEmpty) return; // Allow empty field
+
+    // Allow numbers with optional decimal point
+    // This regex allows:
+    // - Single digits (0-9)
+    // - Multiple digits
+    // - A single decimal point
+    // - Numbers with decimal places
+    final validNumber = RegExp(r'^\d*\.?\d*$');
+
+    if (!validNumber.hasMatch(value)) {
+      // If invalid, remove non-numeric characters except decimal point
+      String sanitized = value.replaceAll(RegExp(r'[^\d.]'), '');
+
+      // Ensure only one decimal point
+      int decimalCount = '.'.allMatches(sanitized).length;
+      if (decimalCount > 1) {
+        sanitized = sanitized.replaceAll('.', '');
+        sanitized = '${sanitized.substring(0, sanitized.length - 1)}.${sanitized.substring(sanitized.length - 1)}';
+      }
+
+      // Update controller only if the value has changed
+      if (sanitized != controller.text) {
+        controller.text = sanitized;
+        // Place cursor at the end
+        controller.selection = TextSelection.fromPosition(
+          TextPosition(offset: controller.text.length),
+        );
+      }
+    }
+  }
+
+  void _handleEditingComplete() {
+    if (controller.text.endsWith('.')) {
+      controller.text = controller.text.replaceAll('.', '');
+    }
+    onEditingComplete?.call();
+    ticketController.update(['reactive_field_$title']);
+  }
+
+  bool _isReadOnly() {
+    switch (title) {
+      case 'Basic Fare CHGS %':
+      case 'Basic Fare CHGS PKR':
+        return readOnly || ticketController.isBasicFareCHGSReadOnly.value;
+      case 'Total Fare CHGS %':
+      case 'Total Fare CHGS PKR':
+        return readOnly || ticketController.isTotalFareReadOnly.value;
+      case 'Party WHT PKR':
+      case 'Total':
+        return true;
+      default:
+        return readOnly;
+    }
   }
 }
