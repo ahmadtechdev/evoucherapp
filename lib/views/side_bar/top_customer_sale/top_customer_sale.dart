@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../common/color_extension.dart';
 import '../../../common/drawer.dart';
-import '../../../common_widget/round_textfield.dart';
+import '../../../common_widget/round_text_field.dart';
 import 'controller/top_customer_sale_controller.dart';
 
 class CustomerReportScreen extends StatelessWidget {
   final CustomerReportController controller = Get.put(CustomerReportController());
 
-  CustomerReportScreen({Key? key}) : super(key: key);
+  CustomerReportScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

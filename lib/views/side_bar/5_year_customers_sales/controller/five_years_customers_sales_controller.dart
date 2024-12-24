@@ -2,7 +2,7 @@
 
 import 'package:get/get.dart';
 
-import '../models/5_years_customer_sales_modal.dart';
+import '../models/five_years_customer_sales_modal.dart';
 
 class FiveYearCustomersSalesController extends GetxController {
   var selectedYear = Rxn<String>();

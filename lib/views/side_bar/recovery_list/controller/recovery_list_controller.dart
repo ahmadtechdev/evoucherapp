@@ -324,7 +324,6 @@ class RecoveryListController extends GetxController {
               ),
         );
       } catch (e) {
-        // ignore: use_build_context_synchronously
 
         CustomSnackBar(
             message: "Failed to generate PDF: $e",

@@ -1,7 +1,6 @@
 import 'package:evoucher/views/home/report_grid_section.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import '../../common_widget/bottom_navigation.dart';
 import '../../common/drawer.dart';
 import '../../service/session_manager.dart';

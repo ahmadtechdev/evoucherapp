@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../service/api_service.dart';
+
 class EntryTicketController extends GetxController {
   // Text Editing Controllers
   late TextEditingController phoneNoController;
@@ -11,6 +13,11 @@ class EntryTicketController extends GetxController {
   late TextEditingController sectorController;
   late TextEditingController segmentsController;
   late TextEditingController sectorTypeController;
+  // final Rx<String?> selectedSectorType = Rx<String?>(null);
+  final Map<String, String> sectorTypes = {
+    'DOMESTIC': 'DOMESTIC',
+    'INTERNATIONAL': 'INTERNATIONAL',
+  }.obs;
   late TextEditingController basicFareController;
   late TextEditingController otherTaxesController;
 
@@ -40,6 +47,10 @@ class EntryTicketController extends GetxController {
 
   // Supplier Controllers
   late TextEditingController issueFromController;
+  final Map<String, String> issueFrom = {
+    'GDS': 'GDS (Airline Stock)',
+    'B2B': 'B2B (XO)',
+  }.obs;
   late TextEditingController consultantNameController;
   late TextEditingController remarksController;
 
@@ -77,10 +88,10 @@ class EntryTicketController extends GetxController {
   final RxBool isAddMoreTaxesEnabled = false.obs;
   final RxBool isAddMoreChangesEnabled = false.obs;
   final RxBool isAddMoreCommissionsEnabled = false.obs;
-  final RxBool isAdditionalDetailsEnabled = false.obs;
+  final RxBool isTicketReceivingDetailsEnabled = false.obs;
 
   // Additional details
-  final RxList<Map<String, dynamic>> additionalDetails =
+  final RxList<Map<String, dynamic>> ticketReceivingDetails =
       <Map<String, dynamic>>[].obs;
 
 
@@ -160,73 +171,26 @@ class EntryTicketController extends GetxController {
   void _addListeners() {
     // Basic Fare CHGS listeners
     basicFareCHGSController.addListener(() {
-      final basicFareCHGS = double.tryParse(basicFareCHGSController.text) ?? 0.0;
-      final basicFare = double.tryParse(basicFareController.text) ?? 0.0;
-
-      if (basicFareCHGS != 0 && basicFare != 0) {
-        final calculatedPKR = (basicFareCHGS / 100) * basicFare;
-        if (calculatedPKR != double.tryParse(basicFareCHGSPKRController.text)) {
-          basicFareCHGSPKRController.text = calculatedPKR.round().toString();
-        }
-      }else{
-        const calculatedPKR =0;
-        basicFareCHGSPKRController.text = calculatedPKR.round().toString();
-      }
-
+      calculateBasicFareCHGS();
       checkAndUpdateReadOnlyStates();
       recalculateAll();
     });
 
     basicFareCHGSPKRController.addListener(() {
-      final basicFareCHGSPKR = double.tryParse(basicFareCHGSPKRController.text) ?? 0.0;
-      final basicFare = double.tryParse(basicFareController.text) ?? 0.0;
-
-      if (basicFareCHGSPKR != 0 && basicFare != 0) {
-        final calculatedPercentage = (basicFareCHGSPKR / basicFare) * 100;
-        if (calculatedPercentage != double.tryParse(basicFareCHGSController.text)) {
-          basicFareCHGSController.text = calculatedPercentage.toStringAsFixed(2);
-        }
-      }else{
-        const calculatedPKR =0;
-        basicFareCHGSController.text = calculatedPKR.toStringAsFixed(2);
-      }
-
+      calculateBasicFareCHGS();
       checkAndUpdateReadOnlyStates();
       recalculateAll();
     });
 
     // Total Fare CHGS listeners
     totalFareCHGSController.addListener(() {
-      final totalFareCHGS = double.tryParse(totalFareCHGSController.text) ?? 0.0;
-      final totalBase = calculateTotalBase();
-
-      if (totalFareCHGS != 0 && totalBase != 0) {
-        final calculatedPKR = (totalFareCHGS / 100) * totalBase;
-        if (calculatedPKR != double.tryParse(totalFareCHGSPKRController.text)) {
-          totalFareCHGSPKRController.text = calculatedPKR.round().toString();
-        }
-      }else{
-        const calculatedPKR =0;
-        totalFareCHGSPKRController.text = calculatedPKR.round().toString();
-      }
-
+      calculateTotalFareCHGS();
       checkAndUpdateReadOnlyStates();
       recalculateAll();
     });
 
     totalFareCHGSPKRController.addListener(() {
-      final totalFareCHGSPKR = double.tryParse(totalFareCHGSPKRController.text) ?? 0.0;
-      final totalBase = calculateTotalBase();
-
-      if (totalFareCHGSPKR != 0 && totalBase != 0) {
-        final calculatedPercentage = (totalFareCHGSPKR / totalBase) * 100;
-        if (calculatedPercentage != double.tryParse(totalFareCHGSController.text)) {
-          totalFareCHGSController.text = calculatedPercentage.toStringAsFixed(2);
-        }
-      }else{
-        const calculatedPKR =0;
-        totalFareCHGSController.text = calculatedPKR.toStringAsFixed(2);
-      }
+      calculateTotalFareCHGS();
 
       checkAndUpdateReadOnlyStates();
       recalculateAll();
@@ -234,34 +198,12 @@ class EntryTicketController extends GetxController {
 
     // Party Commission listeners
     partyCommController.addListener(() {
-      final partyComm = double.tryParse(partyCommController.text) ?? 0.0;
-      final basicFare = double.tryParse(basicFareController.text) ?? 0.0;
-
-      if (partyComm != 0 && basicFare != 0) {
-        final calculatedPKR = (partyComm / 100) * basicFare;
-        if (calculatedPKR != double.tryParse(partyCommPKRController.text)) {
-          partyCommPKRController.text = calculatedPKR.round().toString();
-        }
-      }else{
-        const calculatedPKR =0;
-        partyCommPKRController.text = calculatedPKR.round().toString();
-      }
+      calculatePartyComm();
       recalculateAll();
     });
 
     partyCommPKRController.addListener(() {
-      final partyCommPKR = double.tryParse(partyCommPKRController.text) ?? 0.0;
-      final basicFare = double.tryParse(basicFareController.text) ?? 0.0;
-
-      if (partyCommPKR != 0 && basicFare != 0) {
-        final calculatedPercentage = (partyCommPKR / basicFare) * 100;
-        if (calculatedPercentage != double.tryParse(partyCommController.text)) {
-          partyCommController.text = calculatedPercentage.toStringAsFixed(2);
-        }
-      }else{
-        const calculatedPKR =0;
-        partyCommController.text = calculatedPKR.toStringAsFixed(0);
-      }
+      calculatePartyComm();
       recalculateAll();
     });
 
@@ -278,10 +220,11 @@ class EntryTicketController extends GetxController {
     otherTaxesController.addListener(recalculateAll);
 
     // Tax field listeners
-    [emdController, ccController, spController, rgController,
+    for (var controller in [emdController, ccController, spController, rgController,
       ydController, e3Controller, ioController, yiController,
-      xzController, pkController, zrController, yqController]
-        .forEach((controller) => controller.addListener(recalculateAll));
+      xzController, pkController, zrController, yqController]) {
+      controller.addListener(recalculateAll);
+    }
 
     // Add new listeners for supplier calculations
     airLineCommController.addListener(() {
@@ -410,7 +353,7 @@ class EntryTicketController extends GetxController {
     final psfPKR = double.tryParse(psfPKRController.text) ?? 0.0;
 
     final totalBuying = total - airLineCommPKR + airLineWHTPKR + psfPKR;
-    totalBuyingController.text = totalBuying.toStringAsFixed(2);
+    totalBuyingController.text = totalBuying.round().toString();
     update();
   }
 
@@ -419,14 +362,14 @@ class EntryTicketController extends GetxController {
     final totalBuying = double.tryParse(totalBuyingController.text) ?? 0.0;
 
     if (totalSelling > totalBuying) {
-      profitController.text = (totalSelling - totalBuying).toStringAsFixed(2);
-      lossController.text = '0.00';
+      profitController.text = (totalSelling - totalBuying).round().toString();
+      lossController.text = '0';
     } else if (totalBuying > totalSelling) {
-      lossController.text = (totalBuying - totalSelling).toStringAsFixed(2);
-      profitController.text = '0.00';
+      lossController.text = (totalBuying - totalSelling).round().toString();
+      profitController.text = '0';
     } else {
-      lossController.text = '0.00';
-      profitController.text = '0.00';
+      lossController.text = '0';
+      profitController.text = '0';
     }
     update();
   }
@@ -434,8 +377,8 @@ class EntryTicketController extends GetxController {
   void calculateTotalDebitCredit() {
     final totalBuying = double.tryParse(totalBuyingController.text) ?? 0.0;
 
-    totalDebitController.text = totalBuying.toStringAsFixed(2);
-    totalCreditController.text = totalBuying.toStringAsFixed(2);
+    totalDebitController.text = totalBuying.round().toString();
+    totalCreditController.text = totalBuying.round().toString();
     update();
   }
 
@@ -465,7 +408,7 @@ class EntryTicketController extends GetxController {
   }
 
 
-  // ******************************************SuppplieR **********************************************
+  // ******************************************SuppplieR ENd **********************************************
 
   double calculateTotalBase() {
     final basicFare = double.tryParse(basicFareController.text) ?? 0.0;
@@ -523,14 +466,26 @@ class EntryTicketController extends GetxController {
     if (isBasicFareCHGSReadOnly.value) return;
 
     final basicFare = double.tryParse(basicFareController.text) ?? 0.0;
-    final basicFareCHGS = double.tryParse(basicFareCHGSController.text) ?? 0.0;
-    final basicFareCHGSPKR = double.tryParse(basicFareCHGSPKRController.text) ?? 0.0;
+    final basicFareCHGS = double.tryParse(basicFareCHGSController.text);
+    final basicFareCHGSPKR = double.tryParse(basicFareCHGSPKRController.text);
 
-    if (basicFareCHGSPKR == 0 && basicFare != 0 && basicFareCHGS != 0) {
-      basicFareCHGSPKRController.text = ((basicFareCHGS / 100) * basicFare).toStringAsFixed(2);
-    } else if (basicFare != 0 && basicFareCHGSPKR != 0) {
-      basicFareCHGSController.text = ((basicFareCHGSPKR / basicFare) * 100).toStringAsFixed(2);
+    // Only calculate if we have valid numbers
+    if (basicFare != 0.0) {
+      if (basicFareCHGS != null && basicFareCHGSController.text.isNotEmpty) {
+        // Calculate PKR value only if percentage is valid
+        final calculatedPKR = (basicFareCHGS / 100) * basicFare;
+        if (calculatedPKR != double.tryParse(basicFareCHGSPKRController.text)) {
+          basicFareCHGSPKRController.text = calculatedPKR.round().toString();
+        }
+      } else if (basicFareCHGSPKR != null && basicFareCHGSPKRController.text.isNotEmpty) {
+        // Calculate percentage only if PKR value is valid
+        final calculatedPercentage = (basicFareCHGSPKR / basicFare) * 100;
+        if (calculatedPercentage != double.tryParse(basicFareCHGSController.text)) {
+          basicFareCHGSController.text = calculatedPercentage.toStringAsFixed(2);
+        }
+      }
     }
+
     update();
   }
 
@@ -539,33 +494,58 @@ class EntryTicketController extends GetxController {
 
     final basicFare = double.tryParse(basicFareController.text) ?? 0.0;
     final otherTaxes = double.tryParse(otherTaxesController.text) ?? 0.0;
-    final totalFareCHGS = double.tryParse(totalFareCHGSController.text) ?? 0.0;
-    final totalFareCHGSPKR = double.tryParse(totalFareCHGSPKRController.text) ?? 0.0;
+    final totalFareCHGS = double.tryParse(totalFareCHGSController.text);
+    final totalFareCHGSPKR = double.tryParse(totalFareCHGSPKRController.text);
     final moreTaxes = _getSumOfMoreTaxes();
 
     final totalBase = basicFare + otherTaxes + moreTaxes;
 
-    if (totalFareCHGSPKR == 0 && totalBase != 0 && totalFareCHGS != 0) {
-      totalFareCHGSPKRController.text = ((totalFareCHGS / 100) * totalBase).toStringAsFixed(2);
-    } else if (totalBase != 0 && totalFareCHGSPKR != 0) {
-      totalFareCHGSController.text = ((totalFareCHGSPKR / totalBase) * 100).toStringAsFixed(2);
+    // Only calculate if we have a valid base amount
+    if (totalBase != 0.0) {
+      if (totalFareCHGS != null && totalFareCHGSController.text.isNotEmpty) {
+        // Calculate PKR value only if percentage is valid
+        final calculatedPKR = (totalFareCHGS / 100) * totalBase;
+        if (calculatedPKR != double.tryParse(totalFareCHGSPKRController.text)) {
+          totalFareCHGSPKRController.text = calculatedPKR.round().toString();
+        }
+      } else if (totalFareCHGSPKR != null && totalFareCHGSPKRController.text.isNotEmpty) {
+        // Calculate percentage only if PKR value is valid
+        final calculatedPercentage = (totalFareCHGSPKR / totalBase) * 100;
+        if (calculatedPercentage != double.tryParse(totalFareCHGSController.text)) {
+          totalFareCHGSController.text = calculatedPercentage.toStringAsFixed(2);
+        }
+      }
     }
+
     update();
   }
 
   void calculatePartyComm() {
     final basicFare = double.tryParse(basicFareController.text) ?? 0.0;
-    final partyComm = double.tryParse(partyCommController.text) ?? 0.0;
-    final partyCommPKR = double.tryParse(partyCommPKRController.text) ?? 0.0;
+    final partyComm = double.tryParse(partyCommController.text);
+    final partyCommPKR = double.tryParse(partyCommPKRController.text);
 
-    if (partyCommPKR == 0 && basicFare != 0 && partyComm != 0) {
-      partyCommPKRController.text = ((partyComm / 100) * basicFare).toStringAsFixed(2);
-    } else if (basicFare != 0 && partyCommPKR != 0) {
-      partyCommController.text = ((partyCommPKR / basicFare) * 100).toStringAsFixed(2);
+    // Only calculate if we have a valid basic fare
+    if (basicFare != 0.0) {
+      if (partyComm != null && partyCommController.text.isNotEmpty) {
+        // Calculate PKR value only if percentage is valid
+        final calculatedPKR = (partyComm / 100) * basicFare;
+        if (calculatedPKR != double.tryParse(partyCommPKRController.text)) {
+          partyCommPKRController.text = calculatedPKR.round().toString();
+        }
+      } else if (partyCommPKR != null && partyCommPKRController.text.isNotEmpty) {
+        // Calculate percentage only if PKR value is valid
+        final calculatedPercentage = (partyCommPKR / basicFare) * 100;
+        if (calculatedPercentage != double.tryParse(partyCommController.text)) {
+          partyCommController.text = calculatedPercentage.toStringAsFixed(2);
+        }
+      }
     }
+
     calculatePartyWHT();
     update();
   }
+
 
   void calculatePartyWHT() {
     final partyCommPKR = double.tryParse(partyCommPKRController.text) ?? 0.0;
@@ -590,7 +570,7 @@ class EntryTicketController extends GetxController {
     final total = basicFare + otherTaxes + moreTaxes + basicFareCHGSPKR +
         totalFareCHGSPKR - partyCommPKR + partyWHTPKR;
 
-    pkrTotalSellingController.text = total.toStringAsFixed(2);
+    pkrTotalSellingController.text = total.round().toString();
   }
 
   void calculateTotal() {
@@ -599,7 +579,7 @@ class EntryTicketController extends GetxController {
     final moreTaxes = _getSumOfMoreTaxes();
 
     final total = basicFare + otherTaxes + moreTaxes;
-    totalController.text = total.toStringAsFixed(2);
+    totalController.text = total.round().toString();
   }
 
 
@@ -715,6 +695,100 @@ class EntryTicketController extends GetxController {
         throw Exception('Invalid charge field name: $fieldName');
     }
   }
+
+  void addTicketReceivingDetail() {
+    ticketReceivingDetails.add({
+      'name': ''.obs,
+      'amount': ''.obs,
+    });
+  }
+
+  void removeTicketReceivingDetail(int index) {
+    if (ticketReceivingDetails.length > 1) {
+      ticketReceivingDetails.removeAt(index);
+    }
+  }
+
+
+  // Add this method to make the API call
+  Future<void> saveTicketVoucher() async {
+    final ApiService apiService = ApiService();
+
+    // Prepare the data from your fields
+    final Map<String, dynamic> requestBody = {
+      "voucher_date": todayDate.value.toIso8601String().split('T')[0],
+      "customer_account": customerAccount.value,
+      "supplier_account": supplierDetail.value,
+      "pax_name": paxNameController.text.trim(),
+      "airline_code": airLineController.text.trim(),
+      "sector": sectorController.text.trim(),
+      "sector_type": sectorTypeController.text.trim(),
+      "issued_from": issueFromController.text.trim(),
+      "basic_fare": basicFareController.text.trim(),
+      "other_taxes": otherTaxesController.text.trim(),
+      "emd": emdController.text.trim(),
+      "cc": ccController.text.trim(),
+      "sp": spController.text.trim(),
+      "rg": rgController.text.trim(),
+      "yd": ydController.text.trim(),
+      "e3": e3Controller.text.trim(),
+      "io": ioController.text.trim(),
+      "yi": yiController.text.trim(),
+      "xz": xzController.text.trim(),
+      "pk": pkController.text.trim(),
+      "zr": zrController.text.trim(),
+      "yq": yqController.text.trim(),
+      "basic_charges_percent": basicFareCHGSController.text.trim(),
+      "basic_charges_rs": basicFareCHGSPKRController.text.trim(),
+      "total_charges_percent": totalFareCHGSController.text.trim(),
+      "total_charges_rs": totalFareCHGSPKRController.text.trim(),
+      "party_commission_percent": partyCommController.text.trim(),
+      "party_commission_rs": partyCommPKRController.text.trim(),
+      "party_wht_percent": partyWHTController.text.trim(),
+      "party_wht_rs": partyWHTPKRController.text.trim(),
+      "airline_commission_percent": airLineCommController.text.trim(),
+      "airline_commission_rs": airLineCommPKRController.text.trim(),
+      "airline_wht_percent": airLineWHTController.text.trim(),
+      "airline_wht_rs": airLineWHTPKRController.text.trim(),
+      "psf_percent": psfController.text.trim(),
+      "psf_rs": psfPKRController.text.trim(),
+      "receiving": ticketReceivingDetails.map((detail) {
+        return {
+          "receiving_account": detail['name'].value,
+          "receiving_amount": detail['amount'].value,
+        };
+      }).toList(),
+    };
+
+    try {
+      // Call the POST request using the ApiService
+      final response = await apiService.postData(
+        endpoint: 'ticketVoucher',
+        body: requestBody,
+      );
+
+      // Handle the response
+      if (response['status'] == 'success') {
+        Get.snackbar(
+          'Success',
+          'Ticket voucher saved successfully.',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        throw Exception(response['message'] ?? 'Failed to save ticket voucher');
+      }
+    } catch (e) {
+      // Show error message
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
 }
 
 

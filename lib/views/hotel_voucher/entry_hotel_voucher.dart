@@ -7,7 +7,7 @@ import '../../common/accounts_dropdown.dart';
 import '../../common/color_extension.dart';
 import '../../common_widget/dart_selector2.dart';
 import '../../common_widget/date_range_selector.dart';
-import '../../common_widget/round_textfield.dart';
+import '../../common_widget/round_text_field.dart';
 import 'entry_hotel_controller.dart';
 
 class EntryHotelVoucher extends StatelessWidget {
@@ -149,18 +149,18 @@ class EntryHotelVoucher extends StatelessWidget {
           Row(
             children: [
               Obx(() => Checkbox(
-                value: controller.isAdditionalDetailsEnabled.value,
+                value: controller.isHotelReceivingAccountsEnabled.value,
                 onChanged: (bool? value) {
-                  controller.isAdditionalDetailsEnabled.value =
+                  controller.isHotelReceivingAccountsEnabled.value =
                       value ?? false;
                   if (value == true) {
                     // Add first entry when checkbox is checked
-                    if (controller.additionalDetails.isEmpty) {
-                      controller.addAdditionalDetail();
+                    if (controller.hotelReceivingDetails.isEmpty) {
+                      controller.addHotelReceivingDetail();
                     }
                   } else {
                     // Clear all additional details when unchecked
-                    controller.additionalDetails.clear();
+                    controller.hotelReceivingDetails.clear();
                   }
                 },
                 activeColor: TColor.primary,
@@ -172,11 +172,11 @@ class EntryHotelVoucher extends StatelessWidget {
             ],
           ),
           Obx(() {
-            if (controller.isAdditionalDetailsEnabled.value) {
+            if (controller.isHotelReceivingAccountsEnabled.value) {
               return Column(
                 children: [
                   for (int index = 0;
-                  index < controller.additionalDetails.length;
+                  index < controller.hotelReceivingDetails.length;
                   index++)
                     Padding(
                       padding: const EdgeInsets.only(top: 15),
@@ -197,20 +197,20 @@ class EntryHotelVoucher extends StatelessWidget {
                                 icon: Icon(Icons.add_circle,
                                     color: TColor.secondary),
                                 onPressed: () =>
-                                    controller.addAdditionalDetail(),
+                                    controller.addHotelReceivingDetail(),
                               ),
-                              if (controller.additionalDetails.length > 1)
+                              if (controller.hotelReceivingDetails.length > 1)
                                 IconButton(
                                   icon: Icon(Icons.remove_circle,
                                       color: TColor.third),
                                   onPressed: () =>
-                                      controller.removeAdditionalDetail(index),
+                                      controller.removeHotelReceivingDetail(index),
                                 ),
                             ],
                           ),
                           AccountDropdown(
                             onChanged: (value) => controller
-                                .additionalDetails[index]['name'].value = value,
+                                .hotelReceivingDetails[index]['name'].value = value,
                           ),
                           // RoundTitleTextfield(
                           //   title: 'Guest Name',
@@ -226,7 +226,7 @@ class EntryHotelVoucher extends StatelessWidget {
                             hintText: 'Enter Amount',
                             keyboardType: TextInputType.number,
                             onChanged: (value) => controller
-                                .additionalDetails[index]['amount']
+                                .hotelReceivingDetails[index]['amount']
                                 .value = value,
                             left:
                             Icon(Icons.email, color: TColor.secondaryText),
@@ -397,18 +397,17 @@ class EntryHotelVoucher extends StatelessWidget {
   Widget _buildFinancialDetails(EntryHotelController controller) {
     return Column(
       children: [
-        Container(
-            child: RoundTitleTextfield(
-              controller: controller.roomPerNightSelling,
-              title: 'Room Per Night Rate',
-              hintText: 'Enter rate per night',
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                controller.calculateCustomerSide();
-                //
-              },
-              left: Icon(Icons.attach_money, color: TColor.secondaryText),
-            )),
+        RoundTitleTextfield(
+          controller: controller.roomPerNightSelling,
+          title: 'Room Per Night Rate',
+          hintText: 'Enter rate per night',
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            controller.calculateCustomerSide();
+            //
+          },
+          left: Icon(Icons.attach_money, color: TColor.secondaryText),
+        ),
         const SizedBox(height: 15),
         Obx(() => RoundTitleTextfield(
           title: 'Total Sale Amount',
@@ -427,18 +426,17 @@ class EntryHotelVoucher extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Container(
-                  child: RoundTitleTextfield(
-                    controller: controller.roeSellingRate,
-                    title: 'Exchange Rate',
-                    hintText: 'Enter ROE',
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      controller.calculateCustomerSide();
-                    },
-                    left:
-                    Icon(Icons.currency_exchange, color: TColor.secondaryText),
-                  )),
+              child: RoundTitleTextfield(
+                controller: controller.roeSellingRate,
+                title: 'Exchange Rate',
+                hintText: 'Enter ROE',
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  controller.calculateCustomerSide();
+                },
+                left:
+                Icon(Icons.currency_exchange, color: TColor.secondaryText),
+              ),
             ),
             const SizedBox(width: 15),
             Expanded(
@@ -500,45 +498,42 @@ class EntryHotelVoucher extends StatelessWidget {
   Widget _buildSupplierFinancials(EntryHotelController controller) {
     return Column(
       children: [
-        Container(
-            child: RoundTitleTextfield(
-              controller: controller.roomPerNightBuying,
-              title: 'Room/Night Buying',
-              hintText: 'Enter Price',
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                controller.calculateSupplierSide();
-              },
-              left: Icon(Icons.shopping_cart, color: TColor.secondaryText),
-            )),
+        RoundTitleTextfield(
+          controller: controller.roomPerNightBuying,
+          title: 'Room/Night Buying',
+          hintText: 'Enter Price',
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            controller.calculateSupplierSide();
+          },
+          left: Icon(Icons.shopping_cart, color: TColor.secondaryText),
+        ),
         const SizedBox(height: 15),
-        Container(
-            child: RoundTitleTextfield(
-              controller: controller.totalBuyingAmount,
-              title: 'Total Buying Amount',
-              hintText: 'Enter Amount',
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                controller.calculateSupplierSide();
-              },
-              left: Icon(Icons.calculate, color: TColor.secondaryText),
-            )),
+        RoundTitleTextfield(
+          controller: controller.totalBuyingAmount,
+          title: 'Total Buying Amount',
+          hintText: 'Enter Amount',
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            controller.calculateSupplierSide();
+          },
+          left: Icon(Icons.calculate, color: TColor.secondaryText),
+        ),
         const SizedBox(height: 15),
         Row(
           children: [
             Expanded(
-              child: Container(
-                  child: RoundTitleTextfield(
-                    controller: controller.roebuyingRate,
-                    title: 'Exchange Rate',
-                    hintText: 'Enter ROE',
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      controller.calculateSupplierSide();
-                    },
-                    left:
-                    Icon(Icons.currency_exchange, color: TColor.secondaryText),
-                  )),
+              child: RoundTitleTextfield(
+                controller: controller.roebuyingRate,
+                title: 'Exchange Rate',
+                hintText: 'Enter ROE',
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  controller.calculateSupplierSide();
+                },
+                left:
+                Icon(Icons.currency_exchange, color: TColor.secondaryText),
+              ),
             ),
             const SizedBox(width: 15),
             Expanded(
@@ -717,7 +712,7 @@ class EntryHotelVoucher extends StatelessWidget {
             colorText: TColor.white,
             snackPosition: SnackPosition.TOP,
           );
-          Get.to(() => ViewHotalVoucher());
+          Get.to(() => ViewHotelVoucher());
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: TColor.primary,

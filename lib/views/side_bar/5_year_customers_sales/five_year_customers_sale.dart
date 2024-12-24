@@ -1,4 +1,4 @@
-// lib/views/five_years_customer_sale.dart
+
 
 import 'package:evoucher/views/side_bar/5_year_customers_sales/widgets/top_search_dropdown_section.dart';
 import 'package:flutter/material.dart';
@@ -6,10 +6,10 @@ import 'package:get/get.dart';
 
 import '../../../common/color_extension.dart';
 import '../../../common/drawer.dart';
-import 'controller/5_years_customers_sales_controller.dart';
+import 'controller/five_years_customers_sales_controller.dart';
 
 class FiveYearsCustomerSale extends StatelessWidget {
-  const FiveYearsCustomerSale({Key? key}) : super(key: key);
+  const FiveYearsCustomerSale({super.key});
 
   @override
   Widget build(BuildContext context) {

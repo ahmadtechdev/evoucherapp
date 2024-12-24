@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../common/color_extension.dart';
 
-class RoundTextfield extends StatelessWidget {
+class RoundTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String hintText;
   final TextInputType? keyboardType;
@@ -11,7 +11,7 @@ class RoundTextfield extends StatelessWidget {
   final Widget? right; // Optional right-side icon or widget
   final Function(String)? onChanged;
 
-  const RoundTextfield({
+  const RoundTextField({
     super.key,
     required this.hintText,
     this.controller,

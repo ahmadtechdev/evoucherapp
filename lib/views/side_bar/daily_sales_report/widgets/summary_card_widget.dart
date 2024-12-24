@@ -1,8 +1,6 @@
 // lib/views/widgets/summary_card.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../common/color_extension.dart';
 import '../controller/daily_sales_report_controller.dart';
@@ -16,9 +14,9 @@ class SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalPurchase = controller.calculateTotal('totalP');
-    final totalSales = controller.calculateTotal('totalS');
-    final totalProfit = controller.calculateTotal('pL');
+    // final totalPurchase = controller.calculateTotal('totalP');
+    // final totalSales = controller.calculateTotal('totalS');
+    // final totalProfit = controller.calculateTotal('pL');
 
     return Container(
         padding: const EdgeInsets.all(16),
@@ -36,7 +34,7 @@ class SummaryCard extends StatelessWidget {
                     fontSize: 18,
                     fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Row(
+            const Row(
               children: [
                 // Summary Items
                 // (Same as before)
@@ -54,7 +52,7 @@ class SummaryItem extends StatelessWidget {
   final Color? valueColor;
 
   const SummaryItem(
-      {required this.icon,
+      {super.key, required this.icon,
       required this.label,
       required this.value,
       this.valueColor});

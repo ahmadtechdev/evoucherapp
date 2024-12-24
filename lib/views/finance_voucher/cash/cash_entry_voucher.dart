@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../common/color_extension.dart';
 import '../../../common_widget/date_selecter.dart';
 import '../../../common_widget/snackbar.dart';
-import '../../../service/api_service.dart';
 import '../widgets/entry_card.dart';
 import '../controller/entry_controller.dart';
 
@@ -113,7 +112,7 @@ class _CashEntryVoucherState extends State<CashEntryVoucher> {
           voucherController.clearEntries();
 
           // Navigate back or clear the form
-          Navigator.pop(context);
+          Get.back();
         } else {
           CustomSnackBar(
               message: responseData['message'] ?? 'Failed to save voucher',

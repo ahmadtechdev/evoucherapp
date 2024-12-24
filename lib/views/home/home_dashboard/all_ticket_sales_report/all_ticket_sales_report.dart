@@ -1,6 +1,5 @@
 import 'package:evoucher/common_widget/dart_selector2.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../common/color_extension.dart';
 

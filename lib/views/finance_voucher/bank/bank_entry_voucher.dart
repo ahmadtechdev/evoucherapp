@@ -2,13 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../common/color_extension.dart';
 import '../../../common_widget/date_selecter.dart';
 import '../../../common_widget/snackbar.dart';
-import '../../../service/api_service.dart';
 import '../widgets/entry_card.dart';
 import '../controller/entry_controller.dart';
 
@@ -23,7 +21,7 @@ class _BankEntryVoucherState extends State<BankEntryVoucher> {
   DateTime selectedDate = DateTime.now();
   late final VoucherController _voucherController;
   bool _isSaving = false;
-  final ApiService _apiService = ApiService();
+  // final ApiService _apiService = ApiService();
   double totalDebit = 0.0;
   double totalCredit = 0.0;
   final FocusNode _mainFocusNode = FocusNode();
@@ -112,7 +110,7 @@ class _BankEntryVoucherState extends State<BankEntryVoucher> {
           _voucherController.clearEntries();
 
           // Navigate back or clear the form
-          Navigator.pop(context);
+          Get.back();
         } else {
           CustomSnackBar(
               message: responseData['message'] ?? 'Failed to save voucher',

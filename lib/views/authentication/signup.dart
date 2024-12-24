@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'dart:math' as math;
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';
-import '../../common_widget/round_textfield.dart';
+import '../../common_widget/round_text_field.dart';
 
 
 class SignUpView extends StatefulWidget {
@@ -97,39 +97,39 @@ class _SignUpViewState extends State<SignUpView> {
                               fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 16),
-                        RoundTextfield(
+                        RoundTextField(
                           hintText: "Full Name",
                           controller: txtName,
                         ),
                         const SizedBox(height: 16),
-                        RoundTextfield(
+                        RoundTextField(
                           hintText: "Valid Email",
                           controller: txtEmail,
                           keyboardType: TextInputType.emailAddress,
                         ),
                         const SizedBox(height: 16),
-                        RoundTextfield(
+                        RoundTextField(
                           hintText: "Contact No",
                           controller: txtMobile,
                           keyboardType: TextInputType.phone,
                         ),
                         const SizedBox(height: 16),
-                        RoundTextfield(
+                        RoundTextField(
                           hintText: "Company Name",
                           controller: txtName,
                         ),
                         const SizedBox(height: 16),
-                        RoundTextfield(
+                        RoundTextField(
                           hintText: "Company Address",
                           controller: txtAddress,
                         ),
                         const SizedBox(height: 16),
-                        RoundTextfield(
+                        RoundTextField(
                           hintText: "City Name",
                           controller: txtAddress,
                         ),
                         const SizedBox(height: 16),
-                        RoundTextfield(
+                        RoundTextField(
                           hintText: "Select Demo",
                           controller: txtAddress,
                         ),

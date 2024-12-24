@@ -8,7 +8,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import '../../../common/accounts_dropdown.dart';
 import '../../../common/color_extension.dart';
 import '../../../common_widget/dart_selector2.dart';
-import '../../../common_widget/round_textfield.dart';
+import '../../../common_widget/round_text_field.dart';
 import 'entry_visa_voucher_controller.dart';
 
 
@@ -118,7 +118,7 @@ class VisaVoucher extends StatelessWidget {
         children: [
           _buildSectionTitle('Customer Information'),
           AccountDropdown(
-            hinttext: 'Select Customer Account',
+            hintText: 'Select Customer Account',
             onChanged: (value) {
               if (value != null) {
                 // controller.customerAccount.value =value;
@@ -239,7 +239,7 @@ class VisaVoucher extends StatelessWidget {
         children: [
           _buildSectionTitle('Supplier Information'),
           AccountDropdown(
-            hinttext: 'Select Supplier Account',
+            hintText: 'Select Supplier Account',
             onChanged: (value) {
               if (value != null) {
                 // controller.supplierDetail.value = value;
@@ -249,7 +249,7 @@ class VisaVoucher extends StatelessWidget {
           const SizedBox(height: 15),
           AccountDropdown(
             showSearch: false,
-            hinttext: 'Select Consultant  Account',
+            hintText: 'Select Consultant  Account',
             onChanged: (value) {
               if (value != null) {
                 // controller.supplierDetail.value = value;
@@ -301,14 +301,14 @@ class VisaVoucher extends StatelessWidget {
         ),
         const SizedBox(height: 15),
         RoundTitleTextfield(
-          controller: controller.PassportNo,
+          controller: controller.passportNo,
           title: 'Passport No',
           hintText: 'Enter Passport No',
           left: Icon(MdiIcons.passport, color: TColor.secondaryText),
         ),
         const SizedBox(height: 15),
         RoundTitleTextfield(
-          controller: controller.Vtype,
+          controller: controller.visaType,
           title: 'V. Type',
           hintText: 'Enter V. Type',
           left: Icon(Icons.business, color: TColor.secondaryText),
@@ -329,7 +329,7 @@ class VisaVoucher extends StatelessWidget {
             const SizedBox(width: 15),
             Expanded(
               child: RoundTitleTextfield(
-                controller: controller.Visa_No,
+                controller: controller.visaNo,
                 title: 'Visa No:',
                 hintText: 'Enter Visa No:',
                 left: Icon(Icons.airplane_ticket, color: TColor.secondaryText),
@@ -344,42 +344,40 @@ class VisaVoucher extends StatelessWidget {
   Widget _buildFinancialDetails(VisaVoucherControler controller) {
     return Column(
       children: [
-        Container(
-            child: RoundTitleTextfield(
-              controller: controller.Foreign_Sale_Rate,
-              title: 'Foreign Sale Rate',
-              hintText: 'Foreign Sale Rate',
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                controller.calculateTotalSelling();
-                // controller.suplier_calculateTotalSelling();
-              },
-              left: Icon(Icons.attach_money, color: TColor.secondaryText),
-            )),
+        RoundTitleTextfield(
+          controller: controller.foreignSaleRateController,
+          title: 'Foreign Sale Rate',
+          hintText: 'Foreign Sale Rate',
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            controller.calculateTotalSelling();
+            // controller.suplier_calculateTotalSelling();
+          },
+          left: Icon(Icons.attach_money, color: TColor.secondaryText),
+        ),
         const SizedBox(height: 15),
         Row(
           children: [
             Expanded(
-              child: Container(
-                  child: RoundTitleTextfield(
-                    controller: controller.roeSellingRate,
+              child: RoundTitleTextfield(
+                controller: controller.roeSellingRateController,
 
-                    title: 'Exchange Rate',
-                    hintText: 'Enter ROE',
-                    keyboardType: TextInputType.number,
-                    //
-                    onChanged: (value) {
-                      controller.calculateTotalSelling();
-                      // controller.suplier_calculateTotalSelling();
-                    },
-                    left:
-                    Icon(Icons.currency_exchange, color: TColor.secondaryText),
-                  )),
+                title: 'Exchange Rate',
+                hintText: 'Enter ROE',
+                keyboardType: TextInputType.number,
+                //
+                onChanged: (value) {
+                  controller.calculateTotalSelling();
+                  // controller.suplier_calculateTotalSelling();
+                },
+                left:
+                Icon(Icons.currency_exchange, color: TColor.secondaryText),
+              ),
             ),
             const SizedBox(width: 15),
             Expanded(
               child: RoundTitleTextfield(
-                controller: controller.sellingCurrency,
+                controller: controller.sellingCurrencyController,
                 title: 'Currency',
                 hintText: 'Enter currency',
                 left: Icon(Icons.money, color: TColor.secondaryText),
@@ -390,7 +388,7 @@ class VisaVoucher extends StatelessWidget {
         const SizedBox(height: 15),
         Obx(() => RoundTitleTextfield(
           controller: TextEditingController(
-              text: controller.totalSellingAmount.value),
+              text: controller.totalSellingAmountController.value),
           title: 'Pkr Total Buying',
           hintText: 'Enter buying Amount',
           readOnly: true,
@@ -401,58 +399,43 @@ class VisaVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildSupplierBasicInfo(VisaVoucherControler controller) {
-    return Column(
-      children: [
-        RoundTitleTextfield(
-          controller: controller.Foreign_Purchsae_Rate,
-          title: 'Foreign Purchsae Rate',
-          hintText: 'Foreign Purchsae Rate',
-          keyboardType: TextInputType.number,
-          onChanged: (value) => controller.suplier_calculateTotalSelling(),
-          left: Icon(Icons.confirmation_number, color: TColor.secondaryText),
-        ),
-      ],
-    );
-  }
 
   // Similar changes for Supplier Financials
   Widget _buildSupplierFinancials(VisaVoucherControler controller) {
     return Column(
       children: [
         RoundTitleTextfield(
-          controller: controller.Foreign_Purchsae_Rate,
+          controller: controller.foreignPurchaseRateController,
           title: 'Foreign Purchsae Rate',
           hintText: 'Foreign Purchsae Rate',
           keyboardType: TextInputType.number,
-          onChanged: (value) => controller.suplier_calculateTotalSelling(),
+          onChanged: (value) => controller.supplierCalculateTotalSelling(),
           left: Icon(Icons.confirmation_number, color: TColor.secondaryText),
         ),
         const SizedBox(height: 15),
         Row(
           children: [
             Expanded(
-              child: Container(
-                  child: RoundTitleTextfield(
-                    controller: controller.suplier_roeSellingRate,
+              child: RoundTitleTextfield(
+                controller: controller.supplierROESellingRateController,
 
-                    title: 'Exchange Rate',
-                    hintText: 'Enter ROE',
-                    keyboardType: TextInputType.number,
-                    // initialValue: controller.roeSellingRate.value == 1.0
-                    //     ? ''
-                    //     : controller.roeSellingRate.value.toStringAsFixed(2),
-                    onChanged: (value) =>
-                        controller.suplier_calculateTotalSelling(),
+                title: 'Exchange Rate',
+                hintText: 'Enter ROE',
+                keyboardType: TextInputType.number,
+                // initialValue: controller.roeSellingRate.value == 1.0
+                //     ? ''
+                //     : controller.roeSellingRate.value.toStringAsFixed(2),
+                onChanged: (value) =>
+                    controller.supplierCalculateTotalSelling(),
 
-                    left:
-                    Icon(Icons.currency_exchange, color: TColor.secondaryText),
-                  )),
+                left:
+                Icon(Icons.currency_exchange, color: TColor.secondaryText),
+              ),
             ),
             const SizedBox(width: 15),
             Expanded(
               child: RoundTitleTextfield(
-                controller: controller.sellingCurrency,
+                controller: controller.sellingCurrencyController,
                 title: 'Currency',
                 hintText: 'Enter currency',
                 left: Icon(Icons.money, color: TColor.secondaryText),
@@ -482,8 +465,7 @@ class VisaVoucher extends StatelessWidget {
           children: [
             Expanded(
               child: Obx(
-                    () => Container(
-                    child: RoundTitleTextfield(
+                    () => RoundTitleTextfield(
                       textclr: Colors.green,
                       controller:
                       TextEditingController(text: controller.profit.value),
@@ -491,14 +473,13 @@ class VisaVoucher extends StatelessWidget {
                       hintText: 'Profit Amount',
                       readOnly: true,
                       left: Icon(Icons.trending_up, color: TColor.secondary),
-                    )),
+                    ),
               ),
             ),
             const SizedBox(width: 15),
             Expanded(
               child: Obx(
-                    () => Container(
-                    child: RoundTitleTextfield(
+                    () => RoundTitleTextfield(
                       textclr: Colors.red,
                       controller:
                       TextEditingController(text: controller.loss.value),
@@ -506,7 +487,7 @@ class VisaVoucher extends StatelessWidget {
                       hintText: 'Loss Amount',
                       readOnly: true,
                       left: Icon(Icons.trending_down, color: TColor.third),
-                    )),
+                    ),
               ),
             ),
           ],
@@ -584,15 +565,14 @@ class VisaVoucher extends StatelessWidget {
                 SizedBox(
                   width: 40,
                   child: Center(
-                    child: Container(
-                        child: Text(
-                          '${count.value}',
-                          style: TextStyle(
-                            color: TColor.primaryText,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
+                    child: Text(
+                      '${count.value}',
+                      style: TextStyle(
+                        color: TColor.primaryText,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 IconButton(
@@ -633,7 +613,7 @@ class VisaVoucher extends StatelessWidget {
             colorText: TColor.white,
             snackPosition: SnackPosition.TOP,
           );
-          Get.to(() => ViewHotalVoucher());
+          Get.to(() => ViewHotelVoucher());
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: TColor.primary,

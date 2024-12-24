@@ -4,9 +4,8 @@ import '../common/color_extension.dart';
 
 class CustomDropdown extends StatelessWidget {
   final String hint;
-  final Map<String, String>
-  items; // Changed from List<String> to Map<String, String>
-  final String? selectedItemId; // Changed to store the selected item's ID
+  final Map<String, String> items;
+  final String? selectedItemId;
   final ValueChanged<String?>? onChanged;
   final bool enabled;
   final bool showSearch;
@@ -23,6 +22,13 @@ class CustomDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate adaptive height
+    final itemHeight = 48.0; // Height per item
+    final searchBoxHeight = showSearch ? 56.0 : 0.0; // Search box height if enabled
+    final padding = 16.0; // Top and bottom padding
+    final calculatedHeight = (items.length * itemHeight) + searchBoxHeight + padding;
+    final maxAllowedHeight = MediaQuery.of(context).size.height / 2;
+
     return DropdownSearch<String>(
       enabled: enabled,
       popupProps: PopupProps.menu(
@@ -41,13 +47,13 @@ class CustomDropdown extends StatelessWidget {
         ),
         showSelectedItems: true,
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height / 2,
+          // Only apply maxHeight if calculated height exceeds maximum allowed height
+          maxHeight: calculatedHeight > maxAllowedHeight ? maxAllowedHeight : calculatedHeight,
         ),
       ),
-      items: items.values.toList(), // Use the names for display
+      items: items.values.toList(),
       selectedItem: selectedItemId != null ? items[selectedItemId] : null,
       onChanged: (selectedName) {
-        // Find the corresponding ID when a name is selected
         final selectedId = items.keys.firstWhere(
               (id) => items[id] == selectedName,
           orElse: () => '',
@@ -63,8 +69,7 @@ class CustomDropdown extends StatelessWidget {
             borderSide: BorderSide.none,
           ),
           hintText: hint,
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
     );

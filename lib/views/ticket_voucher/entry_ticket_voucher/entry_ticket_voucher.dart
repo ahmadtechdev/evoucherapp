@@ -1,13 +1,13 @@
 // entry_hotel_voucher.dart
 
-import 'package:evoucher/views/hotel_voucher/view_hotel_voucher/view_hotel_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../common/accounts_dropdown.dart';
 import '../../../common/color_extension.dart';
+import '../../../common_widget/custom_dropdown.dart';
 import '../../../common_widget/dart_selector2.dart';
-import '../../../common_widget/round_textfield.dart';
+import '../../../common_widget/round_text_field.dart';
 import 'entry_ticket_controller.dart';
 
 class EntryTicketVoucher extends StatelessWidget {
@@ -80,14 +80,7 @@ class EntryTicketVoucher extends StatelessWidget {
       ),
       child: ElevatedButton(
         onPressed: () {
-          Get.snackbar(
-            'Success',
-            'Booking Saved Successfully',
-            backgroundColor: TColor.secondary,
-            colorText: TColor.white,
-            snackPosition: SnackPosition.TOP,
-          );
-          Get.to(() => ViewHotalVoucher());
+          controller.saveTicketVoucher();
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: TColor.primary,
@@ -132,6 +125,102 @@ class CustomerTab extends StatelessWidget {
           _buildChargesSection(),
           _buildCommissionSection(),
           _buildTotalsSection(),
+          _buildSectionTitle('Debit Receiving Account'),
+          const SizedBox(height: 15),
+          Row(
+            children: [
+              Obx(() => Checkbox(
+                    value: controller.isTicketReceivingDetailsEnabled.value,
+                    onChanged: (bool? value) {
+                      controller.isTicketReceivingDetailsEnabled.value =
+                          value ?? false;
+                      if (value == true) {
+                        // Add first entry when checkbox is checked
+                        if (controller.ticketReceivingDetails.isEmpty) {
+                          controller.addTicketReceivingDetail();
+                        }
+                      } else {
+                        // Clear all additional details when unchecked
+                        controller.ticketReceivingDetails.clear();
+                      }
+                    },
+                    activeColor: TColor.primary,
+                  )),
+              Text(
+                'Any Receiving',
+                style: TextStyle(color: TColor.primaryText),
+              ),
+            ],
+          ),
+          Obx(() {
+            if (controller.isTicketReceivingDetailsEnabled.value) {
+              return Column(
+                children: [
+                  for (int index = 0;
+                      index < controller.ticketReceivingDetails.length;
+                      index++)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Account ${index + 1}',
+                                  style: TextStyle(
+                                    color: TColor.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.add_circle,
+                                    color: TColor.secondary),
+                                onPressed: () =>
+                                    controller.addTicketReceivingDetail(),
+                              ),
+                              if (controller.ticketReceivingDetails.length > 1)
+                                IconButton(
+                                  icon: Icon(Icons.remove_circle,
+                                      color: TColor.third),
+                                  onPressed: () => controller
+                                      .removeTicketReceivingDetail(index),
+                                ),
+                            ],
+                          ),
+                          AccountDropdown(
+                            onChanged: (value) => controller
+                                .ticketReceivingDetails[index]['name']
+                                .value = value,
+                          ),
+                          // RoundTitleTextfield(
+                          //   title: 'Guest Name',
+                          //   hintText: 'Enter Guest Name',
+                          //   onChanged: (value) => controller
+                          //       .additionalDetails[index]['name'].value = value,
+                          //   left:
+                          //       Icon(Icons.person, color: TColor.secondaryText),
+                          // ),
+                          const SizedBox(height: 15),
+                          RoundTitleTextfield(
+                            title: 'Now Receiving',
+                            hintText: 'Enter Amount',
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) => controller
+                                .ticketReceivingDetails[index]['amount']
+                                .value = value,
+                            left:
+                                Icon(Icons.email, color: TColor.secondaryText),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              );
+            }
+            return const SizedBox.shrink();
+          }),
         ],
       ),
     );
@@ -247,13 +336,17 @@ class CustomerTab extends StatelessWidget {
             icon: Icons.segment,
           ),
           const SizedBox(height: 15),
-          _buildTextField(
-            title: 'Sector Type',
-            hintText: 'Enter Sector Type',
-            controller: controller.sectorTypeController,
-            icon: Icons.category,
+          // Replace your _buildTextField with this widget
+          CustomDropdown(
+            hint: ' Sector Type',
+            items: controller.sectorTypes,
+            selectedItemId: controller.sectorTypeController.text,
+            onChanged: (value) {
+              controller.sectorTypeController.text = value!;
+            },
+            showSearch: false,
+            enabled: true,
           ),
-          const SizedBox(height: 15),
           ReactiveTextField(
             title: 'Basic Fare',
             controller: controller.basicFareController,
@@ -283,8 +376,7 @@ class CustomerTab extends StatelessWidget {
           _buildSectionTitle('Add More Taxes'),
           CheckboxListTile(
             title: Text('Add more Taxes',
-                style: TextStyle(color: TColor.primaryText)
-            ),
+                style: TextStyle(color: TColor.primaryText)),
             value: controller.isAddMoreTaxesEnabled.value,
             onChanged: (value) {
               controller.isAddMoreTaxesEnabled.value = value ?? false;
@@ -293,8 +385,7 @@ class CustomerTab extends StatelessWidget {
             controlAffinity: ListTileControlAffinity.leading,
             activeColor: TColor.primary,
           ),
-          if (controller.isAddMoreTaxesEnabled.value)
-            _buildTaxFields(),
+          if (controller.isAddMoreTaxesEnabled.value) _buildTaxFields(),
         ],
       ),
     );
@@ -302,19 +393,31 @@ class CustomerTab extends StatelessWidget {
 
   Widget _buildTaxFields() {
     final taxFields = [
-      'EMD', 'CC', 'SP', 'RG', 'YD', 'E3',
-      'IO', 'YI', 'XZ', 'PK', 'ZR', 'YQ'
+      'EMD',
+      'CC',
+      'SP',
+      'RG',
+      'YD',
+      'E3',
+      'IO',
+      'YI',
+      'XZ',
+      'PK',
+      'ZR',
+      'YQ'
     ];
 
     return Column(
-      children: taxFields.map((field) =>
-          ReactiveTextField(
-            title: field,
-            controller: controller.getTaxController(field),
-            ticketController: controller,
-            onEditingComplete: controller.calculateTotal,
-          ),
-      ).toList(),
+      children: taxFields
+          .map(
+            (field) => ReactiveTextField(
+              title: field,
+              controller: controller.getTaxController(field),
+              ticketController: controller,
+              onEditingComplete: controller.calculateTotal,
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -405,7 +508,6 @@ class CustomerTab extends StatelessWidget {
             title: 'PKR Total Selling',
             controller: controller.pkrTotalSellingController,
             ticketController: controller,
-
           ),
           ReactiveTextField(
             title: 'Total',
@@ -438,7 +540,7 @@ class CustomerTab extends StatelessWidget {
 class SupplierTab extends StatelessWidget {
   final EntryTicketController controller;
 
-  const SupplierTab({Key? key, required this.controller}) : super(key: key);
+  const SupplierTab({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -496,11 +598,16 @@ class SupplierTab extends StatelessWidget {
           },
         ),
         const SizedBox(height: 15),
-        _buildTextField(
-          title: 'Issue From',
-          hintText: 'Enter Issue From',
-          controller: controller.issueFromController,
-          icon: Icons.business,
+
+        CustomDropdown(
+          hint: 'Issue From',
+          items: controller.issueFrom,
+          selectedItemId: controller.issueFromController.text,
+          onChanged: (value) {
+            controller.issueFromController.text = value!;
+          },
+          showSearch: false,
+          enabled: true,
         ),
         const SizedBox(height: 15),
         _buildTextField(
@@ -706,7 +813,9 @@ class ReactiveTextField extends StatelessWidget {
           title: title,
           hintText: 'Enter $title',
           controller: controller,
-          bgColor: _isReadOnly() ? TColor.secondaryText.withOpacity(0.4) : TColor.textfield,
+          bgColor: _isReadOnly()
+              ? TColor.secondaryText.withOpacity(0.4)
+              : TColor.textfield,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           readOnly: _isReadOnly(),
           onChanged: _handleOnChanged,
@@ -739,7 +848,8 @@ class ReactiveTextField extends StatelessWidget {
       int decimalCount = '.'.allMatches(sanitized).length;
       if (decimalCount > 1) {
         sanitized = sanitized.replaceAll('.', '');
-        sanitized = '${sanitized.substring(0, sanitized.length - 1)}.${sanitized.substring(sanitized.length - 1)}';
+        sanitized =
+            '${sanitized.substring(0, sanitized.length - 1)}.${sanitized.substring(sanitized.length - 1)}';
       }
 
       // Update controller only if the value has changed

@@ -145,25 +145,21 @@ class EntryHotelController extends GetxController {
   }
 
   // Additional Details Management
-  final RxBool isAdditionalDetailsEnabled = false.obs;
-  final RxList<Map<String, dynamic>> additionalDetails =
+  final RxBool isHotelReceivingAccountsEnabled = false.obs;
+  final RxList<Map<String, dynamic>> hotelReceivingDetails =
       <Map<String, dynamic>>[].obs;
 
-  void addAdditionalDetail() {
-    additionalDetails.add({
+  void addHotelReceivingDetail() {
+    hotelReceivingDetails.add({
       'name': ''.obs,
       'amount': ''.obs,
     });
   }
 
-  void removeAdditionalDetail(int index) {
-    if (additionalDetails.length > 1) {
-      additionalDetails.removeAt(index);
+  void removeHotelReceivingDetail(int index) {
+    if (hotelReceivingDetails.length > 1) {
+      hotelReceivingDetails.removeAt(index);
     }
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 }

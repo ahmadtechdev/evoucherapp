@@ -9,7 +9,7 @@ class AccountDropdown extends StatelessWidget {
   final bool isEnabled;
   final String? initialValue;
   final String? subHeadName;
-  final String? hinttext;
+  final String? hintText;
   final bool showSearch;
 
   final void Function(String?)? onChanged;
@@ -21,7 +21,7 @@ class AccountDropdown extends StatelessWidget {
         this.initialValue,
         this.subHeadName,
         this.onChanged,
-        this.hinttext = 'Select an account',
+        this.hintText = 'Select an account',
         this.showSearch = true});
 
   @override
@@ -39,7 +39,7 @@ class AccountDropdown extends StatelessWidget {
 
       return CustomDropdown(
         showSearch: showSearch,
-        hint: hinttext.toString(),
+        hint: hintText.toString(),
         items: accountsMap, // Pass the map instead of just names
         selectedItemId: initialValue, // Use selectedItemId with the account ID
         onChanged: (selectedAccountId) {

@@ -8,12 +8,12 @@ class CustomDateRangeSelector extends StatelessWidget {
   final Function(int) onNightsChanged;
 
   const CustomDateRangeSelector({
-    Key? key,
+    super.key,
     required this.dateRange,
     required this.onDateRangeChanged,
     required this.nights,
     required this.onNightsChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

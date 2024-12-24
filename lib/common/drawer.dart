@@ -1,7 +1,6 @@
 import 'package:evoucher/views/side_bar/accounts/accounts/accounts.dart';
 import 'package:evoucher/views/home/home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import '../views/side_bar/daily_acitvity_report/daily_activity_report.dart';
 import '../views/side_bar/daily_cash_activity/daily_cash_activity.dart';
@@ -12,7 +11,7 @@ import '../views/side_bar/incomes_report/income_report_view.dart';
 import '../views/side_bar/invoice_settlement/invoice_settlement/invoice_settlement.dart';
 import '../views/side_bar/monthly_profit_loss/monthly_profit_loss.dart';
 import '../views/side_bar/monthly_sale_report/monthly_sale_report.dart';
-import '../views/side_bar/5_year_customers_sales/5_year_customers_sale.dart';
+import '../views/side_bar/5_year_customers_sales/five_year_customers_sale.dart';
 import '../views/side_bar/recovery_list/recovery_list.dart';
 import '../views/side_bar/top_customer_sale/top_customer_sale.dart';
 import '../views/side_bar/total_monthly_expense/total_monthly_expenses.dart';
@@ -70,18 +69,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
   void _scrollToSelectedItem() {
     if (_selectedItemKey.currentContext != null) {
       final RenderObject? renderObject = _selectedItemKey.currentContext!.findRenderObject();
-      final RenderAbstractViewport viewport = RenderAbstractViewport.of(renderObject);
-      if (viewport != null && renderObject != null) {
-        final ScrollableState? scrollableState = Scrollable.of(_selectedItemKey.currentContext!);
-        if (scrollableState != null) {
-          scrollableState.position.ensureVisible(
-            renderObject,
-            alignment: 0.5, // Center the item
-            duration: const Duration(milliseconds: 100),
-            curve: Curves.easeInOut,
-          );
-        }
-      }
+      if (renderObject != null) {
+        final ScrollableState scrollableState = Scrollable.of(_selectedItemKey.currentContext!);
+        scrollableState.position.ensureVisible(
+          renderObject,
+          alignment: 0.5, // Center the item
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeInOut,
+        );
+            }
     }
   }
 
@@ -275,7 +271,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
         title: 'Daily Sales Report',
         icon: Icons.analytics_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => DailySalesReportScreen()),
+        onTap: () => Get.to(() => const DailySalesReportScreen()),
 
       ),_buildNavigationItem(
         title: 'Recovery List',

@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 class ViewTicketVoucher extends StatelessWidget {
   final TicketVoucherController controller = Get.put(TicketVoucherController());
 
+   ViewTicketVoucher({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,16 +21,16 @@ class ViewTicketVoucher extends StatelessWidget {
       ),
       body: Column(
         children: [
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Container(
             decoration: BoxDecoration(
               color: TColor.white,
-              borderRadius: BorderRadius.only(
+              borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),
               ),
             ),
-            padding: EdgeInsets.fromLTRB(16, 0, 16, 30),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
             child: Column(
               children: [
                 Row(
@@ -41,7 +43,7 @@ class ViewTicketVoucher extends StatelessWidget {
                         onDateChanged: (DateTime value) {},
                       ),
                     ),
-                    SizedBox(width: 15),
+                    const SizedBox(width: 15),
                     Expanded(
                       child: DateSelector2(
                         label: 'To Date',
@@ -59,7 +61,7 @@ class ViewTicketVoucher extends StatelessWidget {
             child: Obx(
               () {
                 return ListView.builder(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   itemCount: controller.ticketVouchers.length,
                   itemBuilder: (context, index) {
                     var ticket = controller.ticketVouchers[index];
@@ -76,7 +78,7 @@ class ViewTicketVoucher extends StatelessWidget {
 
   Widget _buildVoucherCard(Map<String, String> ticket) {
     return Container(
-      margin: EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
         color: TColor.white,
         borderRadius: BorderRadius.circular(20),
@@ -84,17 +86,17 @@ class ViewTicketVoucher extends StatelessWidget {
           BoxShadow(
             color: TColor.primary.withOpacity(0.1),
             blurRadius: 20,
-            offset: Offset(0, 5),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
       child: Column(
         children: [
           Container(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: TColor.primary.withOpacity(0.15),
-              borderRadius: BorderRadius.only(
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
               ),
@@ -102,7 +104,7 @@ class ViewTicketVoucher extends StatelessWidget {
             child: Row(
               children: [
                 Icon(Icons.confirmation_number, color: TColor.primary),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 Text(
                   'TV ID: ${ticket['tv_id']}',
                   style: TextStyle(
@@ -111,7 +113,7 @@ class ViewTicketVoucher extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 IconButton(
                   icon: Icon(Icons.visibility, color: TColor.primary),
                   onPressed: () {
@@ -128,46 +130,38 @@ class ViewTicketVoucher extends StatelessWidget {
               children: [
                 _buildInfoRow(
                     Icons.person, 'Customer', ticket['customer'] ?? ''),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 _buildInfoRow(Icons.flight, 'PNR', ticket['pnr'] ?? ''),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 _buildInfoRow(Icons.description, 'Description',
                     ticket['description'] ?? ''),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 _buildInfoRow(Icons.business, 'Supplier Account',
                     ticket['supplier'] ?? ''),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
                       child: _buildInfoRow(Icons.person_add, 'Added by',
                           ticket['added_by'] ?? ''),
                     ),
-                    Container(
-                      // padding:
-                      //     EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      // decoration: BoxDecoration(
-                      //   color: TColor.primary,
-                      //   borderRadius: BorderRadius.circular(20),
-                      // ),
-                      child: Text(
-                        'PKR ${ticket['price']}',
-                        style: TextStyle(
-                          color: TColor.primary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    Text(
+                      'PKR ${ticket['price']}',
+                      style: TextStyle(
+                        color: TColor.primary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
                       child: _buildActionButton('Invoice 1', Icons.receipt),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(
                       child:
                           _buildActionButton('Invoice 2', Icons.receipt_long),
@@ -187,7 +181,7 @@ class ViewTicketVoucher extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, size: 20, color: TColor.secondaryText),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,7 +194,7 @@ class ViewTicketVoucher extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: 2),
+              const SizedBox(height: 2),
               Text(
                 value,
                 style: TextStyle(
@@ -223,7 +217,7 @@ class ViewTicketVoucher extends StatelessWidget {
         backgroundColor: TColor.primary.withOpacity(0.05),
         foregroundColor: TColor.primary,
         elevation: 0,
-        padding: EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -232,10 +226,10 @@ class ViewTicketVoucher extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 20),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
             ),

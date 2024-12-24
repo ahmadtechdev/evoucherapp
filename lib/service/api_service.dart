@@ -13,6 +13,52 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   final String baseUrl = "https://evoucher.pk/api-new/";
+
+  // Reuse the existing `postLogin` method pattern for a generic POST request
+  Future<Map<String, dynamic>> postData({
+    required String endpoint,
+    required Map<String, dynamic> body,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    final url = Uri.parse(baseUrl + endpoint);
+
+    try {
+      // Print request details for debugging
+      debugPrint('Request URL: $url');
+      debugPrint('Request Body: $body');
+
+      // Create request
+      final request = http.Request('POST', url);
+      request.headers.addAll({
+        'Content-Type': 'application/json',
+        'Authorization': token.isNotEmpty ? "Bearer $token" : "",
+      });
+
+      // Set the request body
+      request.body = json.encode(body);
+
+      // Send the request
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      // Print response for debugging
+      debugPrint('Response Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      final responseData = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return responseData;
+      } else {
+        throw Exception(responseData['message'] ?? 'Request failed');
+      }
+    } catch (e) {
+      debugPrint('API Error: $e');
+      throw Exception('Network error: Please check your internet connection');
+    }
+  }
+
   Future<Map<String, dynamic>> postLogin({
     required String endpoint,
     required Map<String, dynamic> body
@@ -120,7 +166,7 @@ class ApiService {
   Future<Map<String, dynamic>> fetchAccounts({String? subheadName}) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final url = Uri.parse(baseUrl + 'fetchAccounts');
+    final url = Uri.parse('${baseUrl}fetchAccounts');
 
     try {
       // Prepare the request body
@@ -170,7 +216,7 @@ class ApiService {
       required String toDate}) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final url = Uri.parse(baseUrl + 'accountLedger');
+    final url = Uri.parse('${baseUrl}accountLedger');
 
     try {
       // Prepare the request body

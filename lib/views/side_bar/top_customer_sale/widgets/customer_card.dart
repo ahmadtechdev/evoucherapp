@@ -9,7 +9,7 @@ import '../models/top_customer_sale_model.dart';
 class CustomerCard extends StatelessWidget {
   final Customer customer;
 
-  const CustomerCard({Key? key, required this.customer}) : super(key: key);
+  const CustomerCard({super.key, required this.customer});
 
   @override
   Widget build(BuildContext context) {

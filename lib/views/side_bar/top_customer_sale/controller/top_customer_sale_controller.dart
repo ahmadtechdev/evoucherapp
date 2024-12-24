@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 
 import '../models/top_customer_sale_model.dart';
-import 'package:get/get.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';

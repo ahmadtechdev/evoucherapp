@@ -9,7 +9,7 @@ class DateSelectionSection extends StatelessWidget {
   final DateTimeRange selectedDateRange;
   final Function(DateTimeRange) onDateChanged;
 
-  const DateSelectionSection({required this.selectedDateRange, required this.onDateChanged});
+  const DateSelectionSection({super.key, required this.selectedDateRange, required this.onDateChanged});
 
   @override
   Widget build(BuildContext context) {

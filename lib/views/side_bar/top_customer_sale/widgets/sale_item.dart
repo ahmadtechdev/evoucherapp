@@ -9,11 +9,11 @@ class SaleItem extends StatelessWidget {
   final Color color;
 
   const SaleItem({
-    Key? key,
+    super.key,
     required this.title,
     required this.amount,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

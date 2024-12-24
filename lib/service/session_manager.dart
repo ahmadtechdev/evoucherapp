@@ -5,7 +5,9 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Add this package to pubspec.yaml
 
 class SessionManager extends GetxController {
+  // ignore: constant_identifier_names
   static const String TOKEN_KEY = 'token';
+  // ignore: constant_identifier_names
   static const String TOKEN_EXPIRY_KEY = 'token_expiry';
 
   final _isLoggedIn = false.obs;

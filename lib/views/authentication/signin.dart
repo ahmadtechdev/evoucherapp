@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'dart:math' as math;
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';
-import '../../common_widget/round_textfield.dart';
+import '../../common_widget/round_text_field.dart';
 import '../../common_widget/snackbar.dart';
 import '../../service/api_service.dart';
 import '../../service/session_manager.dart';
@@ -205,12 +205,12 @@ class _SignInState extends State<SignIn> {
                         ),
                         const SizedBox(height: 20),
 
-                        RoundTextfield(
+                        RoundTextField(
                           hintText: "User name",
                           controller: txtUser,
                         ),
                         const SizedBox(height: 20),
-                        RoundTextfield(
+                        RoundTextField(
                           hintText: "Password",
                           controller: txtPassword,
                           obscureText: _obscurePassword,

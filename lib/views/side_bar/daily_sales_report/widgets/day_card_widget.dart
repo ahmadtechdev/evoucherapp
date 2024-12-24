@@ -17,8 +17,8 @@ class DayCardState extends State<DayCard> {
 
   @override
   Widget build(BuildContext context) {
-    final summary = widget.dayData.summary;
-    final details = widget.dayData.details;
+    // final summary = widget.dayData.summary;
+    // final details = widget.dayData.details;
 
     return Container(
         margin: const EdgeInsets.only(bottom: 8),

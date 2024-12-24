@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../common/color_extension.dart';
-import '../../../../common_widget/round_textfield.dart';
+import '../../../../common_widget/round_text_field.dart';
 import 'controller/settle_invoice_controller.dart';
 
 class SingleInvoiceSettlementPage extends StatelessWidget {
@@ -350,7 +350,7 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
               children: [
                 const Text("Settle Amount: "),
                 Expanded(
-                  child: RoundTextfield(
+                  child: RoundTextField(
                     hintText: "Enter amount",
                     keyboardType: TextInputType.number,
                     onChanged: (value) {

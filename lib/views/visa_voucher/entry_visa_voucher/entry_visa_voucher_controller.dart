@@ -12,47 +12,47 @@ class VisaVoucherControler extends GetxController {
 
   // Customer Fields (unchanged)
   final customerAccount = TextEditingController();
-  final CustomerName = TextEditingController();
+  final customerName = TextEditingController();
   final phoneNo = TextEditingController();
-  final PassportNo = TextEditingController();
+  final passportNo = TextEditingController();
   final country = TextEditingController();
-  final Visa_No = TextEditingController();
-  final Vtype = TextEditingController();
+  final visaNo = TextEditingController();
+  final visaType = TextEditingController();
 
   // Booking Details (unchanged)
 
   // Selling Side Calculations (modified)
   // custmer side
-  final Foreign_Sale_Rate = TextEditingController();
-  final totalSellingAmount = RxString('0');
-  final roeSellingRate = TextEditingController(text: '1');
-  final sellingCurrency = TextEditingController();
+  final foreignSaleRateController = TextEditingController();
+  final totalSellingAmountController = RxString('0');
+  final roeSellingRateController = TextEditingController(text: '1');
+  final sellingCurrencyController = TextEditingController();
 
   void calculateTotalSelling() {
-    double foreignSaleRate = double.tryParse(Foreign_Sale_Rate.text) ?? 0.0;
-    double exchangeRate = double.tryParse(roeSellingRate.text) ?? 1.0;
+    double foreignSaleRate = double.tryParse(foreignSaleRateController.text) ?? 0.0;
+    double exchangeRate = double.tryParse(roeSellingRateController.text) ?? 1.0;
     double totalSelling = foreignSaleRate * exchangeRate;
 
     // Update the total selling amount dynamically
-    totalSellingAmount.value = totalSelling.toStringAsFixed(0);
+    totalSellingAmountController.value = totalSelling.toStringAsFixed(0);
   }
 
   // suplier side
   final pkrTotalBuying = RxString('0');
-  final supplierDetail = TextEditingController();
-  final Foreign_Purchsae_Rate = TextEditingController();
-  final suplier_roeSellingRate = TextEditingController(text: '1');
+  final supplierDetailController = TextEditingController();
+  final foreignPurchaseRateController = TextEditingController();
+  final supplierROESellingRateController = TextEditingController(text: '1');
   final profit = RxString('0.00');
   final loss = RxString('0.00');
 
-  void suplier_calculateTotalSelling() {
-    double foreignSaleRate = double.tryParse(Foreign_Purchsae_Rate.text) ?? 0.0;
-    double exchangeRate = double.tryParse(suplier_roeSellingRate.text) ?? 1.0;
+  void supplierCalculateTotalSelling() {
+    double foreignSaleRate = double.tryParse(foreignPurchaseRateController.text) ?? 0.0;
+    double exchangeRate = double.tryParse(supplierROESellingRateController.text) ?? 1.0;
     double totalBuyingAmount = foreignSaleRate * exchangeRate;
 
     // Update the total selling amount dynamically
     pkrTotalBuying.value = totalBuyingAmount.toStringAsFixed(0);
-    var totalSellingAmount1 = double.tryParse(totalSellingAmount.value);
+    var totalSellingAmount1 = double.tryParse(totalSellingAmountController.value);
 
     // Calculate profit or loss
     if (totalBuyingAmount > totalSellingAmount1!) {
@@ -111,8 +111,4 @@ class VisaVoucherControler extends GetxController {
     }
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 }
