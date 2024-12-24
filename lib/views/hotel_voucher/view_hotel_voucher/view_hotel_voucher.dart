@@ -3,6 +3,7 @@ import 'package:evoucher/common_widget/dart_selector2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'foriiegn_invoice/hotel_view_voucher_detail.dart';
 import 'view_hotel_voucher_controller.dart';
 
 class ViewHotelVoucher extends StatelessWidget {
@@ -119,6 +120,7 @@ class ViewHotelVoucher extends StatelessWidget {
                   icon: Icon(Icons.visibility, color: TColor.primary),
                   onPressed: () {
                     // Implement view action
+                    Get.to(()=> const VoucherDetailScreen());
                   },
                 ),
               ],

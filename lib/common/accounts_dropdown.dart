@@ -14,20 +14,26 @@ class AccountDropdown extends StatelessWidget {
 
   final void Function(String?)? onChanged;
 
-  const AccountDropdown(
-      {super.key,
-        this.primaryColor = const Color(0xFF2196F3),
-        this.isEnabled = true,
-        this.initialValue,
-        this.subHeadName,
-        this.onChanged,
-        this.hintText = 'Select an account',
-        this.showSearch = true});
+  const AccountDropdown({super.key,
+    this.primaryColor = const Color(0xFF2196F3),
+    this.isEnabled = true,
+    this.initialValue,
+    this.subHeadName,
+    this.onChanged,
+    this.hintText = 'Select an account',
+    this.showSearch = true});
 
   @override
   Widget build(BuildContext context) {
-    final AccountsController accountsController =
-    Get.find<AccountsController>();
+    final AccountsController accountsController = Get.find<
+        AccountsController>();
+
+    // Fetch accounts when widget is built, if subHeadName is provided
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (subHeadName != null) {
+        accountsController.fetchAccounts(subheadName: subHeadName);
+      }
+    });
 
     return Obx(() {
       final accountsList = accountsController.accounts;
@@ -40,10 +46,9 @@ class AccountDropdown extends StatelessWidget {
       return CustomDropdown(
         showSearch: showSearch,
         hint: hintText.toString(),
-        items: accountsMap, // Pass the map instead of just names
-        selectedItemId: initialValue, // Use selectedItemId with the account ID
+        items: accountsMap,
+        selectedItemId: initialValue,
         onChanged: (selectedAccountId) {
-          // When an account is selected, the ID will be passed to the onChanged callback
           onChanged?.call(selectedAccountId);
         },
         enabled: isEnabled,

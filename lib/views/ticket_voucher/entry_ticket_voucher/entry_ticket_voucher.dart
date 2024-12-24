@@ -270,6 +270,7 @@ class CustomerTab extends StatelessWidget {
       builder: (_) => Column(
         children: [
           AccountDropdown(
+            subHeadName: "Customers",
             onChanged: (value) {
               if (value != null) controller.customerAccount.value = value;
               controller.update(['customer_details']);
@@ -593,6 +594,7 @@ class SupplierTab extends StatelessWidget {
       children: [
         _buildSectionTitle('Supplier Detail'),
         AccountDropdown(
+          subHeadName: "Air Tickets Suppliers",
           onChanged: (value) {
             if (value != null) controller.supplierDetail.value = value;
           },

@@ -365,7 +365,7 @@ class EntryTicketController extends GetxController {
       profitController.text = (totalSelling - totalBuying).round().toString();
       lossController.text = '0';
     } else if (totalBuying > totalSelling) {
-      lossController.text = (totalBuying - totalSelling).round().toString();
+      lossController.text = ((totalBuying - totalSelling)*-1).round().toString();
       profitController.text = '0';
     } else {
       lossController.text = '0';

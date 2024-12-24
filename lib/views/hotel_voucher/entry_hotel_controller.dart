@@ -125,13 +125,13 @@ class EntryHotelController extends GetxController {
 
   void calculateSummary() {
     final pkrTotalBuyingValue = pkrTotalBuying.value;
-    final totalSellingValue = totalSellingAmount.value;
+    final totalSellingValue = pkrTotalSelling.value;
 
     if (totalSellingValue > pkrTotalBuyingValue) {
       profit.value = (totalSellingValue - pkrTotalBuyingValue).roundToDouble();
       loss.value = 0.0;
     } else if (pkrTotalBuyingValue > totalSellingValue) {
-      loss.value = (pkrTotalBuyingValue - totalSellingValue).roundToDouble();
+      loss.value = ((pkrTotalBuyingValue - totalSellingValue)*-1).roundToDouble();
       profit.value = 0.0;
     } else {
       profit.value = 0.0;

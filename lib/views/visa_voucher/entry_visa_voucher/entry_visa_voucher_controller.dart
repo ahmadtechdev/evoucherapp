@@ -56,15 +56,15 @@ class VisaVoucherControler extends GetxController {
 
     // Calculate profit or loss
     if (totalBuyingAmount > totalSellingAmount1!) {
-      loss.value = (totalBuyingAmount - totalSellingAmount1).round().toString();
-      profit.value = ''; // Clear loss field
+      loss.value = ((totalBuyingAmount - totalSellingAmount1)*-1).round().toString();
+      profit.value = '0'; // Clear loss field
     } else if (totalBuyingAmount < totalSellingAmount1) {
       profit.value =
           (totalSellingAmount1 - totalBuyingAmount).round().toString();
-      loss.value = ''; // Clear profit field
+      loss.value = '0'; // Clear profit field
     } else {
-      profit.value = '';
-      loss.value = '';
+      profit.value = '0';
+      loss.value = '0';
     }
   }
 
