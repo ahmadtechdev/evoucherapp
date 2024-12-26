@@ -3,11 +3,11 @@
 import 'package:evoucher/views/hotel_voucher/view_hotel_voucher/view_hotel_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../common/accounts_dropdown.dart';
-import '../../common/color_extension.dart';
-import '../../common_widget/dart_selector2.dart';
-import '../../common_widget/date_range_selector.dart';
-import '../../common_widget/round_text_field.dart';
+import '../../../common/accounts_dropdown.dart';
+import '../../../common/color_extension.dart';
+import '../../../common_widget/dart_selector2.dart';
+import '../../../common_widget/date_range_selector.dart';
+import '../../../common_widget/round_text_field.dart';
 import 'entry_hotel_controller.dart';
 
 class EntryHotelVoucher extends StatelessWidget {
@@ -52,7 +52,7 @@ class EntryHotelVoucher extends StatelessWidget {
       child: GetBuilder<EntryHotelController>(
         init: EntryHotelController(),
         builder: (controller) => Obx(
-              () => Column(
+          () => Column(
             children: [
               _buildTopDateSection(controller),
               Expanded(
@@ -102,7 +102,7 @@ class EntryHotelVoucher extends StatelessWidget {
               label: "Cancellation Deadline",
               initialDate: DateTime.now(),
               onDateChanged: (value) =>
-              controller.cancellationDeadlineDate.value = value,
+                  controller.cancellationDeadlineDate.value = value,
             ),
           ),
         ],
@@ -118,6 +118,8 @@ class EntryHotelVoucher extends StatelessWidget {
         children: [
           _buildSectionTitle('Customer Information'),
           AccountDropdown(
+            subHeadName: "Customers",
+            hintText: 'Select Customer Account',
             onChanged: (value) {
               if (value != null) {}
             },
@@ -149,22 +151,22 @@ class EntryHotelVoucher extends StatelessWidget {
           Row(
             children: [
               Obx(() => Checkbox(
-                value: controller.isHotelReceivingAccountsEnabled.value,
-                onChanged: (bool? value) {
-                  controller.isHotelReceivingAccountsEnabled.value =
-                      value ?? false;
-                  if (value == true) {
-                    // Add first entry when checkbox is checked
-                    if (controller.hotelReceivingDetails.isEmpty) {
-                      controller.addHotelReceivingDetail();
-                    }
-                  } else {
-                    // Clear all additional details when unchecked
-                    controller.hotelReceivingDetails.clear();
-                  }
-                },
-                activeColor: TColor.primary,
-              )),
+                    value: controller.isHotelReceivingAccountsEnabled.value,
+                    onChanged: (bool? value) {
+                      controller.isHotelReceivingAccountsEnabled.value =
+                          value ?? false;
+                      if (value == true) {
+                        // Add first entry when checkbox is checked
+                        if (controller.hotelReceivingDetails.isEmpty) {
+                          controller.addHotelReceivingDetail();
+                        }
+                      } else {
+                        // Clear all additional details when unchecked
+                        controller.hotelReceivingDetails.clear();
+                      }
+                    },
+                    activeColor: TColor.primary,
+                  )),
               Text(
                 'Any Receiving',
                 style: TextStyle(color: TColor.primaryText),
@@ -176,8 +178,8 @@ class EntryHotelVoucher extends StatelessWidget {
               return Column(
                 children: [
                   for (int index = 0;
-                  index < controller.hotelReceivingDetails.length;
-                  index++)
+                      index < controller.hotelReceivingDetails.length;
+                      index++)
                     Padding(
                       padding: const EdgeInsets.only(top: 15),
                       child: Column(
@@ -203,14 +205,15 @@ class EntryHotelVoucher extends StatelessWidget {
                                 IconButton(
                                   icon: Icon(Icons.remove_circle,
                                       color: TColor.third),
-                                  onPressed: () =>
-                                      controller.removeHotelReceivingDetail(index),
+                                  onPressed: () => controller
+                                      .removeHotelReceivingDetail(index),
                                 ),
                             ],
                           ),
                           AccountDropdown(
                             onChanged: (value) => controller
-                                .hotelReceivingDetails[index]['name'].value = value,
+                                .hotelReceivingDetails[index]['name']
+                                .value = value,
                           ),
                           // RoundTitleTextfield(
                           //   title: 'Guest Name',
@@ -229,7 +232,7 @@ class EntryHotelVoucher extends StatelessWidget {
                                 .hotelReceivingDetails[index]['amount']
                                 .value = value,
                             left:
-                            Icon(Icons.email, color: TColor.secondaryText),
+                                Icon(Icons.email, color: TColor.secondaryText),
                           ),
                         ],
                       ),
@@ -252,6 +255,7 @@ class EntryHotelVoucher extends StatelessWidget {
         children: [
           _buildSectionTitle('Supplier Information'),
           AccountDropdown(
+            subHeadName: "Air Tickets Suppliers",
             onChanged: (value) {
               if (value != null) {}
             },
@@ -410,18 +414,18 @@ class EntryHotelVoucher extends StatelessWidget {
         ),
         const SizedBox(height: 15),
         Obx(() => RoundTitleTextfield(
-          title: 'Total Sale Amount',
-          hintText: 'Enter sale amount',
-          keyboardType: TextInputType.number,
-          initialValue: controller.totalSellingAmount.value == 0.0
-              ? ''
-              : controller.totalSellingAmount.value.toStringAsFixed(0),
-          onChanged: (value) {
-            double parsedValue = double.tryParse(value) ?? 0.0;
-            controller.totalSellingAmount.value = parsedValue;
-          },
-          left: Icon(Icons.attach_money, color: TColor.secondaryText),
-        )),
+              title: 'Total Sale Amount',
+              hintText: 'Enter sale amount',
+              keyboardType: TextInputType.number,
+              initialValue: controller.totalSellingAmount.value == 0.0
+                  ? ''
+                  : controller.totalSellingAmount.value.toStringAsFixed(0),
+              onChanged: (value) {
+                double parsedValue = double.tryParse(value) ?? 0.0;
+                controller.totalSellingAmount.value = parsedValue;
+              },
+              left: Icon(Icons.attach_money, color: TColor.secondaryText),
+            )),
         const SizedBox(height: 15),
         Row(
           children: [
@@ -435,7 +439,7 @@ class EntryHotelVoucher extends StatelessWidget {
                   controller.calculateCustomerSide();
                 },
                 left:
-                Icon(Icons.currency_exchange, color: TColor.secondaryText),
+                    Icon(Icons.currency_exchange, color: TColor.secondaryText),
               ),
             ),
             const SizedBox(width: 15),
@@ -451,18 +455,18 @@ class EntryHotelVoucher extends StatelessWidget {
         ),
         const SizedBox(height: 15),
         Obx(() => RoundTitleTextfield(
-          title: 'PKR Total Selling',
-          hintText: 'Enter total selling',
-          keyboardType: TextInputType.number,
-          initialValue: controller.pkrTotalSelling.value == 0.0
-              ? ''
-              : controller.pkrTotalSelling.value.toStringAsFixed(2),
-          onChanged: (value) {
-            double parsedValue = double.tryParse(value) ?? 0.0;
-            controller.pkrTotalSelling.value = parsedValue;
-          },
-          left: Icon(Icons.attach_money, color: TColor.secondaryText),
-        )),
+              title: 'PKR Total Selling',
+              hintText: 'Enter total selling',
+              keyboardType: TextInputType.number,
+              initialValue: controller.pkrTotalSelling.value == 0.0
+                  ? ''
+                  : controller.pkrTotalSelling.value.toStringAsFixed(2),
+              onChanged: (value) {
+                double parsedValue = double.tryParse(value) ?? 0.0;
+                controller.pkrTotalSelling.value = parsedValue;
+              },
+              left: Icon(Icons.attach_money, color: TColor.secondaryText),
+            )),
       ],
     );
   }
@@ -514,6 +518,9 @@ class EntryHotelVoucher extends StatelessWidget {
           title: 'Total Buying Amount',
           hintText: 'Enter Amount',
           keyboardType: TextInputType.number,
+          readOnly: true,
+          bgColor: TColor.readOnlyTextField,
+          textClr: TColor.readOnlyText,
           onChanged: (value) {
             controller.calculateSupplierSide();
           },
@@ -532,7 +539,7 @@ class EntryHotelVoucher extends StatelessWidget {
                   controller.calculateSupplierSide();
                 },
                 left:
-                Icon(Icons.currency_exchange, color: TColor.secondaryText),
+                    Icon(Icons.currency_exchange, color: TColor.secondaryText),
               ),
             ),
             const SizedBox(width: 15),
@@ -548,18 +555,18 @@ class EntryHotelVoucher extends StatelessWidget {
         ),
         const SizedBox(height: 15),
         Obx(() => RoundTitleTextfield(
-          title: 'Pkr Total Buying',
-          hintText: 'Enter buying Amount',
-          keyboardType: TextInputType.number,
-          initialValue: controller.pkrTotalBuying.value == 0.0
-              ? ''
-              : controller.pkrTotalBuying.value.toStringAsFixed(2),
-          onChanged: (value) {
-            double parsedValue = double.tryParse(value) ?? 0.0;
-            controller.pkrTotalBuying.value = parsedValue;
-          },
-          left: Icon(Icons.calculate, color: TColor.secondaryText),
-        )),
+              title: 'Pkr Total Buying',
+              hintText: 'Enter buying Amount',
+              keyboardType: TextInputType.number,
+              initialValue: controller.pkrTotalBuying.value == 0.0
+                  ? ''
+                  : controller.pkrTotalBuying.value.toStringAsFixed(2),
+              onChanged: (value) {
+                double parsedValue = double.tryParse(value) ?? 0.0;
+                controller.pkrTotalBuying.value = parsedValue;
+              },
+              left: Icon(Icons.calculate, color: TColor.secondaryText),
+            )),
       ],
     );
   }
@@ -572,22 +579,26 @@ class EntryHotelVoucher extends StatelessWidget {
           children: [
             Expanded(
               child: Obx(() => RoundTitleTextfield(
-                title: 'Total Profit',
-                hintText: 'Profit Amount',
-                readOnly: true,
-                initialValue: controller.profit.value.toStringAsFixed(2),
-                left: Icon(Icons.trending_up, color: TColor.secondary),
-              )),
+                    title: 'Total Profit',
+                    hintText: 'Profit Amount',
+                    readOnly: true,
+                    bgColor: TColor.readOnlyTextField,
+                    textClr: TColor.secondary,
+                    initialValue: controller.profit.value.toStringAsFixed(2),
+                    left: Icon(Icons.trending_up, color: TColor.secondary),
+                  )),
             ),
             const SizedBox(width: 15),
             Expanded(
               child: Obx(() => RoundTitleTextfield(
-                title: 'Total Loss',
-                hintText: 'Loss Amount',
-                readOnly: true,
-                initialValue: controller.loss.value.toStringAsFixed(2),
-                left: Icon(Icons.trending_down, color: TColor.third),
-              )),
+                    title: 'Total Loss',
+                    hintText: 'Loss Amount',
+                    readOnly: true,
+                    bgColor: TColor.readOnlyTextField,
+                    textClr: TColor.third,
+                    initialValue: controller.loss.value.toStringAsFixed(2),
+                    left: Icon(Icons.trending_down, color: TColor.third),
+                  )),
             ),
           ],
         ),
@@ -596,24 +607,24 @@ class EntryHotelVoucher extends StatelessWidget {
           children: [
             Expanded(
               child: Obx(() => RoundTitleTextfield(
-                title: 'Total Debit',
-                hintText: 'Debit Amount',
-                readOnly: true,
-                initialValue:
-                controller.pkrTotalBuying.value.toStringAsFixed(0),
-                left: Icon(Icons.add_card, color: TColor.secondaryText),
-              )),
+                    title: 'Total Debit',
+                    hintText: 'Debit Amount',
+                    readOnly: true,
+                    initialValue:
+                        controller.pkrTotalBuying.value.toStringAsFixed(0),
+                    left: Icon(Icons.add_card, color: TColor.secondaryText),
+                  )),
             ),
             const SizedBox(width: 15),
             Expanded(
               child: Obx(() => RoundTitleTextfield(
-                title: 'Total Credit',
-                hintText: 'Credit Amount',
-                readOnly: true,
-                initialValue:
-                controller.pkrTotalBuying.value.toStringAsFixed(0),
-                left: Icon(Icons.credit_card, color: TColor.secondaryText),
-              )),
+                    title: 'Total Credit',
+                    hintText: 'Credit Amount',
+                    readOnly: true,
+                    initialValue:
+                        controller.pkrTotalBuying.value.toStringAsFixed(0),
+                    left: Icon(Icons.credit_card, color: TColor.secondaryText),
+                  )),
             ),
           ],
         ),
@@ -631,7 +642,7 @@ class EntryHotelVoucher extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       decoration: BoxDecoration(
-        color: TColor.textfield,
+        color: TColor.textField,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Row(
@@ -665,13 +676,13 @@ class EntryHotelVoucher extends StatelessWidget {
                   width: 40,
                   child: Center(
                     child: Obx(() => Text(
-                      '${count.value}',
-                      style: TextStyle(
-                        color: TColor.primaryText,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )),
+                          '${count.value}',
+                          style: TextStyle(
+                            color: TColor.primaryText,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )),
                   ),
                 ),
                 IconButton(

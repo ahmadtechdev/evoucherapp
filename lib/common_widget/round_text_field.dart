@@ -27,7 +27,7 @@ class RoundTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: bgColor ?? TColor.textfield,
+          color: bgColor ?? TColor.textField,
           borderRadius: BorderRadius.circular(25)),
       child: Row(
         children: [
@@ -95,7 +95,7 @@ class SearchTextField extends StatelessWidget{
           hintStyle: TextStyle(color: TColor.placeholder),
           prefixIcon: Icon(Icons.search, color: TColor.secondary),
           filled: true,
-          fillColor: TColor.textfield,
+          fillColor: TColor.textField,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -128,7 +128,7 @@ class RoundTitleTextfield extends StatelessWidget {
   final Function(String)? onChanged;
   final String? initialValue;
   final VoidCallback? onEditingComplete;  // Added this line
-  final Color? textclr;
+  final Color? textClr;
 
   const RoundTitleTextfield({
     super.key,
@@ -144,7 +144,7 @@ class RoundTitleTextfield extends StatelessWidget {
     this.obscureText = false,
     this.readOnly = false,
     this.onEditingComplete,
-    this.textclr,// Added this line
+    this.textClr,// Added this line
   });
 
   @override
@@ -158,7 +158,7 @@ class RoundTitleTextfield extends StatelessWidget {
     return Container(
       height: 55,
       decoration: BoxDecoration(
-          color: bgColor ?? TColor.textfield,
+          color: bgColor ?? TColor.textField,
           borderRadius: BorderRadius.circular(25)),
       child: Row(
         children: [
@@ -175,7 +175,7 @@ class RoundTitleTextfield extends StatelessWidget {
                   margin: const EdgeInsets.only(top: 8),
                   alignment: Alignment.topLeft,
                   child: TextField(
-                    style: TextStyle(color: textclr ?? TColor.primaryText),
+                    style: TextStyle(color: textClr ?? TColor.primaryText),
                     autocorrect: false,
                     controller: effectiveController,
                     obscureText: obscureText,

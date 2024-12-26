@@ -172,7 +172,7 @@ class _JournalEntryVoucherState extends State<JournalEntryVoucher> {
                 ReusableEntryCard(
                   showImageUpload: false,
                   primaryColor: TColor.primary,
-                  textFieldColor: TColor.textfield,
+                  textFieldColor: TColor.textField,
                   textColor: TColor.white,
                   placeholderColor: TColor.placeholder,
                 ),

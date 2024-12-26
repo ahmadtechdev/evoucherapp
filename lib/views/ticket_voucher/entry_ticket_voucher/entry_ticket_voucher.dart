@@ -408,19 +408,31 @@ class CustomerTab extends StatelessWidget {
       'YQ'
     ];
 
-    return Column(
-      children: taxFields
-          .map(
-            (field) => ReactiveTextField(
-              title: field,
-              controller: controller.getTaxController(field),
-              ticketController: controller,
-              onEditingComplete: controller.calculateTotal,
-            ),
-          )
-          .toList(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final itemWidth = (constraints.maxWidth - 24) / 2; // Calculate width for two items, considering spacing
+        return Wrap(
+          spacing: 8.0, // Horizontal spacing between fields
+          runSpacing: 8.0, // Vertical spacing between rows
+          children: taxFields.map(
+                (field) {
+              return SizedBox(
+                width: itemWidth, // Responsive width based on device constraints
+                child: ReactiveTextField(
+                  title: field,
+                  controller: controller.getTaxController(field),
+                  ticketController: controller,
+                  onEditingComplete: controller.calculateTotal,
+                ),
+              );
+            },
+          ).toList(),
+        );
+      },
     );
   }
+
+
 
   Widget _buildChargesSection() {
     return GetBuilder<EntryTicketController>(
@@ -816,8 +828,10 @@ class ReactiveTextField extends StatelessWidget {
           hintText: 'Enter $title',
           controller: controller,
           bgColor: _isReadOnly()
-              ? TColor.secondaryText.withOpacity(0.4)
-              : TColor.textfield,
+              ? TColor.readOnlyTextField
+              : TColor.textField,
+          textClr: _isReadOnly()
+          ? TColor.readOnlyText : TColor.primaryText,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           readOnly: _isReadOnly(),
           onChanged: _handleOnChanged,

@@ -23,7 +23,7 @@ class SearchDropdownWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: TColor.textfield,
+              color: TColor.textField,
               borderRadius: BorderRadius.circular(12),
             ),
             child: DropdownButtonHideUnderline(

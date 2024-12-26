@@ -140,7 +140,7 @@ class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
     SalesReportUtils.filterData(salesData, selectedDateRange);
 
     return Scaffold(
-      backgroundColor: TColor.textfield,
+      backgroundColor: TColor.textField,
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: TColor.primary,

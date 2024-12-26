@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../common/color_extension.dart';
 import '../../common_widget/bottom_navigation.dart';
 import 'entry_visa_voucher/visa_voucher.dart';
-import 'view_visa_voucher.dart';
+import 'view_visa_voucher/view_visa_voucher.dart';
 
 class Visa extends StatefulWidget {
   const Visa({super.key});

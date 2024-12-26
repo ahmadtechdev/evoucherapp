@@ -247,7 +247,7 @@ class InvoiceSettlement extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: TColor.textfield,
+                        color: TColor.textField,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(

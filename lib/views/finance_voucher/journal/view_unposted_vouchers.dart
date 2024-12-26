@@ -34,7 +34,7 @@ class _ViewUnPostedVouchersState extends State<ViewUnPostedVouchers> {
               primaryColor: TColor.primary,
               // isViewMode: true,
               // showAddRowButton: false,
-              textFieldColor: TColor.textfield,
+              textFieldColor: TColor.textField,
               textColor: TColor.white,
               placeholderColor: TColor.placeholder,
               onTotalChanged: (totalDebit, totalCredit) {

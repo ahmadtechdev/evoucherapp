@@ -1,5 +1,5 @@
 import 'package:evoucher/common/drawer.dart';
-import 'package:evoucher/views/hotel_voucher/entry_hotel_voucher.dart';
+import 'package:evoucher/views/hotel_voucher/entry_hotel_voucher/entry_hotel_voucher.dart';
 import 'package:evoucher/views/hotel_voucher/view_hotel_voucher/view_hotel_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

@@ -178,7 +178,7 @@ class _CashEntryVoucherState extends State<CashEntryVoucher> {
                 ReusableEntryCard(
                   showImageUpload: true, // or false if you don't want image upload
                   primaryColor: TColor.primary,
-                  textFieldColor: TColor.textfield,
+                  textFieldColor: TColor.textField,
                   textColor: TColor.white,
                   placeholderColor: TColor.placeholder,
 

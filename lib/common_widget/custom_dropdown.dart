@@ -42,7 +42,7 @@ class CustomDropdown extends StatelessWidget {
               borderSide: BorderSide.none,
             ),
             filled: true,
-            fillColor: TColor.textfield,
+            fillColor: TColor.textField,
           ),
         ),
         showSelectedItems: true,
@@ -63,7 +63,7 @@ class CustomDropdown extends StatelessWidget {
       dropdownDecoratorProps: DropDownDecoratorProps(
         dropdownSearchDecoration: InputDecoration(
           filled: true,
-          fillColor: TColor.textfield,
+          fillColor: TColor.textField,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,

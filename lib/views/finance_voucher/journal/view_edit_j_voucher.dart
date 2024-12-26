@@ -227,7 +227,7 @@ class _JournalVoucherDetailState extends State<JournalVoucherDetail> {
 
                     showImageUpload: false,
                     primaryColor: TColor.primary,
-                    textFieldColor: TColor.textfield,
+                    textFieldColor: TColor.textField,
                     textColor: TColor.white,
                     placeholderColor: TColor.placeholder,
                     isViewMode: !isEditMode,

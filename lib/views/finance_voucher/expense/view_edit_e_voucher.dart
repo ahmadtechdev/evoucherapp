@@ -235,7 +235,7 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
 
                     showImageUpload: true,
                     primaryColor: TColor.primary,
-                    textFieldColor: TColor.textfield,
+                    textFieldColor: TColor.textField,
                     textColor: TColor.white,
                     placeholderColor: TColor.placeholder,
                     isViewMode: !isEditMode,

@@ -1,6 +1,6 @@
 import 'package:evoucher/common/color_extension.dart';
 import 'package:evoucher/common_widget/dart_selector2.dart';
-import 'package:evoucher/views/visa_voucher/visa_voucher_controller.dart';
+import 'package:evoucher/views/visa_voucher/view_visa_voucher/visa_voucher_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
