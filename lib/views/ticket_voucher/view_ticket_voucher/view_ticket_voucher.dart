@@ -274,7 +274,7 @@ class ViewTicketVoucher extends StatelessWidget {
                       pw.Image(pw.MemoryImage(logoImageData), width: 120),
                       // Address
                       pw.Text('2nd Floor JOURNEY ONLINE Plaza, Al-hamra town, east canal road, Faisalabad',
-                          style: pw.TextStyle(fontSize: 10)),
+                          style: const pw.TextStyle(fontSize: 10)),
                       pw.RichText(
                         text: pw.TextSpan(
                           children: [
@@ -366,18 +366,16 @@ class ViewTicketVoucher extends StatelessWidget {
                 ],
               ),
               pw.Divider(thickness: 1),
-              pw.SizedBox(height: 10),
-
 
               pw.SizedBox(height: 20),
 
               // Invoice details table
               pw.Table(
                 columnWidths: {
-                  0: pw.FlexColumnWidth(1),
-                  1: pw.FlexColumnWidth(2),
-                  2: pw.FlexColumnWidth(2),
-                  3: pw.FlexColumnWidth(1),
+                  0: const pw.FlexColumnWidth(1),
+                  1: const pw.FlexColumnWidth(2),
+                  2: const pw.FlexColumnWidth(2),
+                  3: const pw.FlexColumnWidth(1),
                 },
                 border: pw.TableBorder.all(width: 0.5),
                 children: [
@@ -397,11 +395,11 @@ class ViewTicketVoucher extends StatelessWidget {
               // Passenger details table
               pw.Table(
                 columnWidths: {
-                  0: pw.FlexColumnWidth(2),
-                  1: pw.FlexColumnWidth(1),
-                  2: pw.FlexColumnWidth(1),
-                  3: pw.FlexColumnWidth(1),
-                  4: pw.FlexColumnWidth(2),
+                  0: const pw.FlexColumnWidth(2),
+                  1: const pw.FlexColumnWidth(1),
+                  2: const pw.FlexColumnWidth(1),
+                  3: const pw.FlexColumnWidth(1),
+                  4: const pw.FlexColumnWidth(2),
                 },
                 border: pw.TableBorder.all(width: 0.5),
                 children: [
@@ -434,10 +432,10 @@ class ViewTicketVoucher extends StatelessWidget {
               pw.Table(
                 border: pw.TableBorder.all(width: 0.5),
                 columnWidths: {
-                  0: pw.FlexColumnWidth(2),
-                  1: pw.FlexColumnWidth(2),
-                  2: pw.FlexColumnWidth(2),
-                  3: pw.FlexColumnWidth(4),
+                  0: const pw.FlexColumnWidth(2),
+                  1: const pw.FlexColumnWidth(2),
+                  2: const pw.FlexColumnWidth(2),
+                  3: const pw.FlexColumnWidth(4),
                 },
                 children: [
                   _buildTableRow(
