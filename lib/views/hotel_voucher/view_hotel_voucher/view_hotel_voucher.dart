@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'foriiegn_invoice/hotel_view_voucher_detail.dart';
+import 'invoices_functions_class.dart';
 import 'view_hotel_voucher_controller.dart';
 
 import 'package:pdf/pdf.dart';
@@ -14,10 +15,14 @@ import 'package:flutter/services.dart' show ByteData, rootBundle;
 class ViewHotelVoucher extends StatelessWidget {
   final HotelVoucherController controller = Get.put(HotelVoucherController());
 
+  // Create an instance of the InvoiceGenerator class
+  final invoiceGenerator = InvoiceGenerator();
   ViewHotelVoucher({super.key});
 
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
       backgroundColor: TColor.white,
       appBar: AppBar(
@@ -167,14 +172,15 @@ class ViewHotelVoucher extends StatelessWidget {
                     Expanded(
                       child: _buildActionButton(
                           'New Invoice', Icons.receipt, TColor.secondary, onPressed: () {
-                        generateAndPreviewNewHotelInvoice(context);
+                        // generateAndPreviewNewHotelInvoice(context);
+                        invoiceGenerator.generateAndPreviewNewHotelInvoice(context);
                       }),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildActionButton(
                           'Hotel Invoice', Icons.receipt_long, TColor.black, onPressed: () {
-                        generateAndPreviewNewHotelInvoice(context);
+                        invoiceGenerator.generateAndPreviewDefiniteHotelInvoice(context);
     }
                       ),
                     ),
@@ -185,12 +191,16 @@ class ViewHotelVoucher extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildActionButton(
-                          'Hotel Voucher', Icons.visibility, TColor.primary,  onPressed: (){}),
+                          'Hotel Voucher', Icons.visibility, TColor.primary,  onPressed: (){
+                            invoiceGenerator.generateAndPreviewHotelVoucher(context);
+                      }),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildActionButton(
-                          'Foreign Invoice', Icons.visibility, Colors.red,  onPressed: (){}),
+                          'Foreign Invoice', Icons.visibility, Colors.red,  onPressed: (){
+                            invoiceGenerator.generateAndPreviewForeignInvoice(context);
+                      }),
                     ),
                   ],
                 ),
@@ -265,261 +275,5 @@ class ViewHotelVoucher extends StatelessWidget {
       ),
     );
   }
-
-  Future<void> generateAndPreviewNewHotelInvoice(BuildContext context) async {
-    // Create PDF document
-    final doc = pw.Document();
-
-    // Load logo from assets
-    final logoImage = await rootBundle.load('assets/img/logo1.png');
-    final logoImageData = logoImage.buffer.asUint8List();
-
-    doc.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(20),
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              // Header with logo and company info
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.Image(pw.MemoryImage(logoImageData), width: 120),
-                        // Address
-                        pw.Text('2nd Floor JOURNEY ONLINE Plaza, Al-hamra town, east canal road, Faisalabad',
-                            style: const pw.TextStyle(fontSize: 10)),
-                        pw.RichText(
-                          text: pw.TextSpan(
-                            children: [
-                              pw.TextSpan(
-                                text: 'CELL : ',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
-                              ),
-                              pw.TextSpan(
-                                text: '03337323379',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
-                              ),
-                              pw.TextSpan(
-                                text: ' - PHONE : ',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
-                              ),
-                              pw.TextSpan(
-                                text: '03037666866',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
-                              ),
-                              pw.TextSpan(
-                                text: ' - EMAIL : ',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
-                              ),
-                              pw.TextSpan(
-                                text: 'ameeramillattts@hotmail.com',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                      ]
-                  ),
-
-
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.end,
-                    children: [
-                      pw.RichText(
-                          text: pw.TextSpan(
-                              children: [
-                                pw.TextSpan(
-                                  text: 'NTN: ',
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
-                                ),
-                                pw.TextSpan(
-                                  text: 'HUN6678',
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
-                                ),
-                              ]
-                          )
-                      ),
-                      pw.RichText(
-                          text: pw.TextSpan(
-                              children: [
-                                pw.TextSpan(
-                                  text: 'Company ID: ',
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
-                                ),
-                                pw.TextSpan(
-                                  text: 'HGDFR58',
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
-                                ),
-                              ]
-                          )
-                      ),
-
-                      pw.SizedBox(
-                          height: 8
-                      ),
-                      pw.Container(
-                        width: 120,
-                        padding: const pw.EdgeInsets.all(5),
-                        decoration: pw.BoxDecoration(
-                          border: pw.Border.all(width: 2),
-                        ),
-                        child: pw.Column(
-                            children: [
-
-                              pw.Text('Invoices: 852'),
-                              pw.SizedBox(
-                                  height: 4
-                              ),
-                              pw.Text('(PKR) = 14,000.00'),
-                            ]
-                        ),)
-                    ],
-                  ),
-                ],
-              ),
-              pw.Divider(thickness: 1),
-
-              pw.SizedBox(height: 20),
-
-              // Invoice details table
-              pw.Table(
-                columnWidths: {
-                  0: const pw.FlexColumnWidth(1),
-                  1: const pw.FlexColumnWidth(1),
-                  2: const pw.FlexColumnWidth(1),
-                  3: const pw.FlexColumnWidth(1),
-                },
-                border: pw.TableBorder.all(width: 0.5),
-                children: [
-                  _buildTableRow(
-                    ['Account Name:', 'Hotel Invoice Date #', 'Option Date', 'Confirmation'],
-                    isHeader: true,
-                    fontSize: 10,
-                  ),
-                  _buildTableRow(
-                    ['Adam', 'Thu, 31 Oct 2024', '30, Nov -0001', ''],
-                    fontSize: 10,
-                  ),
-                ],
-              ),
-              pw.SizedBox(height: 20),
-
-              // Passenger details table
-              pw.Table(
-                columnWidths: {
-                  0: const pw.FlexColumnWidth(1),
-                  1: const pw.FlexColumnWidth(1),
-                  2: const pw.FlexColumnWidth(1),
-                  3: const pw.FlexColumnWidth(1),
-                  4: const pw.FlexColumnWidth(1),
-                  5: const pw.FlexColumnWidth(2),
-                  6: const pw.FlexColumnWidth(1),
-                },
-                border: pw.TableBorder.all(width: 0.5),
-                children: [
-                  _buildTableRow(
-                    ['Pax Name', 'Hotel', 'Room Type #', 'Meal', 'Destination','CheckIn - CheckOut','Amount (PKR)'],
-                    isHeader: true,
-                    fontSize: 10,
-                  ),
-                  _buildTableRow(
-                    ['Hassan', 'ABC TEST GTEl', 'Double Room', 'None', 'Mecca- Saudia', 'Thu, 31 OCt, 2024 \n Sat, 02 Nov, 2024', '14,000.00'],
-                    fontSize: 10,
-                  ),
-                  _buildTableRow(
-                    ['', '', '','','', 'Total:', 'PKR 14,000.00'],
-                    fontSize: 10,
-                    isBold: true,
-                  ),
-                ],
-              ),
-              pw.SizedBox(height: 16),
-              // In words
-              pw.Text('IN WORDS: Fourteen Thousands PkR Only', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
-              pw.SizedBox(height: 10),
-              pw.Text('On behalf of AGENT1', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
-              pw.SizedBox(height: 10),
-
-              pw.Divider(thickness: 1),
-              // Bank details section
-              pw.Text('Bank Account Details with Account Title', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
-              pw.Table(
-                border: pw.TableBorder.all(width: 0.5),
-                columnWidths: {
-                  0: const pw.FlexColumnWidth(2),
-                  1: const pw.FlexColumnWidth(2),
-                  2: const pw.FlexColumnWidth(2),
-                  3: const pw.FlexColumnWidth(4),
-                },
-                children: [
-                  _buildTableRow(
-                    ['Acc Title', 'Bank Name', 'Account No', 'Bank Address'],
-                    isHeader: true,
-                    fontSize: 10,
-                  ),
-                  ...['Askari Bank', 'Meezan Bank', 'Alfalah Bank', 'HBL'].map((bank) {
-                    return _buildTableRow(
-                      [
-                        'JO TRAVELS',
-                        bank,
-                        bank == 'Askari Bank'
-                            ? '000123300000'
-                            : bank == 'Meezan Bank'
-                            ? '000112000108'
-                            : bank == 'Alfalah Bank'
-                            ? '000007676001'
-                            : '010101010',
-                        bank == 'Askari Bank'
-                            ? 'Satyana Road Branch, Faisalabad'
-                            : bank == 'Meezan Bank'
-                            ? 'Susan Road Branch, Faisalabad'
-                            : bank == 'Alfalah Bank'
-                            ? 'PC Branch, Faisalabad'
-                            : 'CANL ROAD BRANCH',
-                      ],
-                      fontSize: 10,
-                    );
-                  }).toList(),
-                ],
-              ),
-              pw.SizedBox(height: 10),
-
-            ],
-          );
-        },
-      ),
-    );
-
-    // Show print preview
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => doc.save(),
-      name: 'Invoice_950',
-    );
-  }
-
-  // Helper to build table rows
-  pw.TableRow _buildTableRow(List<String> cells, {bool isHeader = false, double fontSize = 12, bool isBold = false}) {
-    return pw.TableRow(
-      children: cells.map((cell) {
-        return pw.Padding(
-          padding: const pw.EdgeInsets.all(5),
-          child: pw.Text(
-            cell,
-            style: pw.TextStyle(
-              fontSize: fontSize,
-              fontWeight: isHeader || isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
 
 }

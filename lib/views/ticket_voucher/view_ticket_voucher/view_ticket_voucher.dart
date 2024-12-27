@@ -169,14 +169,14 @@ class ViewTicketVoucher extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildActionButton(
-                          'Refund', Icons.currency_exchange, TColor.third, context, onPressed: () {
+                          'Refund', Icons.currency_exchange, TColor.third, onPressed: () {
                         Get.to(const TicketRefundTicketScreen());
                       }),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildActionButton(
-                          'Invoice', Icons.receipt_long, TColor.primary,context, onPressed: () {
+                          'Invoice', Icons.receipt_long, TColor.primary, onPressed: () {
                         generateAndPreviewInvoice(context);
                       }),
                     ),
@@ -225,7 +225,7 @@ class ViewTicketVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(String label, IconData icon, Color backgroundColor,BuildContext context, {VoidCallback? onPressed}) {
+  Widget _buildActionButton(String label, IconData icon, Color backgroundColor, {VoidCallback? onPressed}) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -265,11 +265,21 @@ class ViewTicketVoucher extends StatelessWidget {
     final logoImageData = logoImage.buffer.asUint8List();
 
     doc.addPage(
-      pw.Page(
+      pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(20),
-        build: (pw.Context context) {
-          return pw.Column(
+        footer: (pw.Context context) {
+          return pw.Container(
+            alignment: pw.Alignment.centerRight,
+            padding: const pw.EdgeInsets.only(top: 10),
+            child: pw.Text(
+              'Developed by Journeyonline.pk | CTC # 0310 0007901',
+              style: pw.TextStyle(fontSize: 10, fontStyle: pw.FontStyle.italic),
+            ),
+          );
+        },
+        build: (pw.Context context) =>[
+           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               // Header with logo and company info
@@ -479,8 +489,8 @@ class ViewTicketVoucher extends StatelessWidget {
               pw.SizedBox(height: 10),
 
             ],
-          );
-        },
+          ),
+        ],
       ),
     );
 

@@ -82,7 +82,32 @@ class _TicketViewSingleVoucherState extends State<TicketViewSingleVoucher>
               ],
             ),
           ),
-          _buildHeaderButtons(),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: Row(
+              children: [
+
+                Expanded(
+                  child: _buildActionButton(
+                      'Edit', Icons.edit, TColor.secondary, context,
+                      onPressed: () {}),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildActionButton(
+                      'Refund', Icons.currency_exchange, TColor.third, context,
+                      onPressed: () {}),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildActionButton(
+                      'Delete', Icons.delete, TColor.fourth, context,
+                      onPressed: () {}),
+                ),
+
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -396,58 +421,30 @@ class _TicketViewSingleVoucherState extends State<TicketViewSingleVoucher>
       ),
     );
   }
-
-  Widget _buildHeaderButtons() {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  Widget _buildActionButton(
+      String label, IconData icon, Color backgroundColor, BuildContext context,
+      {VoidCallback? onPressed}) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: TColor.white,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+      ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: TColor.fourth,
-                foregroundColor: Colors.white,
-                textStyle: const TextStyle(fontSize: 10), // Font size set to 10
-              ),
-              onPressed: () {},
-              child: const Text('Edit Voucher'),
-            ),
-          ),
+          Icon(icon, size: 20),
           const SizedBox(width: 8),
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: TColor.secondary,
-                foregroundColor: Colors.white,
-                textStyle: const TextStyle(fontSize: 10), // Font size set to 10
-              ),
-              onPressed: () {},
-              child: const Text('Send Invoice'),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: TColor.third,
-                foregroundColor: Colors.white,
-                textStyle: const TextStyle(fontSize: 10), // Font size set to 10
-              ),
-              onPressed: () {},
-              child: const Text('Refund Now'),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: TColor.fourth,
-                foregroundColor: Colors.white,
-                textStyle: const TextStyle(fontSize: 10), // Font size set to 10
-              ),
-              onPressed: () {},
-              child: const Text('Void /Delete TVR'),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -455,18 +452,4 @@ class _TicketViewSingleVoucherState extends State<TicketViewSingleVoucher>
     );
   }
 
-  Widget _buildTextField({
-    required String title,
-    required String hintText,
-    required TextEditingController controller,
-    required IconData icon,
-  }) {
-    return RoundTitleTextfield(
-      title: title,
-      hintText: hintText,
-      controller: controller,
-      keyboardType: TextInputType.text,
-      left: Icon(icon, color: TColor.secondaryText),
-    );
-  }
 }

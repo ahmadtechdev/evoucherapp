@@ -4,6 +4,11 @@ import 'package:evoucher/views/visa_voucher/view_visa_voucher/visa_voucher_contr
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:flutter/services.dart' show ByteData, rootBundle;
+
 class ViewVisaVoucher extends StatelessWidget {
   final VisaVoucherController controller = Get.put(VisaVoucherController());
 
@@ -65,7 +70,7 @@ class ViewVisaVoucher extends StatelessWidget {
                   itemCount: controller.ticketVouchers.length,
                   itemBuilder: (context, index) {
                     var ticket = controller.ticketVouchers[index];
-                    return _buildVoucherCard(ticket);
+                    return _buildVoucherCard(ticket, context);
                   },
                 );
               },
@@ -76,7 +81,7 @@ class ViewVisaVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildVoucherCard(Map<String, String> ticket) {
+  Widget _buildVoucherCard(Map<String, String> ticket, BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -163,13 +168,15 @@ class ViewVisaVoucher extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildActionButton('Invoice 1', Icons.receipt),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child:
-                          _buildActionButton('Invoice 2', Icons.receipt_long),
-                    ),
+                        child: _buildActionButton('Invoice ', Icons.receipt,
+                            onPressed: () {
+                      generateAndPreviewInvoice(context);
+                    })),
+                    // const SizedBox(width: 12),
+                    // Expanded(
+                    //   child:
+                    //       _buildActionButton('Invoice 2', Icons.receipt_long),
+                    // ),
                   ],
                 ),
               ],
@@ -214,9 +221,10 @@ class ViewVisaVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(String label, IconData icon) {
+  Widget _buildActionButton(String label, IconData icon,
+      {VoidCallback? onPressed}) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: TColor.primary.withOpacity(0.05),
         foregroundColor: TColor.primary,
@@ -240,6 +248,283 @@ class ViewVisaVoucher extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> generateAndPreviewInvoice(BuildContext context) async {
+    // Create PDF document
+    final doc = pw.Document();
+
+    // Load logo from assets
+    final logoImage = await rootBundle.load('assets/img/logo1.png');
+    final logoImageData = logoImage.buffer.asUint8List();
+
+    doc.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(20),
+        footer: (pw.Context context) {
+          return pw.Container(
+            alignment: pw.Alignment.centerRight,
+            padding: const pw.EdgeInsets.only(top: 10),
+            child: pw.Text(
+              'Developed by Journeyonline.pk | CTC # 0310 0007901',
+              style: pw.TextStyle(fontSize: 10, fontStyle: pw.FontStyle.italic),
+            ),
+          );
+        },
+        build: (pw.Context context) => [
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              // Header with logo and company info
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Image(pw.MemoryImage(logoImageData), width: 120),
+                        // Address
+                        pw.Text(
+                            '2nd Floor JOURNEY ONLINE Plaza, Al-hamra town, east canal road, Faisalabad',
+                            style: const pw.TextStyle(fontSize: 10)),
+                        pw.RichText(
+                          text: pw.TextSpan(
+                            children: [
+                              pw.TextSpan(
+                                text: 'CELL : ',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                    fontSize: 10),
+                              ),
+                              pw.TextSpan(
+                                text: '03337323379',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.normal,
+                                    fontSize: 10),
+                              ),
+                              pw.TextSpan(
+                                text: ' - PHONE : ',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                    fontSize: 10),
+                              ),
+                              pw.TextSpan(
+                                text: '03037666866',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.normal,
+                                    fontSize: 10),
+                              ),
+                              pw.TextSpan(
+                                text: ' - EMAIL : ',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                    fontSize: 10),
+                              ),
+                              pw.TextSpan(
+                                text: 'ameeramillattts@hotmail.com',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.normal,
+                                    fontSize: 10),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ]),
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.end,
+                    children: [
+                      pw.RichText(
+                          text: pw.TextSpan(children: [
+                        pw.TextSpan(
+                          text: 'NTN: ',
+                          style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.bold, fontSize: 10),
+                        ),
+                        pw.TextSpan(
+                          text: 'HUN6678',
+                          style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.normal, fontSize: 10),
+                        ),
+                      ])),
+                      pw.RichText(
+                          text: pw.TextSpan(children: [
+                        pw.TextSpan(
+                          text: 'Company ID: ',
+                          style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.bold, fontSize: 10),
+                        ),
+                        pw.TextSpan(
+                          text: 'HGDFR58',
+                          style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.normal, fontSize: 10),
+                        ),
+                      ])),
+                      pw.SizedBox(height: 8),
+                      pw.Container(
+                        width: 100,
+                        padding: const pw.EdgeInsets.all(5),
+                        decoration: pw.BoxDecoration(
+                          border: pw.Border.all(width: 2),
+                        ),
+                        child: pw.Column(children: [
+                          pw.Text('Invoices'),
+                          pw.SizedBox(height: 4),
+                          pw.Text('(PKR) = 11.00'),
+                        ]),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+              pw.Divider(thickness: 1),
+
+              pw.SizedBox(height: 20),
+
+              // Invoice details table
+              pw.Table(
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(1),
+                  1: const pw.FlexColumnWidth(1),
+
+                },
+                border: pw.TableBorder.all(width: 0.5),
+                children: [
+                  _buildTableRow(
+                    ['Visa Invoice Date','Account Name'],
+                    isHeader: true,
+                    fontSize: 10,
+                  ),
+                  _buildTableRow(
+                    ['Tue, 24 Dec 2024', 'Afaq travels | +92 3107852255'],
+                    fontSize: 10,
+                  ),
+                ],
+              ),
+              pw.SizedBox(height: 20),
+
+              // Passenger details table
+              pw.Table(
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(1),
+                  1: const pw.FlexColumnWidth(1),
+                  2: const pw.FlexColumnWidth(1),
+                  3: const pw.FlexColumnWidth(1),
+                  4: const pw.FlexColumnWidth(1),
+                },
+                border: pw.TableBorder.all(width: 0.5),
+                children: [
+                  _buildTableRow(
+                    [
+                      'Pax Name',
+                      'Passport No.',
+                      'V. Type #',
+                      'Country',
+                      'Amount (PKR)'
+                    ],
+                    isHeader: true,
+                    fontSize: 10,
+                  ),
+                  _buildTableRow(
+                    ['Afaq Zamir', '1887987989', 'Work', 'Dubai', '1,000.00'],
+                    fontSize: 10,
+                  ),
+                  _buildTableRow(
+                    ['', '', '', 'Total:', 'PKR 1,000.00'],
+                    fontSize: 10,
+                    isBold: true,
+                  ),
+                ],
+              ),
+              pw.SizedBox(height: 16),
+              // In words
+              pw.Text('IN WORDS: Eleven Rupees Only',
+                  style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold, fontSize: 10)),
+              pw.SizedBox(height: 10),
+              pw.Text('On behalf of AGENT1',
+                  style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold, fontSize: 10)),
+              pw.SizedBox(height: 10),
+
+              pw.Divider(thickness: 1),
+              // Bank details section
+              pw.Text('Bank Account Details with Account Title',
+                  style: pw.TextStyle(
+                      fontSize: 12, fontWeight: pw.FontWeight.bold)),
+              pw.Table(
+                border: pw.TableBorder.all(width: 0.5),
+                columnWidths: {
+                  0: const pw.FlexColumnWidth(2),
+                  1: const pw.FlexColumnWidth(2),
+                  2: const pw.FlexColumnWidth(2),
+                  3: const pw.FlexColumnWidth(4),
+                },
+                children: [
+                  _buildTableRow(
+                    ['Acc Title', 'Bank Name', 'Account No', 'Bank Address'],
+                    isHeader: true,
+                    fontSize: 10,
+                  ),
+                  ...['Askari Bank', 'Meezan Bank', 'Alfalah Bank', 'HBL']
+                      .map((bank) {
+                    return _buildTableRow(
+                      [
+                        'JO TRAVELS',
+                        bank,
+                        bank == 'Askari Bank'
+                            ? '000123300000'
+                            : bank == 'Meezan Bank'
+                                ? '000112000108'
+                                : bank == 'Alfalah Bank'
+                                    ? '000007676001'
+                                    : '010101010',
+                        bank == 'Askari Bank'
+                            ? 'Satyana Road Branch, Faisalabad'
+                            : bank == 'Meezan Bank'
+                                ? 'Susan Road Branch, Faisalabad'
+                                : bank == 'Alfalah Bank'
+                                    ? 'PC Branch, Faisalabad'
+                                    : 'CANL ROAD BRANCH',
+                      ],
+                      fontSize: 10,
+                    );
+                  }).toList(),
+                ],
+              ),
+              pw.SizedBox(height: 10),
+            ],
+          ),
+        ],
+      ),
+    );
+
+    // Show print preview
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => doc.save(),
+      name: 'Invoice_950',
+    );
+  }
+
+// Helper to build table rows
+  pw.TableRow _buildTableRow(List<String> cells,
+      {bool isHeader = false, double fontSize = 12, bool isBold = false}) {
+    return pw.TableRow(
+      children: cells.map((cell) {
+        return pw.Padding(
+          padding: const pw.EdgeInsets.all(5),
+          child: pw.Text(
+            cell,
+            style: pw.TextStyle(
+              fontSize: fontSize,
+              fontWeight: isHeader || isBold
+                  ? pw.FontWeight.bold
+                  : pw.FontWeight.normal,
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
