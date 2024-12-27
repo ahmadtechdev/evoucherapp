@@ -1,6 +1,8 @@
 import 'package:evoucher/common/color_extension.dart';
 import 'package:evoucher/common_widget/dart_selector2.dart';
 import 'package:evoucher/views/ticket_voucher/view_ticket_voucher/view_ticket_voucher_controller.dart';
+import 'package:evoucher/views/ticket_voucher/view_ticket_voucher/vouhcer_invoices_view/refund/refund_ticket.dart';
+import 'package:evoucher/views/ticket_voucher/view_ticket_voucher/vouhcer_invoices_view/view/view_single_ticket_voucher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -124,6 +126,7 @@ class ViewTicketVoucher extends StatelessWidget {
                   icon: Icon(Icons.visibility, color: TColor.primary),
                   onPressed: () {
                     // Implement view action
+                    Get.to(()=> const TicketViewSingleVoucher());
                   },
                 ),
               ],
@@ -166,15 +169,20 @@ class ViewTicketVoucher extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildActionButton(
-                          'Invoice 1', Icons.receipt, context, ticket),
+                          'Refund', Icons.currency_exchange, TColor.third, context, onPressed: () {
+                        Get.to(const TicketRefundTicketScreen());
+                      }),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildActionButton(
-                          'Invoice 2', Icons.receipt_long, context, ticket),
+                          'Invoice', Icons.receipt_long, TColor.primary,context, onPressed: () {
+                        generateAndPreviewInvoice(context);
+                      }),
                     ),
                   ],
                 ),
+
               ],
             ),
           ),
@@ -217,15 +225,12 @@ class ViewTicketVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(String label, IconData icon, BuildContext context,
-      Map<String, String> ticket) {
+  Widget _buildActionButton(String label, IconData icon, Color backgroundColor,BuildContext context, {VoidCallback? onPressed}) {
     return ElevatedButton(
-      onPressed: () {
-        generateAndPreviewInvoice(context);
-      },
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: TColor.primary.withOpacity(0.05),
-        foregroundColor: TColor.primary,
+        backgroundColor: backgroundColor.withOpacity(0.7),
+        foregroundColor: TColor.white,
         elevation: 0,
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape: RoundedRectangleBorder(
@@ -248,6 +253,9 @@ class ViewTicketVoucher extends StatelessWidget {
       ),
     );
   }
+
+
+
   Future<void> generateAndPreviewInvoice(BuildContext context) async {
     // Create PDF document
     final doc = pw.Document();

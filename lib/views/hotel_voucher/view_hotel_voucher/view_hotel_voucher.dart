@@ -166,14 +166,14 @@ class ViewHotelVoucher extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildActionButton(
-                          'New Invoice', Icons.receipt, Colors.green, onPressed: () {
+                          'New Invoice', Icons.receipt, TColor.secondary, onPressed: () {
                         generateAndPreviewNewHotelInvoice(context);
                       }),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildActionButton(
-                          'Hotel Invoice', Icons.receipt_long, Colors.yellow, onPressed: () {
+                          'Hotel Invoice', Icons.receipt_long, TColor.black, onPressed: () {
                         generateAndPreviewNewHotelInvoice(context);
     }
                       ),
@@ -185,7 +185,7 @@ class ViewHotelVoucher extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildActionButton(
-                          'Hotel Voucher', Icons.visibility, Colors.grey,  onPressed: (){}),
+                          'Hotel Voucher', Icons.visibility, TColor.primary,  onPressed: (){}),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -241,8 +241,8 @@ class ViewHotelVoucher extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor.withOpacity(0.3),
-        foregroundColor: TColor.primary,
+        backgroundColor: backgroundColor.withOpacity(0.7),
+        foregroundColor: TColor.white,
         elevation: 0,
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape: RoundedRectangleBorder(
