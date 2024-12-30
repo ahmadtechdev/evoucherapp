@@ -1,5 +1,6 @@
 import 'package:evoucher/common/color_extension.dart';
 import 'package:evoucher/common_widget/dart_selector2.dart';
+import 'package:evoucher/views/visa_voucher/view_visa_voucher/visa_invoices_view/view/single_visa_view.dart';
 import 'package:evoucher/views/visa_voucher/view_visa_voucher/visa_voucher_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:flutter/services.dart' show ByteData, rootBundle;
+import 'package:flutter/services.dart' show rootBundle;
 
 class ViewVisaVoucher extends StatelessWidget {
   final VisaVoucherController controller = Get.put(VisaVoucherController());
@@ -123,6 +124,7 @@ class ViewVisaVoucher extends StatelessWidget {
                   icon: Icon(Icons.visibility, color: TColor.primary),
                   onPressed: () {
                     // Implement view action
+                    Get.to(()=> const SingleVisaView());
                   },
                 ),
               ],

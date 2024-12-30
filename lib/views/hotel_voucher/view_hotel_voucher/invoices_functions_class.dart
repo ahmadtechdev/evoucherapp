@@ -688,7 +688,7 @@ class InvoiceGenerator {
 
               // Booking notes
               pw.Text('Booking Notes : Check your Reservation details carefully and inform us immediately,if you need any further clarification, please do not hesitate to contact us.',
-                  style: pw.TextStyle(fontSize: 10)),
+                  style: const pw.TextStyle(fontSize: 10)),
             ],
           );
         },
@@ -755,7 +755,7 @@ class InvoiceGenerator {
                         text: pw.TextSpan(
                           children: [
                             pw.TextSpan(text: 'Client Name: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                            pw.TextSpan(text: 'Adam'),
+                            const pw.TextSpan(text: 'Adam'),
                           ],
                         ),
                       ),
@@ -763,7 +763,7 @@ class InvoiceGenerator {
                         text: pw.TextSpan(
                           children: [
                             pw.TextSpan(text: 'Subject: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                            pw.TextSpan(text: 'Definite Invoice'),
+                            const pw.TextSpan(text: 'Definite Invoice'),
                           ],
                         ),
                       ),
@@ -771,7 +771,7 @@ class InvoiceGenerator {
                         text: pw.TextSpan(
                           children: [
                             pw.TextSpan(text: 'Confirmation#: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                            pw.TextSpan(text: 'N/A'),
+                            const pw.TextSpan(text: 'N/A'),
                           ],
                         ),
                       ),
@@ -784,7 +784,7 @@ class InvoiceGenerator {
                         text: pw.TextSpan(
                           children: [
                             pw.TextSpan(text: 'HV#: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                            pw.TextSpan(text: '852'),
+                            const pw.TextSpan(text: '852'),
                           ],
                         ),
                       ),
@@ -792,7 +792,7 @@ class InvoiceGenerator {
                         text: pw.TextSpan(
                           children: [
                             pw.TextSpan(text: 'Date: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                            pw.TextSpan(text: 'Thu, 31 Oct 2024'),
+                            const pw.TextSpan(text: 'Thu, 31 Oct 2024'),
                           ],
                         ),
                       ),
@@ -800,7 +800,7 @@ class InvoiceGenerator {
                         text: pw.TextSpan(
                           children: [
                             pw.TextSpan(text: 'Phone No: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                            pw.TextSpan(text: '03337323379'),
+                            const pw.TextSpan(text: '03337323379'),
                           ],
                         ),
                       ),
@@ -827,7 +827,7 @@ class InvoiceGenerator {
                     text: pw.TextSpan(
                       children: [
                         pw.TextSpan(text: 'Guest Name: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                        pw.TextSpan(text: 'HASSAN'),
+                        const pw.TextSpan(text: 'HASSAN'),
                       ],
                     ),
                   ),
@@ -835,7 +835,7 @@ class InvoiceGenerator {
                     text: pw.TextSpan(
                       children: [
                         pw.TextSpan(text: 'Option Date: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                        pw.TextSpan(text: '30, Nov -0001'),
+                        const pw.TextSpan(text: '30, Nov -0001'),
                       ],
                     ),
                   ),
@@ -943,7 +943,7 @@ class InvoiceGenerator {
                 child: pw.Center(
                   child: pw.Text(
                     'Developed by Journeyonline.pk | CTC # 0310 0007901',
-                    style: pw.TextStyle(
+                    style: const pw.TextStyle(
                       fontSize: 10,
                     ),
                   ),

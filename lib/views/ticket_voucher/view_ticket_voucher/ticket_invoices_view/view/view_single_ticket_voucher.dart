@@ -1,6 +1,6 @@
 import 'package:evoucher/common/accounts_dropdown.dart';
 import 'package:evoucher/common/color_extension.dart';
-import 'package:evoucher/views/ticket_voucher/view_ticket_voucher/vouhcer_invoices_view/view/view_single_ticket_voucher_controller.dart';
+import 'package:evoucher/views/ticket_voucher/view_ticket_voucher/ticket_invoices_view/view/view_single_ticket_voucher_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:evoucher/common_widget/round_text_field.dart';

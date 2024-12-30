@@ -4,13 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'foriiegn_invoice/hotel_view_voucher_detail.dart';
+import 'hotel_invoices_view/view/single_hotel_view.dart';
 import 'invoices_functions_class.dart';
 import 'view_hotel_voucher_controller.dart';
 
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
-import 'package:flutter/services.dart' show ByteData, rootBundle;
 
 class ViewHotelVoucher extends StatelessWidget {
   final HotelVoucherController controller = Get.put(HotelVoucherController());
@@ -130,7 +127,7 @@ class ViewHotelVoucher extends StatelessWidget {
                   icon: Icon(Icons.visibility, color: TColor.primary),
                   onPressed: () {
                     // Implement view action
-                    Get.to(()=> const VoucherDetailScreen());
+                    Get.to(()=> const SingleHotelView());
                   },
                 ),
               ],

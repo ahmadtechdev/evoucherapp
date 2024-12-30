@@ -1,5 +1,5 @@
 import 'package:evoucher/common/color_extension.dart';
-import 'package:evoucher/views/ticket_voucher/view_ticket_voucher/vouhcer_invoices_view/refund/refund_ticket_controler.dart';
+import 'package:evoucher/views/ticket_voucher/view_ticket_voucher/ticket_invoices_view/refund/refund_ticket_controler.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

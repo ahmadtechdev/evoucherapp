@@ -4,7 +4,7 @@ import '../../../../common/color_extension.dart';
 
 
 class VoucherDetailScreen extends StatefulWidget {
-  const VoucherDetailScreen({Key? key}) : super(key: key);
+  const VoucherDetailScreen({super.key});
 
   @override
   State<VoucherDetailScreen> createState() => _VoucherDetailScreenState();

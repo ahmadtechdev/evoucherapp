@@ -23,9 +23,9 @@ class CustomDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Calculate adaptive height
-    final itemHeight = 48.0; // Height per item
+    const itemHeight = 48.0; // Height per item
     final searchBoxHeight = showSearch ? 56.0 : 0.0; // Search box height if enabled
-    final padding = 16.0; // Top and bottom padding
+    const padding = 16.0; // Top and bottom padding
     final calculatedHeight = (items.length * itemHeight) + searchBoxHeight + padding;
     final maxAllowedHeight = MediaQuery.of(context).size.height / 2;
 
