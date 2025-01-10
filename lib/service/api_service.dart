@@ -4,15 +4,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:evoucher/service/session_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class ApiService {
   final String baseUrl = "https://evoucher.pk/api-new/";
+  var dio = Dio();
 
   // Reuse the existing `postLogin` method pattern for a generic POST request
   Future<Map<String, dynamic>> postData({
@@ -59,10 +60,8 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> postLogin({
-    required String endpoint,
-    required Map<String, dynamic> body
-  }) async {
+  Future<Map<String, dynamic>> postLogin(
+      {required String endpoint, required Map<String, dynamic> body}) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     final url = Uri.parse(baseUrl + endpoint);
@@ -103,12 +102,10 @@ class ApiService {
       debugPrint('Response Status Code: ${response.statusCode}');
       debugPrint('Response Body: ${response.body}');
 
-
       // Parse the response body
       final Map<String, dynamic> responseData;
       try {
         responseData = json.decode(response.body);
-
       } catch (e) {
         throw const FormatException('Invalid response format');
       }
@@ -119,34 +116,29 @@ class ApiService {
           return responseData;
         case 400:
           throw BadRequestException(
-              responseData['message'] ?? 'Bad Request: Invalid input'
-          );
+              responseData['message'] ?? 'Bad Request: Invalid input');
         case 401:
-        // Handle token expiration
+          // Handle token expiration
           final sessionManager = Get.find<SessionManager>();
           await sessionManager.logout();
           throw UnauthorizedException(
-              responseData['message'] ?? 'Unauthorized: Invalid credentials'
-          );
+              responseData['message'] ?? 'Unauthorized: Invalid credentials');
         case 403:
           throw ForbiddenException(
-              responseData['message'] ?? 'Forbidden: Access denied'
-          );
+              responseData['message'] ?? 'Forbidden: Access denied');
         case 404:
           throw NotFoundException(
-              responseData['message'] ?? 'Not Found: Resource does not exist'
-          );
+              responseData['message'] ?? 'Not Found: Resource does not exist');
         case 500:
           throw ServerException(
-              responseData['message'] ?? 'Internal Server Error'
-          );
+              responseData['message'] ?? 'Internal Server Error');
         default:
           throw HttpException(
-              'Unexpected error occurred: ${response.statusCode}'
-          );
+              'Unexpected error occurred: ${response.statusCode}');
       }
     } on TimeoutException {
-      throw NetworkException('Connection timed out. Please check your internet.');
+      throw NetworkException(
+          'Connection timed out. Please check your internet.');
     } on SocketException {
       throw NetworkException('No internet connection. Please try again.');
     } catch (e) {
@@ -161,7 +153,6 @@ class ApiService {
       throw NetworkException('An unexpected error occurred. Please try again.');
     }
   }
-
 
   Future<Map<String, dynamic>> fetchAccounts({String? subheadName}) async {
     final prefs = await SharedPreferences.getInstance();
@@ -264,8 +255,58 @@ class ApiService {
     }
   }
 
-}
+  // get unposted data
+ Future<Map<String, dynamic>?> fetchVoucherUnPosted({
+  required String fromDate,
+  required String toDate,
+  required String voucherId,
+  required String voucherType,
+}) async {
+  // Get the token from SharedPreferences
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token') ?? '';
 
+  // Define headers
+  var headers = {
+    'Content-Type': 'application/json',
+    'Authorization': token.isNotEmpty ? "Bearer $token" : "",
+  };
+
+  // Encode data
+  var data = {
+    "fromDate": fromDate,
+    "toDate": toDate,
+    "voucher_id": voucherId,
+    "voucher_type": voucherType,
+  };
+
+  try {
+    // Send request
+    var response = await dio.post(
+      "${baseUrl}getVoucherUnPosted",
+      options: Options(
+        headers: headers,
+      ),
+      data: data,
+    );
+
+    // Handle response
+    if (response.statusCode == 200) {
+      debugPrint('Response data: ${response.data}');
+      
+      if (response.data['status'] == 'success') {
+        return response.data as Map<String, dynamic>;
+      } else {
+        throw Exception(response.data['message'] ?? 'Request failed');
+      }
+    } else {
+      throw Exception('Request failed with status: ${response.statusCode}');
+    }
+  } catch (e) {
+    debugPrint("Error: $e");
+    throw Exception('Failed to fetch unposted vouchers: $e');
+  }
+}}
 
 // Custom Exception Classes
 class NetworkException implements Exception {

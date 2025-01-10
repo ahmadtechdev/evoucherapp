@@ -7,14 +7,14 @@ import 'package:intl/intl.dart';
 import '../widgets/voucher_header.dart';
 import '../widgets/voucher_widgets.dart';
 
-class ExpenseViewVoucher extends StatefulWidget {
-  const ExpenseViewVoucher({super.key});
+class BankViewVoucher extends StatefulWidget {
+  const BankViewVoucher({super.key});
 
   @override
-  State<ExpenseViewVoucher> createState() => _ExpenseViewVoucherState();
+  State<BankViewVoucher> createState() => _BankViewVoucherState();
 }
 
-class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
+class _BankViewVoucherState extends State<BankViewVoucher> {
   DateTime fromDate = DateTime.now();
   DateTime toDate = DateTime.now();
   final TextEditingController _searchController = TextEditingController();
@@ -65,7 +65,7 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
         "fromDate": formattedFromDate,
         "toDate": formattedToDate,
         "voucher_id": "",
-        "voucher_type": "ev"
+        "voucher_type": "bv"
       });
 
       if (response['status'] == 'success' && response['data'] != null) {
@@ -159,7 +159,7 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
                   ),
                 ),
                 VoucherHeader(
-                  title: 'EXPENSE VOUCHERS LIST',
+                  title: 'BANK VOUCHERS LIST',
                   selectedDate: fromDate, // For backwards compatibility
                   onFromDateChanged: handleFromDateChanged,
                   onToDateChanged: handleToDateChanged,

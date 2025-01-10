@@ -28,6 +28,8 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
   @override
   void initState() {
     super.initState();
+    fromDate = DateTime.now()
+        .subtract(const Duration(days: 180)); // Set to 180 days before
     _fetchJournalVouchers();
   }
 
@@ -54,25 +56,26 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
 
     try {
       // Format dates for API
+
       String formattedFromDate = DateFormat('yyyy-MM-dd').format(fromDate);
       String formattedToDate = DateFormat('yyyy-MM-dd').format(toDate);
 
-      final response = await _apiService.postLogin(
-          endpoint: 'getVoucherPosted',
-          body: {
-            "fromDate": formattedFromDate,
-            "toDate": formattedToDate,
-            "voucher_id": "",
-            "voucher_type": "jv"
-          }
-      );
+      final response =
+          await _apiService.postLogin(endpoint: 'getVoucherPosted', body: {
+        "fromDate": formattedFromDate,
+        "toDate": formattedToDate,
+        "voucher_id": "",
+        "voucher_type": "jv"
+      });
 
       if (response['status'] == 'success' && response['data'] != null) {
-        List<Map<String, dynamic>> voucherList = response['data'].map<Map<String, dynamic>>((item) {
+        List<Map<String, dynamic>> voucherList =
+            response['data'].map<Map<String, dynamic>>((item) {
           var master = item['master'];
           return {
             'id': 'JV ${master['voucher_id']}',
-            'date': DateFormat('EEE, dd MMM yyyy').format(DateTime.parse(master['voucher_data'])),
+            'date': DateFormat('EEE, dd MMM yyyy')
+                .format(DateTime.parse(master['voucher_data'])),
             'description': _getVoucherDescription(item['details']),
             'entries': master['num_entries'],
             'addedBy': master['added_by'],
@@ -126,9 +129,9 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
     setState(() {
       _filteredVouchers = _originalVouchers
           .where((voucher) => voucher['description']
-          .toString()
-          .toLowerCase()
-          .contains(query.toLowerCase()))
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -155,7 +158,6 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
                         child: const Icon(Icons.arrow_back)),
                   ),
                 ),
-
                 VoucherHeader(
                   title: 'JOURNAL VOUCHERS LIST',
                   selectedDate: fromDate, // For backwards compatibility
@@ -166,7 +168,6 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
                   fromDate: fromDate, // Add these new parameters
                   toDate: toDate,
                 ),
-
                 if (_errorMessage.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -175,7 +176,6 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
                       style: const TextStyle(color: Colors.red),
                     ),
                   ),
-
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator())
                 else if (_filteredVouchers.isEmpty && _errorMessage.isEmpty)

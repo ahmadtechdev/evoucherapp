@@ -1,20 +1,19 @@
-import 'package:evoucher/service/api_service.dart';
-import 'package:evoucher/views/finance_voucher/finance.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
+import 'package:evoucher/service/api_service.dart';
+import '../finance.dart';
 import '../widgets/voucher_header.dart';
 import '../widgets/voucher_widgets.dart';
 
-class ExpenseViewVoucher extends StatefulWidget {
-  const ExpenseViewVoucher({super.key});
+class UnpostedBVoucher extends StatefulWidget {
+  const UnpostedBVoucher({super.key});
 
   @override
-  State<ExpenseViewVoucher> createState() => _ExpenseViewVoucherState();
+  State<UnpostedBVoucher> createState() => _UnpostedBVoucherState();
 }
 
-class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
+class _UnpostedBVoucherState extends State<UnpostedBVoucher> {
   DateTime fromDate = DateTime.now();
   DateTime toDate = DateTime.now();
   final TextEditingController _searchController = TextEditingController();
@@ -28,9 +27,8 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
   @override
   void initState() {
     super.initState();
-    fromDate = DateTime.now()
-        .subtract(const Duration(days: 180)); // Set to 180 days before
-    _fetchJournalVouchers();
+    fromDate = DateTime.now().subtract(const Duration(days: 180));
+    _fetchUnpostedVouchers();
   }
 
   bool validateDateRange() {
@@ -44,7 +42,7 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
     return true;
   }
 
-  Future<void> _fetchJournalVouchers() async {
+  Future<void> _fetchUnpostedVouchers() async {
     if (!validateDateRange()) {
       return;
     }
@@ -56,29 +54,34 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
 
     try {
       // Format dates for API
-
       String formattedFromDate = DateFormat('yyyy-MM-dd').format(fromDate);
       String formattedToDate = DateFormat('yyyy-MM-dd').format(toDate);
 
-      final response =
-          await _apiService.postLogin(endpoint: 'getVoucherPosted', body: {
-        "fromDate": formattedFromDate,
-        "toDate": formattedToDate,
-        "voucher_id": "",
-        "voucher_type": "ev"
-      });
+      final response = await _apiService.fetchVoucherUnPosted(
+        fromDate: formattedFromDate,
+        toDate: formattedToDate,
+        voucherId: "",
+        voucherType: "bv",
+      );
 
-      if (response['status'] == 'success' && response['data'] != null) {
+      if (response != null &&
+          response['status'] == 'success' &&
+          response['data'] != null) {
+        List<dynamic> data = response['data'] as List<dynamic>;
         List<Map<String, dynamic>> voucherList =
-            response['data'].map<Map<String, dynamic>>((item) {
+            data.map<Map<String, dynamic>>((item) {
           var master = item['master'];
+          var details = item['details'] as List<dynamic>;
           return {
             'id': 'JV ${master['voucher_id']}',
             'date': DateFormat('EEE, dd MMM yyyy')
                 .format(DateTime.parse(master['voucher_data'])),
-            'description': _getVoucherDescription(item['details']),
-            'entries': master['num_entries'],
-            'addedBy': master['added_by'],
+            'description':
+                details.isNotEmpty && details[0]['description'] != null
+                    ? details[0]['description']
+                    : 'No description available',
+            'entries': master['num_entries'].toString(),
+            'addedBy': master['added_by'] ?? 'Unknown',
             'amount': 'PKR ${master['total_debit']}',
             'fullDetails': item
           };
@@ -91,13 +94,14 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
         });
       } else {
         setState(() {
-          _errorMessage = 'No vouchers found for the selected date range';
+          _errorMessage =
+              'No unposted vouchers found for the selected date range';
           _isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error fetching vouchers: ${e.toString()}';
+        _errorMessage = 'Error fetching unposted vouchers: ${e.toString()}';
         _isLoading = false;
       });
     }
@@ -108,7 +112,7 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
       fromDate = newDate;
       _errorMessage = '';
     });
-    _fetchJournalVouchers();
+    _fetchUnpostedVouchers();
   }
 
   void handleToDateChanged(DateTime newDate) {
@@ -116,22 +120,21 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
       toDate = newDate;
       _errorMessage = '';
     });
-    _fetchJournalVouchers();
-  }
-
-  String _getVoucherDescription(List<dynamic> details) {
-    return details.isNotEmpty
-        ? details[0]['description']
-        : 'No description available';
+    _fetchUnpostedVouchers();
   }
 
   void _filterVouchers(String query) {
     setState(() {
       _filteredVouchers = _originalVouchers
-          .where((voucher) => voucher['description']
-              .toString()
-              .toLowerCase()
-              .contains(query.toLowerCase()))
+          .where((voucher) =>
+              voucher['description']
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              voucher['addedBy']
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -142,7 +145,7 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
       backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: _fetchJournalVouchers,
+          onRefresh: _fetchUnpostedVouchers,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
@@ -152,20 +155,21 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
                   child: Align(
                     alignment: Alignment.topLeft,
                     child: InkWell(
-                        onTap: () {
-                          Get.off(() => const Finance());
-                        },
-                        child: const Icon(Icons.arrow_back)),
+                      onTap: () {
+                        Get.off(() => const Finance());
+                      },
+                      child: const Icon(Icons.arrow_back),
+                    ),
                   ),
                 ),
                 VoucherHeader(
-                  title: 'EXPENSE VOUCHERS LIST',
-                  selectedDate: fromDate, // For backwards compatibility
+                  title: 'Bank Vouchers List',
+                  selectedDate: fromDate,
                   onFromDateChanged: handleFromDateChanged,
                   onToDateChanged: handleToDateChanged,
                   searchController: _searchController,
                   onSearchChanged: _filterVouchers,
-                  fromDate: fromDate, // Add these new parameters
+                  fromDate: fromDate,
                   toDate: toDate,
                 ),
                 if (_errorMessage.isNotEmpty)
@@ -179,11 +183,10 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator())
                 else if (_filteredVouchers.isEmpty && _errorMessage.isEmpty)
-                  const Center(child: Text('No vouchers found'))
+                  const Center(child: Text('No unposted vouchers found'))
                 else
-                  EntryVoucherListView(
+                  UnPostedVoucherListView(
                     vouchers: _filteredVouchers,
-                    type: 'journal',
                     onVoucherTap: (voucher) {
                       print('Voucher Details: ${voucher['fullDetails']}');
                     },

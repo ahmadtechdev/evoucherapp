@@ -30,11 +30,10 @@ class EntryVoucherCard extends StatelessWidget {
         break;
       case 'expense':
         Get.to(() => ExpenseVoucherDetail(voucherData: voucher));
-      break;
+        break;
       default:
         Get.to(() => JournalVoucherDetail(voucherData: voucher));
     }
-
 
     // Call onVoucherTap if provided
     onVoucherTap?.call(voucher);
@@ -162,7 +161,6 @@ class EntryVoucherListView extends StatelessWidget {
     super.key,
     required this.vouchers,
     required this.type,
-
     this.onVoucherTap,
   });
 
@@ -174,7 +172,11 @@ class EntryVoucherListView extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: vouchers.length,
       itemBuilder: (context, index) {
-        return EntryVoucherCard(voucher: vouchers[index], type: type, onVoucherTap: onVoucherTap,);
+        return EntryVoucherCard(
+          voucher: vouchers[index],
+          type: type,
+          onVoucherTap: onVoucherTap,
+        );
       },
     );
   }
@@ -273,7 +275,10 @@ class UnPostedVoucherCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          voucher['addedBy'],
+                          voucher['addedBy'] != null &&
+                                  voucher['addedBy'].isNotEmpty
+                              ? voucher['addedBy']
+                              : 'Unknown',
                           style: TextStyle(
                             color: TColor.fourth,
                             fontWeight: FontWeight.w500,
@@ -307,7 +312,7 @@ class UnPostedVoucherCard extends StatelessWidget {
                 // View Button
                 ElevatedButton.icon(
                   onPressed: () {
-                    Get.to(()=> const ViewUnPostedVouchers());
+                    Get.to(() => const ViewUnPostedVouchers());
                   },
                   icon: const Icon(Icons.visibility_outlined, size: 18),
                   label: const Text('View'),
@@ -339,6 +344,7 @@ class UnPostedVoucherListView extends StatelessWidget {
   const UnPostedVoucherListView({
     super.key,
     required this.vouchers,
+    required Null Function(dynamic voucher) onVoucherTap,
   });
 
   @override

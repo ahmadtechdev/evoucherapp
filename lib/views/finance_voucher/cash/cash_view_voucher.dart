@@ -1,6 +1,8 @@
+import 'package:evoucher/service/api_service.dart';
 import 'package:evoucher/views/finance_voucher/finance.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../widgets/voucher_header.dart';
 import '../widgets/voucher_widgets.dart';
@@ -13,91 +15,181 @@ class CashViewVoucher extends StatefulWidget {
 }
 
 class _CashViewVoucherState extends State<CashViewVoucher> {
-  DateTime selectedDate = DateTime.now();
+  DateTime fromDate = DateTime.now();
+  DateTime toDate = DateTime.now();
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> _filteredVouchers = [];
+  List<Map<String, dynamic>> _originalVouchers = [];
+  bool _isLoading = true;
+  String _errorMessage = '';
 
-  // Dummy data
-  final List<Map<String, dynamic>> _vouchers = [
-    {
-      'id': 'JV 849',
-      'date': 'Wed, 30 Oct 2024',
-      'description': 'DISCOUNT - CASH - W/O ENTRY FOR ACCOUNT ADJUSTMENT',
-      'entries': 2,
-      'addedBy': 'Umer Liaqat',
-      'amount': 'PKR 1,720,079.00',
-    },
-    {
-      'id': 'JV 847',
-      'date': 'Wed, 23 Oct 2024',
-      'description':
-      'DISCOUNT - ALFLAH BANK - W/O ENTRY FOR ACCOUNT ADJUSTMENT',
-      'entries': 2,
-      'addedBy': 'Umer Liaqat',
-      'amount': 'PKR 549,891.00',
-    },
-    {
-      'id': 'JV 815',
-      'date': 'Fri, 20 Sep 2024',
-      'description': 'HUSSNAIN ALI - PAYMENT',
-      'entries': 2,
-      'addedBy': 'Muhammad Zain Sajid\nPosted by:Umer Liaqat',
-      'amount': 'PKR 2.00',
-    },
-  ];
+  final ApiService _apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    _filteredVouchers = _vouchers;
+    fromDate = DateTime.now()
+        .subtract(const Duration(days: 180)); // Set to 180 days before
+    _fetchJournalVouchers();
+  }
+
+  bool validateDateRange() {
+    if (toDate.isBefore(fromDate)) {
+      setState(() {
+        _errorMessage = 'To date cannot be before from date';
+        _isLoading = false;
+      });
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _fetchJournalVouchers() async {
+    if (!validateDateRange()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      // Format dates for API
+
+      String formattedFromDate = DateFormat('yyyy-MM-dd').format(fromDate);
+      String formattedToDate = DateFormat('yyyy-MM-dd').format(toDate);
+
+      final response =
+          await _apiService.postLogin(endpoint: 'getVoucherPosted', body: {
+        "fromDate": formattedFromDate,
+        "toDate": formattedToDate,
+        "voucher_id": "",
+        "voucher_type": "cv"
+      });
+
+      if (response['status'] == 'success' && response['data'] != null) {
+        List<Map<String, dynamic>> voucherList =
+            response['data'].map<Map<String, dynamic>>((item) {
+          var master = item['master'];
+          return {
+            'id': 'JV ${master['voucher_id']}',
+            'date': DateFormat('EEE, dd MMM yyyy')
+                .format(DateTime.parse(master['voucher_data'])),
+            'description': _getVoucherDescription(item['details']),
+            'entries': master['num_entries'],
+            'addedBy': master['added_by'],
+            'amount': 'PKR ${master['total_debit']}',
+            'fullDetails': item
+          };
+        }).toList();
+
+        setState(() {
+          _originalVouchers = voucherList;
+          _filteredVouchers = voucherList;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _errorMessage = 'No vouchers found for the selected date range';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Error fetching vouchers: ${e.toString()}';
+        _isLoading = false;
+      });
+    }
+  }
+
+  void handleFromDateChanged(DateTime newDate) {
+    setState(() {
+      fromDate = newDate;
+      _errorMessage = '';
+    });
+    _fetchJournalVouchers();
+  }
+
+  void handleToDateChanged(DateTime newDate) {
+    setState(() {
+      toDate = newDate;
+      _errorMessage = '';
+    });
+    _fetchJournalVouchers();
+  }
+
+  String _getVoucherDescription(List<dynamic> details) {
+    return details.isNotEmpty
+        ? details[0]['description']
+        : 'No description available';
   }
 
   void _filterVouchers(String query) {
     setState(() {
-      _filteredVouchers = _vouchers
+      _filteredVouchers = _originalVouchers
           .where((voucher) => voucher['description']
-          .toString()
-          .toLowerCase()
-          .contains(query.toLowerCase()))
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()))
           .toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: InkWell(
-                      onTap: () {
-                        Get.off(() => const Finance());
-                      },
-                      child: const Icon(Icons.arrow_back)),
+        child: RefreshIndicator(
+          onRefresh: _fetchJournalVouchers,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: InkWell(
+                        onTap: () {
+                          Get.off(() => const Finance());
+                        },
+                        child: const Icon(Icons.arrow_back)),
+                  ),
                 ),
-              ),
-              // Header
-              VoucherHeader(
-                title: 'CASH VOUCHERS LIST',
-                selectedDate: selectedDate,
-                onFromDateChanged: (newDate) {
-                  setState(() => selectedDate = newDate);
-                },
-                onToDateChanged: (newDate) {
-                  setState(() => selectedDate = newDate);
-                },
-                searchController: _searchController,
-                onSearchChanged: _filterVouchers,
-              ),
-              EntryVoucherListView(vouchers: _filteredVouchers, type: 'cash',),
-            ],
+                VoucherHeader(
+                  title: 'CASH VOUCHERS LIST',
+                  selectedDate: fromDate, // For backwards compatibility
+                  onFromDateChanged: handleFromDateChanged,
+                  onToDateChanged: handleToDateChanged,
+                  searchController: _searchController,
+                  onSearchChanged: _filterVouchers,
+                  fromDate: fromDate, // Add these new parameters
+                  toDate: toDate,
+                ),
+                if (_errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      _errorMessage,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator())
+                else if (_filteredVouchers.isEmpty && _errorMessage.isEmpty)
+                  const Center(child: Text('No vouchers found'))
+                else
+                  EntryVoucherListView(
+                    vouchers: _filteredVouchers,
+                    type: 'journal',
+                    onVoucherTap: (voucher) {
+                      print('Voucher Details: ${voucher['fullDetails']}');
+                    },
+                  ),
+              ],
+            ),
           ),
         ),
       ),

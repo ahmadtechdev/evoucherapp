@@ -1,4 +1,6 @@
 import 'package:evoucher/views/finance_voucher/bank/bank_entry_voucher.dart';
+import 'package:evoucher/views/finance_voucher/bank/bank_view_voucher.dart';
+import 'package:evoucher/views/finance_voucher/bank/unposted_b_voucher.dart';
 import 'package:evoucher/views/finance_voucher/cash/cash_entry_voucher.dart';
 import 'package:evoucher/views/finance_voucher/cash/cash_view_voucher.dart';
 import 'package:evoucher/views/finance_voucher/cash/unposted_c_voucher.dart';
@@ -37,7 +39,6 @@ class _FinanceState extends State<Finance> {
         backgroundColor: TColor.white,
         elevation: 1,
       ),
-
       drawer: const CustomDrawer(currentIndex: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -52,7 +53,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.primary,
                 onTap: () {
                   // Handle Entry Journal Voucher tap
-                  Get.to(()=> const JournalEntryVoucher());
+                  Get.to(() => const JournalEntryVoucher());
                 },
               ),
               VoucherOption(
@@ -61,7 +62,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.primary,
                 onTap: () {
                   // Handle View Journal Voucher tap
-                  Get.to(()=>const JournalViewVoucher());
+                  Get.to(() => const JournalViewVoucher());
                 },
               ),
               VoucherOption(
@@ -71,10 +72,9 @@ class _FinanceState extends State<Finance> {
                 badge: '0',
                 onTap: () {
                   // Handle Unposted J Voucher tap
-                  Get.to(()=>const UnPostedJVoucher());
+                  Get.to(() => const UnPostedJVoucher());
                 },
               ),
-
             ]),
             const SizedBox(height: 24),
             _buildSectionTitle('Cash Voucher'),
@@ -85,7 +85,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.secondary,
                 onTap: () {
                   // Handle Entry Journal Voucher tap
-                  Get.to(()=>const CashEntryVoucher());
+                  Get.to(() => const CashEntryVoucher());
                 },
               ),
               VoucherOption(
@@ -94,7 +94,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.secondary,
                 onTap: () {
                   // Handle View Journal Voucher tap
-                  Get.to(()=>const CashViewVoucher());
+                  Get.to(() => const CashViewVoucher());
                 },
               ),
               VoucherOption(
@@ -104,10 +104,9 @@ class _FinanceState extends State<Finance> {
                 badge: '0',
                 onTap: () {
                   // Handle Unposted J Voucher tap
-                  Get.to(()=>const UnPostedCVoucher());
+                  Get.to(() => const UnPostedCVoucher());
                 },
               ),
-
             ]),
             const SizedBox(height: 24),
             _buildSectionTitle('Expense Voucher'),
@@ -118,7 +117,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.fourth,
                 onTap: () {
                   // Handle Entry Journal Voucher tap
-                  Get.to(()=>const ExpenseEntryVoucher());
+                  Get.to(() => const ExpenseEntryVoucher());
                 },
               ),
               VoucherOption(
@@ -127,7 +126,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.fourth,
                 onTap: () {
                   // Handle View Journal Voucher tap
-                  Get.to(()=>const ExpenseViewVoucher());
+                  Get.to(() => const ExpenseViewVoucher());
                 },
               ),
               VoucherOption(
@@ -137,7 +136,7 @@ class _FinanceState extends State<Finance> {
                 badge: '0',
                 onTap: () {
                   // Handle Unposted J Voucher tap
-                  Get.to(()=>const UnPostedEVoucher());
+                  Get.to(() => const UnPostedEVoucher());
                 },
               ),
             ]),
@@ -150,7 +149,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.secondaryText,
                 onTap: () {
                   // Handle Entry Journal Voucher tap
-                  Get.to(()=>const BankEntryVoucher());
+                  Get.to(() => const BankEntryVoucher());
                 },
               ),
               VoucherOption(
@@ -159,7 +158,7 @@ class _FinanceState extends State<Finance> {
                 color: TColor.secondaryText,
                 onTap: () {
                   // Handle View Journal Voucher tap
-                  // Get.to(()=>const ExpenseViewVoucher());
+                  Get.to(() => const BankViewVoucher());
                 },
               ),
               VoucherOption(
@@ -169,14 +168,16 @@ class _FinanceState extends State<Finance> {
                 badge: '0',
                 onTap: () {
                   // Handle Unposted J Voucher tap
-                  // Get.to(()=>const UnPostedEVoucher());
+                  Get.to(() => const UnpostedBVoucher());
                 },
               ),
             ]),
           ],
         ),
       ),
-      bottomNavigationBar: const CustomBottomNavigationBar(selectedIndex: 1,),
+      bottomNavigationBar: const CustomBottomNavigationBar(
+        selectedIndex: 1,
+      ),
     );
   }
 
@@ -225,22 +226,22 @@ class _FinanceState extends State<Finance> {
             ),
             trailing: option.badge != null
                 ? Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
-              decoration: BoxDecoration(
-                color: TColor.third,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                option.badge!,
-                style: TextStyle(
-                  color: TColor.white,
-                  fontSize: 12,
-                ),
-              ),
-            )
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: TColor.third,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      option.badge!,
+                      style: TextStyle(
+                        color: TColor.white,
+                        fontSize: 12,
+                      ),
+                    ),
+                  )
                 : null,
             // Icon(
             //   Icons.chevron_right,

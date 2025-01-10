@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:intl/intl.dart';
+import 'package:evoucher/service/api_service.dart';
 import '../finance.dart';
 import '../widgets/voucher_header.dart';
 import '../widgets/voucher_widgets.dart';
@@ -13,95 +14,127 @@ class UnPostedJVoucher extends StatefulWidget {
 }
 
 class _UnPostedJVoucherState extends State<UnPostedJVoucher> {
-  DateTime selectedDate = DateTime.now();
+  DateTime fromDate = DateTime.now();
+  DateTime toDate = DateTime.now();
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> _filteredVouchers = [];
-  final List<Map<String, dynamic>> _vouchers = [
-    {
-      'id': 'JV 862',
-      'date': 'Thu, 14 Nov 2024',
-      'description': 'DISCOUNT - CASH - W/O ENTRY FOR ACCOUNT ADJUSTMENT',
-      'entries': '2',
-      'addedBy': 'Muhammad Ali',
-    },
-    {
-      'id': 'PV 445',
-      'date': 'Wed, 13 Nov 2024',
-      'description': 'PAYMENT VOUCHER - UTILITY BILLS SETTLEMENT',
-      'entries': '3',
-      'addedBy': 'Sarah Khan',
-    },
-    {
-      'id': 'RV 723',
-      'date': 'Mon, 11 Nov 2024',
-      'description': 'RECEIPT - CUSTOMER ADVANCE PAYMENT',
-      'entries': '1',
-      'addedBy': 'Ahmed Hassan',
-    },
-    {
-      'id': 'JV 863',
-      'date': 'Sun, 10 Nov 2024',
-      'description': 'SALARY ADJUSTMENT ENTRY - ACCOUNTING DEPARTMENT',
-      'entries': '4',
-      'addedBy': 'Fatima Zaidi',
-    },
-    {
-      'id': 'CV 291',
-      'date': 'Fri, 08 Nov 2024',
-      'description': 'CASH PAYMENT - OFFICE SUPPLIES PURCHASE',
-      'entries': '2',
-      'addedBy': 'Omar Malik',
-    },
-    {
-      'id': 'BV 556',
-      'date': 'Thu, 07 Nov 2024',
-      'description': 'BANK CHARGES ADJUSTMENT - MONTHLY STATEMENT',
-      'entries': '1',
-      'addedBy': 'Zainab Ahmed',
-    },
-    {
-      'id': 'JV 864',
-      'date': 'Wed, 06 Nov 2024',
-      'description': 'DEPRECIATION ENTRY - FIXED ASSETS',
-      'entries': '5',
-      'addedBy': 'Imran Qureshi',
-    },
-    {
-      'id': 'PV 446',
-      'date': 'Tue, 05 Nov 2024',
-      'description': 'VENDOR PAYMENT - MAINTENANCE SERVICES',
-      'entries': '2',
-      'addedBy': 'Ayesha Siddiqui',
-    },
-    {
-      'id': 'RV 724',
-      'date': 'Mon, 04 Nov 2024',
-      'description': 'SALES REVENUE - CASH RECEIPT',
-      'entries': '3',
-      'addedBy': 'Usman Malik',
-    },
-    {
-      'id': 'CV 292',
-      'date': 'Sun, 03 Nov 2024',
-      'description': 'PETTY CASH REIMBURSEMENT',
-      'entries': '6',
-      'addedBy': 'Nadia Hussain',
-    },
-  ];
+  List<Map<String, dynamic>> _originalVouchers = [];
+  bool _isLoading = true;
+  String _errorMessage = '';
+
+  final ApiService _apiService = ApiService();
 
   @override
   void initState() {
     super.initState();
-    _filteredVouchers = _vouchers;
+    fromDate = DateTime.now().subtract(const Duration(days: 180));
+    _fetchUnpostedVouchers();
+  }
+
+  bool validateDateRange() {
+    if (toDate.isBefore(fromDate)) {
+      setState(() {
+        _errorMessage = 'To date cannot be before from date';
+        _isLoading = false;
+      });
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _fetchUnpostedVouchers() async {
+    if (!validateDateRange()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      // Format dates for API
+      String formattedFromDate = DateFormat('yyyy-MM-dd').format(fromDate);
+      String formattedToDate = DateFormat('yyyy-MM-dd').format(toDate);
+
+      final response = await _apiService.fetchVoucherUnPosted(
+        fromDate: formattedFromDate,
+        toDate: formattedToDate,
+        voucherId: "",
+        voucherType: "jv",
+      );
+
+      if (response != null &&
+          response['status'] == 'success' &&
+          response['data'] != null) {
+        List<dynamic> data = response['data'] as List<dynamic>;
+        List<Map<String, dynamic>> voucherList =
+            data.map<Map<String, dynamic>>((item) {
+          var master = item['master'];
+          var details = item['details'] as List<dynamic>;
+          return {
+            'id': 'JV ${master['voucher_id']}',
+            'date': DateFormat('EEE, dd MMM yyyy')
+                .format(DateTime.parse(master['voucher_data'])),
+            'description':
+                details.isNotEmpty && details[0]['description'] != null
+                    ? details[0]['description']
+                    : 'No description available',
+            'entries': master['num_entries'].toString(),
+            'addedBy': master['added_by'] ?? 'Unknown',
+            'amount': 'PKR ${master['total_debit']}',
+            'fullDetails': item
+          };
+        }).toList();
+
+        setState(() {
+          _originalVouchers = voucherList;
+          _filteredVouchers = voucherList;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _errorMessage =
+              'No unposted vouchers found for the selected date range';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Error fetching unposted vouchers: ${e.toString()}';
+        _isLoading = false;
+      });
+    }
+  }
+
+  void handleFromDateChanged(DateTime newDate) {
+    setState(() {
+      fromDate = newDate;
+      _errorMessage = '';
+    });
+    _fetchUnpostedVouchers();
+  }
+
+  void handleToDateChanged(DateTime newDate) {
+    setState(() {
+      toDate = newDate;
+      _errorMessage = '';
+    });
+    _fetchUnpostedVouchers();
   }
 
   void _filterVouchers(String query) {
     setState(() {
-      _filteredVouchers = _vouchers
-          .where((voucher) => voucher['addedBy']
-              .toString()
-              .toLowerCase()
-              .contains(query.toLowerCase()))
+      _filteredVouchers = _originalVouchers
+          .where((voucher) =>
+              voucher['description']
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              voucher['addedBy']
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -109,37 +142,60 @@ class _UnPostedJVoucherState extends State<UnPostedJVoucher> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      backgroundColor: Colors.grey[100],
       body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: _fetchUnpostedVouchers,
           child: SingleChildScrollView(
-              child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: InkWell(
-                  onTap: () {
-                    Get.off(() => const Finance());
-                  },
-                  child: const Icon(Icons.arrow_back)),
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: InkWell(
+                      onTap: () {
+                        Get.off(() => const Finance());
+                      },
+                      child: const Icon(Icons.arrow_back),
+                    ),
+                  ),
+                ),
+                VoucherHeader(
+                  title: 'UNPOSTED JOURNAL VOUCHERS',
+                  selectedDate: fromDate,
+                  onFromDateChanged: handleFromDateChanged,
+                  onToDateChanged: handleToDateChanged,
+                  searchController: _searchController,
+                  onSearchChanged: _filterVouchers,
+                  fromDate: fromDate,
+                  toDate: toDate,
+                ),
+                if (_errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      _errorMessage,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator())
+                else if (_filteredVouchers.isEmpty && _errorMessage.isEmpty)
+                  const Center(child: Text('No unposted vouchers found'))
+                else
+                  UnPostedVoucherListView(
+                    vouchers: _filteredVouchers,
+                    onVoucherTap: (voucher) {
+                      print('Voucher Details: ${voucher['fullDetails']}');
+                    },
+                  ),
+              ],
             ),
           ),
-          VoucherHeader(
-            title: 'Journal Vouchers List',
-            selectedDate: selectedDate,
-            onFromDateChanged: (newDate) {
-              setState(() => selectedDate = newDate);
-            },
-            onToDateChanged: (newDate) {
-              setState(() => selectedDate = newDate);
-            },
-            searchController: _searchController,
-            onSearchChanged: _filterVouchers,
-          ),
-          UnPostedVoucherListView(vouchers: _filteredVouchers),
-        ],
-      ))),
+        ),
+      ),
     );
   }
 }
