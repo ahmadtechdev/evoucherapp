@@ -228,6 +228,7 @@ class _RefundHotelViewState extends State<RefundHotelView>
 
   Widget _buildInfoCard(String title, List<Widget> content) {
     return Card(
+      color: TColor.white,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

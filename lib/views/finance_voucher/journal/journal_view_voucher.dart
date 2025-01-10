@@ -15,7 +15,8 @@ class JournalViewVoucher extends StatefulWidget {
 }
 
 class _JournalViewVoucherState extends State<JournalViewVoucher> {
-  DateTime selectedDate = DateTime.now();
+  DateTime fromDate = DateTime.now();
+  DateTime toDate = DateTime.now();
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> _filteredVouchers = [];
   List<Map<String, dynamic>> _originalVouchers = [];
@@ -30,7 +31,22 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
     _fetchJournalVouchers();
   }
 
+  bool validateDateRange() {
+    if (toDate.isBefore(fromDate)) {
+      setState(() {
+        _errorMessage = 'To date cannot be before from date';
+        _isLoading = false;
+      });
+      return false;
+    }
+    return true;
+  }
+
   Future<void> _fetchJournalVouchers() async {
+    if (!validateDateRange()) {
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errorMessage = '';
@@ -38,21 +54,20 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
 
     try {
       // Format dates for API
-      String fromDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-      String toDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+      String formattedFromDate = DateFormat('yyyy-MM-dd').format(fromDate);
+      String formattedToDate = DateFormat('yyyy-MM-dd').format(toDate);
 
       final response = await _apiService.postLogin(
           endpoint: 'getVoucherPosted',
           body: {
-            "fromDate": fromDate,
-            "toDate": toDate,
+            "fromDate": formattedFromDate,
+            "toDate": formattedToDate,
             "voucher_id": "",
             "voucher_type": "jv"
           }
       );
 
       if (response['status'] == 'success' && response['data'] != null) {
-        // Transform API data to match existing card structure
         List<Map<String, dynamic>> voucherList = response['data'].map<Map<String, dynamic>>((item) {
           var master = item['master'];
           return {
@@ -62,7 +77,7 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
             'entries': master['num_entries'],
             'addedBy': master['added_by'],
             'amount': 'PKR ${master['total_debit']}',
-            'fullDetails': item // Store full details for later use
+            'fullDetails': item
           };
         }).toList();
 
@@ -73,7 +88,7 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
         });
       } else {
         setState(() {
-          _errorMessage = 'No vouchers found';
+          _errorMessage = 'No vouchers found for the selected date range';
           _isLoading = false;
         });
       }
@@ -85,8 +100,23 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
     }
   }
 
+  void handleFromDateChanged(DateTime newDate) {
+    setState(() {
+      fromDate = newDate;
+      _errorMessage = '';
+    });
+    _fetchJournalVouchers();
+  }
+
+  void handleToDateChanged(DateTime newDate) {
+    setState(() {
+      toDate = newDate;
+      _errorMessage = '';
+    });
+    _fetchJournalVouchers();
+  }
+
   String _getVoucherDescription(List<dynamic> details) {
-    // Get a meaningful description from the first detail entry
     return details.isNotEmpty
         ? details[0]['description']
         : 'No description available';
@@ -125,38 +155,39 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
                         child: const Icon(Icons.arrow_back)),
                   ),
                 ),
-                // Header
+
                 VoucherHeader(
                   title: 'JOURNAL VOUCHERS LIST',
-                  selectedDate: selectedDate,
-                  onFromDateChanged: (newDate) {
-                    setState(() => selectedDate = newDate);
-                    _fetchJournalVouchers();
-                  },
-                  onToDateChanged: (newDate) {
-                    setState(() => selectedDate = newDate);
-                    _fetchJournalVouchers();
-                  },
+                  selectedDate: fromDate, // For backwards compatibility
+                  onFromDateChanged: handleFromDateChanged,
+                  onToDateChanged: handleToDateChanged,
                   searchController: _searchController,
                   onSearchChanged: _filterVouchers,
+                  fromDate: fromDate, // Add these new parameters
+                  toDate: toDate,
                 ),
 
-                // Loading or Error State
+                if (_errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      _errorMessage,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator())
-                else if (_errorMessage.isNotEmpty)
-                  Center(child: Text(_errorMessage))
-                else if (_filteredVouchers.isEmpty)
-                    const Center(child: Text('No vouchers found'))
-                  else
-                    EntryVoucherListView(
-                      vouchers: _filteredVouchers,
-                      type: 'journal',
-                      onVoucherTap: (voucher) {
-                        // Print full voucher details when view is tapped
-                        print('Voucher Details: ${voucher['fullDetails']}');
-                      },
-                    ),
+                else if (_filteredVouchers.isEmpty && _errorMessage.isEmpty)
+                  const Center(child: Text('No vouchers found'))
+                else
+                  EntryVoucherListView(
+                    vouchers: _filteredVouchers,
+                    type: 'journal',
+                    onVoucherTap: (voucher) {
+                      print('Voucher Details: ${voucher['fullDetails']}');
+                    },
+                  ),
               ],
             ),
           ),

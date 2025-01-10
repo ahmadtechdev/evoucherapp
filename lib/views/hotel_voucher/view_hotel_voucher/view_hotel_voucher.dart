@@ -3,7 +3,6 @@ import 'package:evoucher/common_widget/dart_selector2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'foriiegn_invoice/hotel_view_voucher_detail.dart';
 import 'hotel_invoices_view/view/single_hotel_view.dart';
 import 'invoices_functions_class.dart';
 import 'view_hotel_voucher_controller.dart';

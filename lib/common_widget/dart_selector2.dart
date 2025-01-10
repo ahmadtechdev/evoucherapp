@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
 import '../common/color_extension.dart';
 
 class DateSelector2 extends StatelessWidget {
@@ -9,8 +8,8 @@ class DateSelector2 extends StatelessWidget {
   final DateTime initialDate;
   final ValueChanged<DateTime> onDateChanged;
   final String label;
-  final bool selectMonthOnly; // New parameter for selecting only the month
-  final bool readonly; // New parameter for selecting only the month
+  final bool selectMonthOnly;
+  final bool readonly;
 
   DateSelector2({
     super.key,
@@ -18,109 +17,55 @@ class DateSelector2 extends StatelessWidget {
     required this.initialDate,
     required this.onDateChanged,
     this.label = "",
-    this.selectMonthOnly = false, // Default value is false
-    this.readonly = false, // Default value is false
-  });
+    this.selectMonthOnly = false,
+    this.readonly = false,
+  }) : selectedDate = initialDate.obs;
 
-  final Rx<DateTime> selectedDate =
-      DateTime.now().obs; // Observable for state management
+  final Rx<DateTime> selectedDate;
 
   Future<void> _selectDate(BuildContext context) async {
+    if (readonly) return;
+
     if (selectMonthOnly) {
-      // Show month picker dialog
-      final int? pickedYear = await showDialog<int>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Select Year",
-                style: TextStyle(color: TColor.primaryText)),
-            content: SizedBox(
-              height: 200,
-              child: ListView.builder(
-                itemCount: 10, // Limit to 10 years (2020-2029 for example)
-                itemBuilder: (context, index) {
-                  int year = DateTime.now().year - 5 + index;
-                  return ListTile(
-                    title: Text(
-                      year.toString(),
-                      style: TextStyle(color: TColor.primaryText),
-                    ),
-                    onTap: () => Navigator.pop(context, year),
-                  );
-                },
-              ),
-            ),
-          );
-        },
-      );
-
-      if (pickedYear != null) {
-        final int? pickedMonth = await showDialog<int>(
-          // ignore: use_build_context_synchronously
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Select Month",
-                  style: TextStyle(color: TColor.primaryText)),
-              content: SizedBox(
-                height: 300,
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisSpacing: 2,
-                    mainAxisSpacing: 2,
-                    crossAxisCount: 3,
-                  ),
-                  itemCount: 12,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () => Navigator.pop(context, index + 1),
-                      child: Container(
-                        color: TColor.black.withOpacity(0.3),
-                        child: Center(
-                          child: Text(
-                            DateFormat.MMMM().format(DateTime(0, index + 1)),
-                            style: TextStyle(color: TColor.primaryText),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            );
-          },
-        );
-
-        if (pickedMonth != null) {
-          selectedDate.value = DateTime(pickedYear, pickedMonth);
-          onDateChanged(selectedDate.value);
-        }
-      }
+      await _selectMonthOnly(context);
     } else {
-      // Default date picker
+      await _selectFullDate(context);
+    }
+  }
+
+  Future<void> _selectFullDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
+    final DateTime firstAllowedDate = DateTime(2020, 1, 1);
+    final DateTime lastAllowedDate = DateTime(now.year + 1, 12, 31);
+
+    DateTime validInitialDate = selectedDate.value;
+    if (validInitialDate.isAfter(lastAllowedDate)) {
+      validInitialDate = lastAllowedDate;
+    }
+    if (validInitialDate.isBefore(firstAllowedDate)) {
+      validInitialDate = firstAllowedDate;
+    }
+
+    try {
       final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: selectedDate.value,
-        firstDate: DateTime(2020),
-        lastDate: DateTime(2025),
+        initialDate: validInitialDate,
+        firstDate: firstAllowedDate,
+        lastDate: lastAllowedDate,
         builder: (context, child) {
           return Theme(
             data: Theme.of(context).copyWith(
               colorScheme: ColorScheme.light(
-                primary: TColor
-                    .primary, // Primary color for headers and selected date
-                onPrimary: TColor.white, // Text color on primary color
-                surface: TColor
-                    .white, // Background color for the date picker surface
-                onSurface: TColor.primaryText, // Text color for dates
-                secondary:
-                TColor.secondary, // Color for the day selected by the user
+                primary: TColor.primary,
+                onPrimary: TColor.white,
+                surface: TColor.white,
+                onSurface: TColor.primaryText,
+                secondary: TColor.secondary,
               ),
               dialogBackgroundColor: TColor.white,
               textButtonTheme: TextButtonThemeData(
                 style: TextButton.styleFrom(
-                  foregroundColor:
-                  TColor.third, // "Cancel" and "OK" button color
+                  foregroundColor: TColor.third,
                 ),
               ),
             ),
@@ -129,18 +74,98 @@ class DateSelector2 extends StatelessWidget {
         },
       );
 
-      if (picked != null && picked != selectedDate.value) {
-        selectedDate.value = picked; // Update observable value
-        onDateChanged(picked); // Notify the parent of the date change
+      if (picked != null) {
+        selectedDate.value = picked;
+        onDateChanged(picked);
+      }
+    } catch (e) {
+      debugPrint('Error in date picker: $e');
+    }
+  }
+
+  Future<void> _selectMonthOnly(BuildContext context) async {
+    final now = DateTime.now();
+    final int? pickedYear = await showDialog<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Select Year",
+            style: TextStyle(color: TColor.primaryText),
+          ),
+          content: SizedBox(
+            height: 300,
+            width: 300,
+            child: ListView.builder(
+              itemCount: now.year - 2020 + 2, // Years from 2020 to next year
+              itemBuilder: (context, index) {
+                int year = 2020 + index;
+                return ListTile(
+                  title: Text(
+                    year.toString(),
+                    style: TextStyle(color: TColor.primaryText),
+                  ),
+                  onTap: () => Navigator.pop(context, year),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+
+    if (pickedYear != null) {
+      final int? pickedMonth = await showDialog<int>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              "Select Month",
+              style: TextStyle(color: TColor.primaryText),
+            ),
+            content: SizedBox(
+              height: 300,
+              width: 300,
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                ),
+                itemCount: 12,
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onTap: () => Navigator.pop(context, index + 1),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: TColor.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Text(
+                          DateFormat('MMM').format(DateTime(2022, index + 1)),
+                          style: TextStyle(color: TColor.primaryText),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      );
+
+      if (pickedMonth != null) {
+        final newDate = DateTime(pickedYear, pickedMonth);
+        selectedDate.value = newDate;
+        onDateChanged(newDate);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    selectedDate.value =
-        initialDate; // Initialize with the provided initial date
-
     return Obx(
           () => Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -151,14 +176,15 @@ class DateSelector2 extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: fontSize,
-                color: TColor.primaryText,
+            if (label.isNotEmpty)
+              Text(
+                label,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: fontSize,
+                  color: TColor.primaryText,
+                ),
               ),
-            ),
             const SizedBox(height: 5),
             InkWell(
               onTap: () => _selectDate(context),
@@ -172,23 +198,24 @@ class DateSelector2 extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Text(
-                      selectMonthOnly
-                          ? DateFormat('MMMM yyyy').format(selectedDate.value)
-                          : DateFormat('dd/MM/yyyy').format(selectedDate.value),
-                      style: TextStyle(
-                        fontSize: fontSize,
-                        color: TColor.primary,
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Text(
+                        selectMonthOnly
+                            ? DateFormat('MMMM yyyy').format(selectedDate.value)
+                            : DateFormat('dd/MM/yyyy').format(selectedDate.value),
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          color: TColor.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 8),
                     Icon(
                       Icons.calendar_today,
                       size: fontSize,
                       color: TColor.primary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 4),
                   ],
                 ),
               ),

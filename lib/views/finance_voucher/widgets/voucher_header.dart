@@ -1,6 +1,5 @@
-
 import 'package:flutter/material.dart';
-
+import 'package:intl/intl.dart';
 import '../../../common/color_extension.dart';
 import '../../../common_widget/dart_selector2.dart';
 import '../../../common_widget/round_text_field.dart';
@@ -8,20 +7,24 @@ import '../../../common_widget/round_text_field.dart';
 class VoucherHeader extends StatelessWidget {
   final String title;
   final DateTime selectedDate;
+  final DateTime fromDate;
+  final DateTime toDate;
   final Function(DateTime) onFromDateChanged;
   final Function(DateTime) onToDateChanged;
   final TextEditingController searchController;
   final Function(String) onSearchChanged;
 
-  const VoucherHeader({
-    super.key,
+  VoucherHeader({super.key,
     required this.title,
     required this.selectedDate,
     required this.onFromDateChanged,
     required this.onToDateChanged,
     required this.searchController,
     required this.onSearchChanged,
-  });
+    DateTime? fromDate,
+    DateTime? toDate,
+  })  : fromDate = fromDate ?? DateTime.now().subtract(const Duration(days: 90)),
+        toDate = toDate ?? DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -33,18 +36,22 @@ class VoucherHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              DateSelector2(
-                fontSize: 16,
-                initialDate: selectedDate,
-                label: "From Month:",
-                onDateChanged: onFromDateChanged,
+              Expanded(
+                child: DateSelector2(
+                  fontSize: 16,
+                  initialDate: fromDate,
+                  label: "From Date:",
+                  onDateChanged: onFromDateChanged,
+                ),
               ),
               const SizedBox(width: 5),
-              DateSelector2(
-                fontSize: 16,
-                initialDate: selectedDate,
-                label: "To Month:    ",
-                onDateChanged: onToDateChanged,
+              Expanded(
+                child: DateSelector2(
+                  fontSize: 16,
+                  initialDate: toDate,
+                  label: "To Date:",
+                  onDateChanged: onToDateChanged,
+                ),
               ),
             ],
           ),
@@ -60,7 +67,7 @@ class VoucherHeader extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'FROM: WED, 08-JAN-2020 | TO: WED, 13-NOV-2024',
+            'FROM: ${DateFormat('EEE, dd-MMM-yyyy').format(fromDate)} | TO: ${DateFormat('EEE, dd-MMM-yyyy').format(toDate)}',
             style: TextStyle(
               fontSize: 12,
               color: TColor.third,
@@ -68,25 +75,6 @@ class VoucherHeader extends StatelessWidget {
             ),
           ),
 
-          // TextField(
-          //   controller: searchController,
-          //   onChanged: onSearchChanged,
-          //   decoration: InputDecoration(
-          //     hintText: 'Search by description...',
-          //     hintStyle: TextStyle(color: TColor.placeholder),
-          //     filled: true,
-          //     fillColor: TColor.textfield,
-          //     prefixIcon: Icon(Icons.search, color: TColor.placeholder),
-          //     border: OutlineInputBorder(
-          //       borderRadius: BorderRadius.circular(12),
-          //       borderSide: BorderSide.none,
-          //     ),
-          //     contentPadding: const EdgeInsets.symmetric(
-          //       horizontal: 16,
-          //       vertical: 12,
-          //     ),
-          //   ),
-          // ),
           SearchTextField(
             hintText: 'Search...',
             controller: searchController,

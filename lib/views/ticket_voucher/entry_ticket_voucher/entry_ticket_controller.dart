@@ -788,8 +788,7 @@ class EntryTicketController extends GetxController {
       );
     }
   }
-
 }
 
 
-// udpatedd started
+// updated started
