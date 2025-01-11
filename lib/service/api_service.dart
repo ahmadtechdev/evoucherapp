@@ -13,6 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   final String baseUrl = "https://evoucher.pk/api-new/";
+  final String baseUrl2 = "https://evoucher.pk/api-test/";
+
   var dio = Dio();
 
   // Reuse the existing `postLogin` method pattern for a generic POST request
@@ -256,57 +258,100 @@ class ApiService {
   }
 
   // get unposted data
- Future<Map<String, dynamic>?> fetchVoucherUnPosted({
-  required String fromDate,
-  required String toDate,
-  required String voucherId,
-  required String voucherType,
-}) async {
-  // Get the token from SharedPreferences
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('token') ?? '';
+  Future<Map<String, dynamic>?> fetchVoucherUnPosted({
+    required String fromDate,
+    required String toDate,
+    required String voucherId,
+    required String voucherType,
+  }) async {
+    // Get the token from SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
 
-  // Define headers
-  var headers = {
-    'Content-Type': 'application/json',
-    'Authorization': token.isNotEmpty ? "Bearer $token" : "",
-  };
+    // Define headers
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
+    };
 
-  // Encode data
-  var data = {
-    "fromDate": fromDate,
-    "toDate": toDate,
-    "voucher_id": voucherId,
-    "voucher_type": voucherType,
-  };
+    // Encode data
+    var data = {
+      "fromDate": fromDate,
+      "toDate": toDate,
+      "voucher_id": voucherId,
+      "voucher_type": voucherType,
+    };
 
-  try {
-    // Send request
-    var response = await dio.post(
-      "${baseUrl}getVoucherUnPosted",
-      options: Options(
-        headers: headers,
-      ),
-      data: data,
-    );
+    try {
+      // Send request
+      var response = await dio.post(
+        "${baseUrl}getVoucherUnPosted",
+        options: Options(
+          headers: headers,
+        ),
+        data: data,
+      );
 
-    // Handle response
-    if (response.statusCode == 200) {
-      debugPrint('Response data: ${response.data}');
-      
-      if (response.data['status'] == 'success') {
+      // Handle response
+      if (response.statusCode == 200) {
+        print('Response data: ${response.data}');
+
+        if (response.data['status'] == 'success') {
+          print('Response data: ${response.data}');
+
+          return response.data as Map<String, dynamic>;
+        } else {
+          throw Exception(response.data['message'] ?? 'Request failed');
+        }
+      } else {
+        throw Exception('Request failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint("Error: $e");
+      throw Exception('Failed to fetch unposted vouchers: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchDailyActivity({
+    required String fromDate,
+    required String toDate,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    // Define headers
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
+    };
+
+    // Request payload
+    var data = {
+      "fromDate": fromDate,
+      "toDate": toDate,
+    };
+
+    try {
+      // Send POST request
+      var response = await dio.post(
+        "${baseUrl2}dailyActivity",
+        options: Options(headers: headers),
+        data: data,
+      );
+
+      // Handle response
+      if (response.statusCode == 200) {
+        print(response.data);
         return response.data as Map<String, dynamic>;
       } else {
-        throw Exception(response.data['message'] ?? 'Request failed');
+        throw Exception('Request failed with status: ${response.statusCode}');
       }
-    } else {
-      throw Exception('Request failed with status: ${response.statusCode}');
+    } catch (e) {
+      print("API Error: $e");
+      throw Exception('Failed to fetch daily activity: $e');
     }
-  } catch (e) {
-    debugPrint("Error: $e");
-    throw Exception('Failed to fetch unposted vouchers: $e');
   }
-}}
+}
 
 // Custom Exception Classes
 class NetworkException implements Exception {

@@ -97,11 +97,13 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
           DateSelector(
             fontSize: fontSize,
             initialDate: selectedDate,
-              onDateChanged: (newDate) async {
-                selectedDate = newDate; // Update local state
-                await Future.delayed(Duration.zero); // Ensure this happens after the build
-                _controller.fetchDashboardData(newDate); // Fetch data without interfering with the build phase
-              },
+            onDateChanged: (newDate) async {
+              selectedDate = newDate; // Update local state
+              await Future.delayed(
+                  Duration.zero); // Ensure this happens after the build
+              _controller.fetchDashboardData(
+                  newDate); // Fetch data without interfering with the build phase
+            },
           ),
           const SizedBox(height: 20),
           _buildSalesGrid(constraints, cardPadding, fontSize, iconSize),
@@ -135,69 +137,43 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
       crossAxisSpacing: padding,
       childAspectRatio: 0.9,
       children: [
+        _buildSalesCard('Ticket Sales', 'PKR ${data.ticket.toStringAsFixed(2)}',
+            Icons.flight, TColor.primary, padding, fontSize, iconSize, () {
+          Get.to(() => TransactionReportScreen());
+        }),
+        _buildSalesCard('Hotel Sales', 'PKR ${data.hotel.toStringAsFixed(2)}',
+            Icons.business, TColor.secondary, padding, fontSize, iconSize, () {
+          Get.to(() => const HotelSalesReport());
+        }),
+        _buildSalesCard('Visa Sales', 'PKR ${data.visa.toStringAsFixed(2)}',
+            Icons.credit_card, TColor.third, padding, fontSize, iconSize, () {
+          Get.to(() => const VisaSalesReport());
+        }),
         _buildSalesCard(
-          'Ticket Sales',
-          'PKR ${data.ticket.toStringAsFixed(2)}',
-          Icons.flight,
-          TColor.primary,
-          padding,
-          fontSize,
-          iconSize,
-            (){
-            Get.to(()=>const TransactionReportScreen());
-            }
-        ),
-        _buildSalesCard(
-          'Hotel Sales',
-          'PKR ${data.hotel.toStringAsFixed(2)}',
-          Icons.business,
-          TColor.secondary,
-          padding,
-          fontSize,
-          iconSize,
-                (){
-                  Get.to(()=>const HotelSalesReport());
-                }
-        ),
-        _buildSalesCard(
-          'Visa Sales',
-          'PKR ${data.visa.toStringAsFixed(2)}',
-          Icons.credit_card,
-          TColor.third,
-          padding,
-          fontSize,
-          iconSize,
-                (){
-                  Get.to(()=>const VisaSalesReport());
-                }
-        ),
-        _buildSalesCard(
-          'Grand Total',
-          'PKR ${data.grand.toStringAsFixed(2)}',
-          Icons.folder,
-          Color.lerp(TColor.primary, TColor.secondary, 0.5)!,
-          padding,
-          fontSize,
-          iconSize,
-                (){
-                  Get.to(()=>const GrandTotalReport());
-                }
-        ),
+            'Grand Total',
+            'PKR ${data.grand.toStringAsFixed(2)}',
+            Icons.folder,
+            Color.lerp(TColor.primary, TColor.secondary, 0.5)!,
+            padding,
+            fontSize,
+            iconSize, () {
+          Get.to(() => const GrandTotalReport());
+        }),
       ],
     );
   }
 
   // Keep the existing _buildSalesCard method as is
   Widget _buildSalesCard(
-      String title,
-      String amount,
-      IconData iconData,
-      Color color,
-      double padding,
-      double fontSize,
-      double iconSize,
-      VoidCallback onViewMorePressed, // Add the function parameter
-      ) {
+    String title,
+    String amount,
+    IconData iconData,
+    Color color,
+    double padding,
+    double fontSize,
+    double iconSize,
+    VoidCallback onViewMorePressed, // Add the function parameter
+  ) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: const Duration(milliseconds: 500),
@@ -270,7 +246,8 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
                           Text(
                             'View More',
                             style: TextStyle(
-                              fontSize: fontSize * 0.85, // Slightly smaller font
+                              fontSize:
+                                  fontSize * 0.85, // Slightly smaller font
                             ),
                           ),
                           const SizedBox(width: 4),
@@ -290,5 +267,4 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
       },
     );
   }
-
 }
