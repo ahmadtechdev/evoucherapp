@@ -19,7 +19,6 @@ class ApiService {
     baseUrl = url;
   }
 
-
   var dio = Dio();
 
   // Reuse the existing `postLogin` method pattern for a generic POST request
@@ -354,6 +353,46 @@ class ApiService {
     } catch (e) {
       print("API Error: $e");
       throw Exception('Failed to fetch daily activity: $e');
+    }
+  }
+
+  Future invoiceSettlementVoucher({
+    required String fromDate,
+    required String toDate,
+    required String account,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? "";
+
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
+    };
+
+    var data = json.encode({
+      "fromDate": fromDate,
+      "toDate": toDate,
+      "account": account,
+    });
+
+    var dio = Dio();
+
+    try {
+      var response = await dio.post(
+        "${baseUrl2}invoiceSettlementVoucher",
+        options: Options(
+          headers: headers,
+        ),
+        data: data,
+      );
+
+      if (response.statusCode == 200) {
+        return response.data; 
+      } else {
+        print('Error: ${response.statusCode} - ${response.statusMessage}');
+      }
+    } catch (e) {
+      print('Exception: $e');
     }
   }
 }

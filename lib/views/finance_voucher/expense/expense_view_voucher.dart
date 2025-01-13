@@ -28,8 +28,8 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
   @override
   void initState() {
     super.initState();
-    fromDate = DateTime.now()
-        .subtract(const Duration(days: 180)); // Set to 180 days before
+            fromDate = DateTime(DateTime.now().year, DateTime.now().month);
+ // Set to 180 days before
     _fetchJournalVouchers();
   }
 

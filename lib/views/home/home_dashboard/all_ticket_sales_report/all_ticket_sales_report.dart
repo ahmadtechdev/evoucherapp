@@ -220,6 +220,13 @@ class CollapsibleTransactionCard extends StatelessWidget {
                 color: TColor.white,
                 border: Border.all(color: TColor.primary.withOpacity(0.2)),
                 borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: TColor.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: ListView.builder(
                 shrinkWrap: true,
@@ -227,64 +234,153 @@ class CollapsibleTransactionCard extends StatelessWidget {
                 itemCount: transaction['details'].length,
                 itemBuilder: (context, detailIndex) {
                   final detail = transaction['details'][detailIndex];
-                  return Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              detail['voucherNo'],
-                              style: TextStyle(
-                                color: TColor.primaryText,
-                                fontWeight: FontWeight.w600,
+                  return Container(
+                    margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: TColor.readOnlyTextField.withOpacity(0.7),
+                      border: detailIndex < transaction['details'].length - 1
+                          ? Border(
+                              bottom: BorderSide(
+                                color: TColor.primary.withOpacity(0.1),
+                                width: 1,
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Customer: ${detail['customerAccount']}',
-                                    style: TextStyle(fontSize: 12),
+                            )
+                          : null,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: TColor.primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  detail['voucherNo'],
+                                  style: TextStyle(
+                                    color: TColor.primary,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
                                   ),
-                                  Text(
-                                    'Supplier: ${detail['supplierAccount']}',
-                                    style: TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.person_outline,
+                                size: 16,
+                                color: TColor.secondaryText,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Customer: ${detail['customerAccount']}',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: TColor.primaryText,
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(detail['paxName']),
-                            Text('Rs ${detail['pAmount']}'),
-                            Text('Rs ${detail['sAmount']}'),
-                            Text(
-                              'Rs ${detail['pnl']}',
-                              style: TextStyle(
-                                color: detail['pnl'] > 0
-                                    ? TColor.secondary
-                                    : TColor.third,
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.business_outlined,
+                                size: 16,
+                                color: TColor.secondaryText,
                               ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Supplier: ${detail['supplierAccount']}',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: TColor.primaryText,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.person_pin_outlined,
+                                size: 16,
+                                color: TColor.secondaryText,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                detail['paxName'],
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: TColor.primaryText,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: TColor.primary.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                          ],
-                        ),
-                        if (detailIndex < transaction['details'].length - 1)
-                          Divider(height: 24),
-                      ],
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _buildAmountColumn(
+                                  'Purchase',
+                                  'Rs ${detail['pAmount']}',
+                                  TColor.third,
+                                ),
+                                Container(
+                                  height: 30,
+                                  width: 1,
+                                  color: TColor.primary.withOpacity(0.1),
+                                ),
+                                _buildAmountColumn(
+                                  'Sale',
+                                  'Rs ${detail['sAmount']}',
+                                  TColor.secondary,
+                                ),
+                                Container(
+                                  height: 30,
+                                  width: 1,
+                                  color: TColor.primary.withOpacity(0.1),
+                                ),
+                                _buildAmountColumn(
+                                  'P/L',
+                                  'Rs ${detail['pnl']}',
+                                  detail['pnl'] > 0
+                                      ? TColor.secondary
+                                      : TColor.third,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
               ),
             ),
 
-          // Main Transaction Card
+          // Main Transaction Card (keeping the existing code)
           Container(
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
@@ -294,6 +390,13 @@ class CollapsibleTransactionCard extends StatelessWidget {
                 width: 1.0,
               ),
               borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: TColor.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -387,6 +490,31 @@ class CollapsibleTransactionCard extends StatelessWidget {
               color: color,
               fontSize: 16,
               fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAmountColumn(String label, String amount, Color amountColor) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: TColor.secondaryText,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            amount,
+            style: TextStyle(
+              color: amountColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],

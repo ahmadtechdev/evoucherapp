@@ -2,17 +2,18 @@ import 'package:evoucher/common/accounts_dropdown.dart';
 import 'package:evoucher/common/color_extension.dart';
 import 'package:evoucher/common/drawer.dart';
 import 'package:evoucher/common_widget/dart_selector2.dart';
+import 'package:evoucher/views/side_bar/invoice_settlement/invoice_settlement/controller/invoice_settlement_controller.dart';
 import 'package:evoucher/views/side_bar/invoice_settlement/settle_invoice/single_invoice_settle.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'controller/invoice_settlement_controller.dart';
 
 class InvoiceSettlement extends StatelessWidget {
   const InvoiceSettlement({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final InvoiceSettlementController controller = Get.put(InvoiceSettlementController());
+    final InvoiceSettlementController controller =
+        Get.put(InvoiceSettlementController());
 
     return Scaffold(
       appBar: AppBar(
@@ -22,14 +23,14 @@ class InvoiceSettlement extends StatelessWidget {
         title: const Text('Invoice Settlement'),
       ),
       drawer: const CustomDrawer(currentIndex: 2),
-      body: SafeArea(  // Added SafeArea
-        child: LayoutBuilder(  // Added LayoutBuilder
+      body: SafeArea(
+        child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,  // Added mainAxisSize
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildDateRangeSection(controller),
                     const SizedBox(height: 12),
@@ -40,11 +41,43 @@ class InvoiceSettlement extends StatelessWidget {
                         isEnabled: true,
                         onChanged: (selectedAccount) {
                           controller.setAccount(selectedAccount!);
+                          controller.fetchInvoices();
                         },
                       ),
                     ),
                     const SizedBox(height: 8),
-                    _buildInvoiceRows(),
+                    Obx(() {
+                      if (controller.invoices.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No Record',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: TColor.primaryText.withOpacity(0.6),
+                            ),
+                          ),
+                        );
+                      } else {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: controller.invoices.length,
+                          itemBuilder: (context, index) {
+                            final invoice = controller.invoices[index];
+                            return _buildInvoiceRow(
+                              voucherId: invoice['voucher_id'],
+                              dated: invoice['date'],
+                              description: invoice['description'],
+                              totalAmount: invoice['total_amount'],
+                              settledAmount: invoice['settled_amount'],
+                              remainingAmount: invoice['remaining_amount'],
+                              status: invoice['status'],
+                            );
+                          },
+                        );
+                      }
+                    }),
                   ],
                 ),
               ),
@@ -60,21 +93,21 @@ class InvoiceSettlement extends StatelessWidget {
       color: TColor.white,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,  // Added mainAxisAlignment
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const SizedBox(width: 18),
-          Expanded(  // Wrapped in Expanded
+          Expanded(
             child: DateSelector2(
               fontSize: 14,
               initialDate: controller.dateFrom.value,
               onDateChanged: (date) {
                 controller.setDateRange(date, controller.dateTo.value);
               },
-              label: "FROM:",
+              label: "FROM: ",
             ),
           ),
           const SizedBox(width: 18),
-          Expanded(  // Wrapped in Expanded
+          Expanded(
             child: DateSelector2(
               fontSize: 14,
               initialDate: controller.dateTo.value,
@@ -90,81 +123,6 @@ class InvoiceSettlement extends StatelessWidget {
     );
   }
 
-  Widget _buildInvoiceRows() {
-    return Column(
-      children: [
-        _buildInvoiceRow(
-          voucherId: 'CV-329',
-          dated: 'Fri, 04 Aug 2023',
-          description: 'CASH RECEIVED FROM AFAQ TRAVEL',
-          totalAmount: 'PKR 50,000',
-          settledAmount: 'PKR 0',
-          remainingAmount: 'PKR 50,000',
-          isSettled: true,
-        ),_buildInvoiceRow(
-          voucherId: 'CV-329',
-          dated: 'Fri, 04 Aug 2023',
-          description: 'CASH RECEIVED FROM AFAQ TRAVEL',
-          totalAmount: 'PKR 50,000',
-          settledAmount: 'PKR 0',
-          remainingAmount: 'PKR 50,000',
-          isSettled: false,
-        ),_buildInvoiceRow(
-          voucherId: 'CV-329',
-          dated: 'Fri, 04 Aug 2023',
-          description: 'CASH RECEIVED FROM AFAQ TRAVEL',
-          totalAmount: 'PKR 50,000',
-          settledAmount: 'PKR 0',
-          remainingAmount: 'PKR 50,000',
-          isSettled: true,
-        ),_buildInvoiceRow(
-          voucherId: 'CV-329',
-          dated: 'Fri, 04 Aug 2023',
-          description: 'CASH RECEIVED FROM AFAQ TRAVEL',
-          totalAmount: 'PKR 50,000',
-          settledAmount: 'PKR 0',
-          remainingAmount: 'PKR 50,000',
-          isSettled: false,
-        ),_buildInvoiceRow(
-          voucherId: 'CV-329',
-          dated: 'Fri, 04 Aug 2023',
-          description: 'CASH RECEIVED FROM AFAQ TRAVEL',
-          totalAmount: 'PKR 50,000',
-          settledAmount: 'PKR 0',
-          remainingAmount: 'PKR 50,000',
-          isSettled: false,
-        ),_buildInvoiceRow(
-          voucherId: 'CV-329',
-          dated: 'Fri, 04 Aug 2023',
-          description: 'CASH RECEIVED FROM AFAQ TRAVEL',
-          totalAmount: 'PKR 50,000',
-          settledAmount: 'PKR 0',
-          remainingAmount: 'PKR 50,000',
-          isSettled: true,
-        ),_buildInvoiceRow(
-          voucherId: 'CV-329',
-          dated: 'Fri, 04 Aug 2023',
-          description: 'CASH RECEIVED FROM AFAQ TRAVEL',
-          totalAmount: 'PKR 50,000',
-          settledAmount: 'PKR 0',
-          remainingAmount: 'PKR 50,000',
-          isSettled: false,
-        ),
-        _buildInvoiceRow(
-          voucherId: 'BV-401',
-          dated: 'Thu, 17 Aug 2023',
-
-          description: 'AFAQ TRAVEL PAYMENT RECEIVED IN HBL',
-          totalAmount: 'PKR 50,000',
-          settledAmount: 'PKR 235234',
-          remainingAmount: 'PKR 50,000',
-          isSettled: true,
-        ),
-        // Add more invoice rows as needed
-      ],
-    );
-  }
-
   Widget _buildInvoiceRow({
     required String voucherId,
     required String dated,
@@ -172,22 +130,28 @@ class InvoiceSettlement extends StatelessWidget {
     required String totalAmount,
     required String settledAmount,
     required String remainingAmount,
-    required bool isSettled,
+    required String status, // Added status parameter
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: GestureDetector(
-        onTap: () {
-          Get.to(() => const SingleInvoiceSettlementPage());
-        },
+        onTap: status != 'settled'
+            ? () {
+                Get.to(() => const SingleInvoiceSettlementPage());
+              }
+            : null, // Disable tap if status is "settled"
         child: Card(
           elevation: 4,
           color: TColor.white,
-          shadowColor: isSettled ? TColor.secondary.withOpacity(0.3) : TColor.primary.withOpacity(0.3),
+          shadowColor: status == 'settled'
+              ? TColor.secondary.withOpacity(0.3)
+              : TColor.primary.withOpacity(0.3),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
-              color: isSettled ? Colors.green.withOpacity(0.2) : Colors.blue.withOpacity(0.2),
+              color: status == 'settled'
+                  ? Colors.green.withOpacity(0.2)
+                  : Colors.blue.withOpacity(0.2),
               width: 1,
             ),
           ),
@@ -197,16 +161,18 @@ class InvoiceSettlement extends StatelessWidget {
                 top: 12,
                 right: 0,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: isSettled ? TColor.secondary : TColor.primary,
+                    color:
+                        status == 'settled' ? TColor.secondary : TColor.primary,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20),
                       bottomLeft: Radius.circular(20),
                     ),
                   ),
                   child: Text(
-                    isSettled ? 'Settled' : 'Unsettled',
+                    status == 'settled' ? 'Settled' : 'Unsettled',
                     style: TextStyle(
                       color: TColor.white,
                       fontSize: 12,
@@ -219,13 +185,14 @@ class InvoiceSettlement extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,  // Added mainAxisSize
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: TColor.placeholder.withOpacity(0.6),
                             borderRadius: BorderRadius.circular(6),
@@ -239,7 +206,7 @@ class InvoiceSettlement extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Expanded(  // Wrapped in Expanded
+                        Expanded(
                           child: Text(
                             dated,
                             style: TextStyle(
@@ -268,11 +235,16 @@ class InvoiceSettlement extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _buildAmountColumn('Total', totalAmount, TColor.primary),
-                          Container(height: 40, width: 1, color: Colors.grey[300]),
-                          _buildAmountColumn('Settled', settledAmount, TColor.secondary),
-                          Container(height: 40, width: 1, color: Colors.grey[300]),
-                          _buildAmountColumn('Remaining', remainingAmount, TColor.fourth),
+                          _buildAmountColumn(
+                              'Total', totalAmount.toString(), TColor.primary),
+                          Container(
+                              height: 40, width: 1, color: Colors.grey[300]),
+                          _buildAmountColumn('Settled',
+                              settledAmount.toString(), TColor.secondary),
+                          Container(
+                              height: 40, width: 1, color: Colors.grey[300]),
+                          _buildAmountColumn('Remaining',
+                              remainingAmount.toString(), TColor.fourth),
                         ],
                       ),
                     ),
@@ -286,29 +258,27 @@ class InvoiceSettlement extends StatelessWidget {
     );
   }
 
-  Widget _buildAmountColumn(String label, String amount, Color amountColor) {
-    return Expanded(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,  // Added mainAxisSize
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 12,
-            ),
+  Widget _buildAmountColumn(String label, String amount, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: TColor.primaryText.withOpacity(0.6),
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
           ),
-          const SizedBox(height: 4),
-          Text(
-            amount,
-            style: TextStyle(
-              color: amountColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
+        ),
+        Text(
+          amount,
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

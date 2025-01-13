@@ -10,7 +10,8 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SettleInvoiceController controller = Get.put(SettleInvoiceController());
+    final SettleInvoiceController controller =
+        Get.put(SettleInvoiceController());
 
     return GestureDetector(
       onTap: () {
@@ -35,7 +36,9 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
                       ...controller.invoices.map((invoice) {
                         return _buildUnsettledInvoiceCard(controller, invoice);
                       }),
-                      SizedBox(height: controller.selectedInvoices.isEmpty ? 0 : 300),
+                      SizedBox(
+                          height:
+                              controller.selectedInvoices.isEmpty ? 0 : 300),
                     ],
                   ),
                 ),
@@ -45,7 +48,8 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
               if (controller.selectedInvoices.isNotEmpty) {
                 return _buildSelectedInvoicesSheet(controller);
               } else {
-                return const SizedBox.shrink(); // Return an empty widget if no invoices are selected
+                return const SizedBox
+                    .shrink(); // Return an empty widget if no invoices are selected
               }
             }),
           ],
@@ -112,7 +116,8 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
             Align(
               alignment: Alignment.bottomRight,
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 decoration: BoxDecoration(
                   color: Colors.green.shade100,
                   borderRadius: BorderRadius.circular(12),
@@ -149,8 +154,10 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
     );
   }
 
-  Widget _buildUnsettledInvoiceCard(SettleInvoiceController controller, Map<String, dynamic> invoice) {
-    return Obx(() { // Make the card reactive
+  Widget _buildUnsettledInvoiceCard(
+      SettleInvoiceController controller, Map<String, dynamic> invoice) {
+    return Obx(() {
+      // Make the card reactive
       bool isSelected = controller.selectedInvoices.contains(invoice);
       return GestureDetector(
         onTap: () {
@@ -185,9 +192,12 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: isSelected ? TColor.white.withOpacity(0.8) : TColor.primary.withOpacity(0.1),
+                        color: isSelected
+                            ? TColor.white.withOpacity(0.8)
+                            : TColor.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -206,7 +216,9 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
                   "Date: ${invoice['date']}",
                   style: TextStyle(
                     fontSize: 14,
-                    color: isSelected ? TColor.white.withOpacity(0.8) : TColor.secondaryText,
+                    color: isSelected
+                        ? TColor.white.withOpacity(0.8)
+                        : TColor.secondaryText,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -214,7 +226,9 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
                   invoice['description'],
                   style: TextStyle(
                     fontSize: 14,
-                    color: isSelected ? TColor.white : TColor.primaryText.withOpacity(0.8),
+                    color: isSelected
+                        ? TColor.white
+                        : TColor.primaryText.withOpacity(0.8),
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -260,7 +274,8 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
               Expanded(
                 child: ListView(
                   controller: scrollController,
-                  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -289,7 +304,8 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSelectedInvoiceCard(SettleInvoiceController controller, Map<String, dynamic> invoice) {
+  Widget _buildSelectedInvoiceCard(
+      SettleInvoiceController controller, Map<String, dynamic> invoice) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       elevation: 4,
@@ -319,7 +335,8 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: TColor.third.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),

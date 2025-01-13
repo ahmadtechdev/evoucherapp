@@ -54,12 +54,12 @@ class WelcomeScreen extends StatelessWidget {
                       Image.asset(
                         'assets/img/newLogo.png',
                         height: screenHeight * 0.12,
-                        width: screenWidth*0.9,
+                        width: screenWidth * 0.9,
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(height: 30),
                       const Text(
-                        'Welcome to Evoucher',
+                        'Welcome To Evoucher',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 24,
@@ -73,7 +73,8 @@ class WelcomeScreen extends StatelessWidget {
                           color: Colors.white.withOpacity(0.9),
                           fontSize: 16,
                         ),
-                      ),const SizedBox(height: 10),
+                      ),
+                      const SizedBox(height: 10),
                       Text(
                         "Accounting Software for Travel Agents",
                         style: TextStyle(

@@ -27,7 +27,7 @@ class _UnPostedCVoucherState extends State<UnPostedCVoucher> {
   @override
   void initState() {
     super.initState();
-    fromDate = DateTime.now().subtract(const Duration(days: 180));
+        fromDate = DateTime(DateTime.now().year, DateTime.now().month);
     _fetchUnpostedVouchers();
   }
 

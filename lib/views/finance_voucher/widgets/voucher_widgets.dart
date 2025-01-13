@@ -99,15 +99,20 @@ class EntryVoucherCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      'Entries: ${voucher['entries']}',
-                      style: TextStyle(
-                        color: TColor.secondary,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                      ),
-                    ),
                   ],
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Entries: ${voucher['entries']}',
+                  style: TextStyle(
+                    color: TColor.secondary,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                  ),
                 ),
                 Text(
                   voucher['amount'],

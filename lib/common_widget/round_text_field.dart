@@ -43,9 +43,7 @@ class RoundTextField extends StatelessWidget {
               obscureText: obscureText,
               keyboardType: keyboardType,
               onChanged: onChanged,
-
               decoration: InputDecoration(
-
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -55,7 +53,6 @@ class RoundTextField extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.w500),
               ),
-
             ),
           ),
           if (right != null)
@@ -69,24 +66,22 @@ class RoundTextField extends StatelessWidget {
   }
 }
 
-class SearchTextField extends StatelessWidget{
+class SearchTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String hintText;
   final ValueChanged<String> onChange;
 
   const SearchTextField({
     super.key,
-
     required this.hintText,
     this.controller,
     required this.onChange,
-
   });
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       child: TextField(
         controller: controller,
         onChanged: onChange,
@@ -112,7 +107,6 @@ class SearchTextField extends StatelessWidget{
       ),
     );
   }
-
 }
 
 class RoundTitleTextfield extends StatelessWidget {
@@ -127,7 +121,7 @@ class RoundTitleTextfield extends StatelessWidget {
   final Widget? right;
   final Function(String)? onChanged;
   final String? initialValue;
-  final VoidCallback? onEditingComplete;  // Added this line
+  final VoidCallback? onEditingComplete; // Added this line
   final Color? textClr;
 
   const RoundTitleTextfield({
@@ -144,7 +138,7 @@ class RoundTitleTextfield extends StatelessWidget {
     this.obscureText = false,
     this.readOnly = false,
     this.onEditingComplete,
-    this.textClr,// Added this line
+    this.textClr, // Added this line
   });
 
   @override
@@ -182,10 +176,10 @@ class RoundTitleTextfield extends StatelessWidget {
                     keyboardType: keyboardType,
                     readOnly: readOnly,
                     onChanged: onChanged,
-                    onEditingComplete: onEditingComplete,  // Added this line
+                    onEditingComplete: onEditingComplete, // Added this line
                     decoration: InputDecoration(
                       contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20),
+                          const EdgeInsets.symmetric(horizontal: 20),
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
                       hintText: hintText,

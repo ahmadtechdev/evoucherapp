@@ -137,21 +137,21 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
       crossAxisSpacing: padding,
       childAspectRatio: 0.9,
       children: [
-        _buildSalesCard('Ticket Sales', 'PKR ${data.ticket.toStringAsFixed(2)}',
+        _buildSalesCard('Ticket Sales', 'PKR ${data.ticket.toStringAsFixed(1)}',
             Icons.flight, TColor.primary, padding, fontSize, iconSize, () {
           Get.to(() => TransactionReportScreen());
         }),
-        _buildSalesCard('Hotel Sales', 'PKR ${data.hotel.toStringAsFixed(2)}',
+        _buildSalesCard('Hotel Sales', 'PKR ${data.hotel.toStringAsFixed(1)}',
             Icons.business, TColor.secondary, padding, fontSize, iconSize, () {
           Get.to(() => const HotelSalesReport());
         }),
-        _buildSalesCard('Visa Sales', 'PKR ${data.visa.toStringAsFixed(2)}',
+        _buildSalesCard('Visa Sales', 'PKR ${data.visa.toStringAsFixed(1)}',
             Icons.credit_card, TColor.third, padding, fontSize, iconSize, () {
           Get.to(() => const VisaSalesReport());
         }),
         _buildSalesCard(
             'Grand Total',
-            'PKR ${data.grand.toStringAsFixed(2)}',
+            'PKR ${data.grand.toStringAsFixed(1)}',
             Icons.folder,
             Color.lerp(TColor.primary, TColor.secondary, 0.5)!,
             padding,
@@ -226,7 +226,7 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
                     Text(
                       amount,
                       style: TextStyle(
-                        fontSize: fontSize * 1.2,
+                        fontSize: fontSize * 1,
                         fontWeight: FontWeight.bold,
                         color: color,
                       ),
@@ -236,11 +236,12 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
                       onPressed: onViewMorePressed, // Use the callback here
                       style: TextButton.styleFrom(
                         foregroundColor: color,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 0),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(

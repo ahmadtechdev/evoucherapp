@@ -14,7 +14,8 @@ class VoucherHeader extends StatelessWidget {
   final TextEditingController searchController;
   final Function(String) onSearchChanged;
 
-  VoucherHeader({super.key,
+  VoucherHeader({
+    super.key,
     required this.title,
     required this.selectedDate,
     required this.onFromDateChanged,
@@ -23,7 +24,8 @@ class VoucherHeader extends StatelessWidget {
     required this.onSearchChanged,
     DateTime? fromDate,
     DateTime? toDate,
-  })  : fromDate = fromDate ?? DateTime.now().subtract(const Duration(days: 90)),
+  })  : fromDate =
+            fromDate ?? DateTime.now().subtract(const Duration(days: 90)),
         toDate = toDate ?? DateTime.now();
 
   @override
@@ -55,26 +57,30 @@ class VoucherHeader extends StatelessWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 12),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: TColor.primaryText,
+          Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: TColor.primaryText,
+              ),
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            'FROM: ${DateFormat('EEE, dd-MMM-yyyy').format(fromDate)} | TO: ${DateFormat('EEE, dd-MMM-yyyy').format(toDate)}',
-            style: TextStyle(
-              fontSize: 12,
-              color: TColor.third,
-              fontWeight: FontWeight.w500,
+          Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Text(
+              'FROM: ${DateFormat('EEE, dd-MMM-yyyy').format(fromDate)} | TO: ${DateFormat('EEE, dd-MMM-yyyy').format(toDate)}',
+              style: TextStyle(
+                fontSize: 12,
+                color: TColor.third,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-
           SearchTextField(
             hintText: 'Search...',
             controller: searchController,
