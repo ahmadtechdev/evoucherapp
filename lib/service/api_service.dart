@@ -12,8 +12,13 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  final String baseUrl = "https://evoucher.pk/api-new/";
+  String baseUrl = "https://evoucher.pk/api-new/";
   final String baseUrl2 = "https://evoucher.pk/api-test/";
+
+  void updateBaseUrl(String url) {
+    baseUrl = url;
+  }
+
 
   var dio = Dio();
 

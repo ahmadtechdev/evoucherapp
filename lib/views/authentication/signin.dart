@@ -5,10 +5,12 @@ import 'package:get/get.dart';
 import 'dart:math' as math;
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';
+import '../../common_widget/round_dropdown_field.dart';
 import '../../common_widget/round_text_field.dart';
 import '../../common_widget/snackbar.dart';
 import '../../service/api_service.dart';
 import '../../service/session_manager.dart';
+import 'cotnroller/auth_controller.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -24,6 +26,10 @@ class _SignInState extends State<SignIn> {
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
   bool _obscurePassword = true;
+
+  final AuthController _authController = Get.put(AuthController());
+  String? selectedClient;
+  final List<String> clients = ['Travel','Travel 1', 'Travel 2', 'Travel 3', 'TOC'];
 
   @override
   void dispose() {
@@ -47,6 +53,8 @@ class _SignInState extends State<SignIn> {
     });
 
     try {
+      _authController.setBaseUrl(selectedClient!);
+
       Map<String, dynamic> body = {
         "Username": txtUser.text.trim(),
         "Password": txtPassword.text.trim(),
@@ -201,6 +209,25 @@ class _SignInState extends State<SignIn> {
                           style: TextStyle(
                             color: TColor.secondaryText,
                             fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Dropdown for client selection
+                        // Replace the existing dropdown with:
+                        RoundDropdownField(
+                          hintText: "Select Client",
+                          value: selectedClient,
+                          items: clients,
+                          onChanged: (String? value) {
+                            setState(() {
+                              selectedClient = value;
+                            });
+                          },
+                          validator: (value) => value == null ? "Please select a client" : null,
+                          right: Icon(
+                            Icons.arrow_drop_down,
+                            color: TColor.secondaryText,
                           ),
                         ),
                         const SizedBox(height: 20),

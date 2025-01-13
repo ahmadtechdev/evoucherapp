@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'controller/invoice_settlement_controller.dart';
 
-
 class InvoiceSettlement extends StatelessWidget {
   const InvoiceSettlement({super.key});
 
@@ -23,27 +22,34 @@ class InvoiceSettlement extends StatelessWidget {
         title: const Text('Invoice Settlement'),
       ),
       drawer: const CustomDrawer(currentIndex: 2),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildDateRangeSection(controller),
-              const SizedBox(height: 12),
-              Padding(
+      body: SafeArea(  // Added SafeArea
+        child: LayoutBuilder(  // Added LayoutBuilder
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: AccountDropdown(
-                  primaryColor: TColor.secondary,
-                  isEnabled: true,
-                  onChanged: (selectedAccount) {
-                    controller.setAccount(selectedAccount!);
-                  },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,  // Added mainAxisSize
+                  children: [
+                    _buildDateRangeSection(controller),
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: AccountDropdown(
+                        primaryColor: TColor.secondary,
+                        isEnabled: true,
+                        onChanged: (selectedAccount) {
+                          controller.setAccount(selectedAccount!);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _buildInvoiceRows(),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
-              _buildInvoiceRows(),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -54,25 +60,31 @@ class InvoiceSettlement extends StatelessWidget {
       color: TColor.white,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,  // Added mainAxisAlignment
         children: [
           const SizedBox(width: 18),
-          DateSelector2(
-            fontSize: 14,
-            initialDate: controller.dateFrom.value,
-            onDateChanged: (date) {
-              controller.setDateRange(date, controller.dateTo.value);
-            },
-            label: "FROM:",
+          Expanded(  // Wrapped in Expanded
+            child: DateSelector2(
+              fontSize: 14,
+              initialDate: controller.dateFrom.value,
+              onDateChanged: (date) {
+                controller.setDateRange(date, controller.dateTo.value);
+              },
+              label: "FROM:",
+            ),
           ),
           const SizedBox(width: 18),
-          DateSelector2(
-            fontSize: 14,
-            initialDate: controller.dateTo.value,
-            onDateChanged: (date) {
-              controller.setDateRange(controller.dateFrom.value, date);
-            },
-            label: "TO:  ",
+          Expanded(  // Wrapped in Expanded
+            child: DateSelector2(
+              fontSize: 14,
+              initialDate: controller.dateTo.value,
+              onDateChanged: (date) {
+                controller.setDateRange(controller.dateFrom.value, date);
+              },
+              label: "TO:  ",
+            ),
           ),
+          const SizedBox(width: 18),
         ],
       ),
     );
@@ -207,6 +219,7 @@ class InvoiceSettlement extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,  // Added mainAxisSize
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -226,11 +239,13 @@ class InvoiceSettlement extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          dated,
-                          style: TextStyle(
-                            color: TColor.primaryText,
-                            fontSize: 13,
+                        Expanded(  // Wrapped in Expanded
+                          child: Text(
+                            dated,
+                            style: TextStyle(
+                              color: TColor.primaryText,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                       ],
@@ -274,6 +289,7 @@ class InvoiceSettlement extends StatelessWidget {
   Widget _buildAmountColumn(String label, String amount, Color amountColor) {
     return Expanded(
       child: Column(
+        mainAxisSize: MainAxisSize.min,  // Added mainAxisSize
         children: [
           Text(
             label,

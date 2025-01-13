@@ -1,58 +1,36 @@
-// // lib/controllers/auth_controller.dart
-// import 'package:get/get.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import '../../../common/color_extension.dart';
-// import '../../../service/api_service.dart';
-// import '../../home/home.dart';
-//
-// class AuthController extends GetxController {
-//   final ApiService _apiService = ApiService();
-//   var isLoading = false.obs;
-//   var obscurePassword = true.obs;
-//   var username = ''.obs;
-//   var password = ''.obs;
-//
-//   Future<void> login() async {
-//     if (username.isEmpty || password.isEmpty) {
-//       Get.snackbar("Error", "Please fill in all required fields", backgroundColor: TColor.third);
-//       return;
-//     }
-//
-//     isLoading.value = true;
-//
-//     try {
-//       Map<String, dynamic> body = {
-//         "Username": username.value.trim(),
-//         "Password": password.value.trim(),
-//       };
-//
-//       final response = await _apiService.post("token", body);
-//       print(response['status']);
-//       print("aj");
-//
-//       if (response['status'] == "success") {
-//         await _handleLoginSuccess(response);
-//       } else {
-//         Get.snackbar("Error", response['message'] ?? "Login failed", backgroundColor:  TColor.third);
-//       }
-//     } catch (e) {
-//       Get.snackbar("Error", e.toString().contains('Exception:')
-//           ? e.toString().split('Exception: ')[1]
-//           : 'Connection error. Please try again.', backgroundColor:  TColor.third);
-//     } finally {
-//       isLoading.value = false;
-//     }
-//   }
-//
-//   Future<void> _handleLoginSuccess(Map<String, dynamic> response) async {
-//     try {
-//       final token = response['token'];
-//       final prefs = await SharedPreferences.getInstance();
-//       await prefs.setString('token', token);
-//       Get.offAll(() => const Home());
-//       Get.snackbar("Success", response['message'], backgroundColor:  TColor.secondary);
-//     } catch (e) {
-//       Get.snackbar("Error", "Error saving user data: ${e.toString()}", backgroundColor:  TColor.third);
-//     }
-//   }
-// }
+import 'package:get/get.dart';
+import '../../../service/api_service.dart';
+
+class AuthController extends GetxController {
+  final ApiService _apiService = ApiService();
+  var baseUrl = "https://default.api.com/".obs; // Observable base URL
+
+  void setBaseUrl(String client) {
+    switch (client) {
+      case 'Travel':
+        baseUrl.value = "https://evoucher.pk/api-new/";
+        break;
+      case 'Travel 1':
+        baseUrl.value = "https://api.travel1.com/";
+        break;
+      case 'Travel 2':
+        baseUrl.value = "https://api.travel2.com/";
+        break;
+      case 'Travel 3':
+        baseUrl.value = "https://api.travel3.com/";
+        break;
+      case 'TOC':
+        baseUrl.value = "https://api.toc.com/";
+        break;
+      default:
+        baseUrl.value = "https://api.default.com/";
+    }
+    print(baseUrl.value);
+    // Update the ApiService base URL in real-time
+    _apiService.updateBaseUrl(baseUrl.value);
+  }
+
+  Future<Map<String, dynamic>> login(Map<String, dynamic> body) async {
+    return await _apiService.postLogin(endpoint: "token", body: body);
+  }
+}
