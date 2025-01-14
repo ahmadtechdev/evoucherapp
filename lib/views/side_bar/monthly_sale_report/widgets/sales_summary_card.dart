@@ -1,11 +1,14 @@
-// widgets/sales_summary_card.dart
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../../../../common/color_extension.dart';
+import '../controller/monthly_sale_controller.dart';
 
-class SalesSummaryCard extends StatelessWidget {
+class SalesSummaryCard extends GetView<MonthlySalesController> {
   const SalesSummaryCard({super.key});
 
-  Widget _buildTotalItem(String label, String amount, IconData icon) {
+  Widget _buildTotalItem(String label, int amount, IconData icon) {
+    final formattedAmount = NumberFormat('#,##0').format(amount);
     return Column(
       children: [
         Icon(icon, color: TColor.primary.withOpacity(0.8), size: 24),
@@ -16,7 +19,7 @@ class SalesSummaryCard extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          amount,
+          formattedAmount,
           style: TextStyle(
             color: TColor.primaryText,
             fontSize: 16,
@@ -29,7 +32,7 @@ class SalesSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Obx(() => Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -54,21 +57,21 @@ class SalesSummaryCard extends StatelessWidget {
               Expanded(
                 child: _buildTotalItem(
                   'Tickets',
-                  '1,188,292',
+                  controller.totalSales.value.ticketSales,
                   Icons.airplane_ticket,
                 ),
               ),
               Expanded(
                 child: _buildTotalItem(
                   'Hotels',
-                  '747,485',
+                  controller.totalSales.value.hotelBookings,
                   Icons.hotel,
                 ),
               ),
               Expanded(
                 child: _buildTotalItem(
                   'Visas',
-                  '191,457',
+                  controller.totalSales.value.visaServices,
                   Icons.credit_card,
                 ),
               ),
@@ -76,6 +79,6 @@ class SalesSummaryCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ));
   }
 }

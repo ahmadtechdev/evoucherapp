@@ -1,12 +1,19 @@
+import 'package:evoucher/views/side_bar/expense_report/controller/expense_report_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../../common/color_extension.dart';
-import '../controller/expense_report_controller.dart';
 
 class ExpenseWidgets {
+  static final currencyFormat = NumberFormat("#,##0.00", "en_US");
+
   static Widget buildMonthCard(
-      DateTime month,
-      ExpenseReportController controller,
-      ) {
+    DateTime month,
+    ExpenseReportController controller,
+  ) {
+    double total = controller.expenseItems.fold(0.0, (sum, expense) {
+      return sum + expense.amount; // Sum the amounts from expenseItems
+    });
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -28,7 +35,7 @@ class ExpenseWidgets {
             final expense = entry.value;
             return _buildExpenseItem(
               expense.name,
-              expense.amount.toString(),
+              currencyFormat.format(expense.amount),
               expense.icon,
               controller.getColorForIndex(index),
               isLast: index == controller.expenseItems.length - 1,
@@ -37,7 +44,7 @@ class ExpenseWidgets {
           const Divider(thickness: 2, height: 1),
           _buildExpenseItem(
             'Total',
-            controller.calculateTotalExpenses().toString(),
+            currencyFormat.format(total), // Pass the calculated total
             Icons.summarize,
             TColor.primary,
             isLast: true,
@@ -59,13 +66,18 @@ class ExpenseWidgets {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Total Expenses Summary',
-            style: TextStyle(
-              color: TColor.primaryText,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total Expenses Summary',
+                style: TextStyle(
+                  color: TColor.primaryText,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           _buildDynamicTotalSummary(controller),
@@ -75,9 +87,9 @@ class ExpenseWidgets {
   }
 
   static Widget _buildMonthHeader(
-      DateTime month,
-      ExpenseReportController controller,
-      ) {
+    DateTime month,
+    ExpenseReportController controller,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -105,22 +117,22 @@ class ExpenseWidgets {
   }
 
   static Widget _buildExpenseItem(
-      String title,
-      String amount,
-      IconData icon,
-      Color color, {
-        bool isLast = false,
-      }) {
+    String title,
+    String amount,
+    IconData icon,
+    Color color, {
+    bool isLast = false,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         border: !isLast
             ? Border(
-          bottom: BorderSide(
-            color: Colors.grey.withOpacity(0.2),
-            width: 1,
-          ),
-        )
+                bottom: BorderSide(
+                  color: Colors.grey.withOpacity(0.2),
+                  width: 1,
+                ),
+              )
             : null,
       ),
       child: Row(
@@ -166,12 +178,12 @@ class ExpenseWidgets {
           .skip(i)
           .take(3)
           .map((expense) => Expanded(
-        child: _buildTotalItem(
-          expense.name,
-          expense.amount.toString(),
-          expense.icon,
-        ),
-      ))
+                child: _buildTotalItem(
+                  expense.name,
+                  currencyFormat.format(expense.total),
+                  expense.icon,
+                ),
+              ))
           .toList();
 
       while (rowItems.length < 3) {
@@ -181,7 +193,10 @@ class ExpenseWidgets {
       rows.add(
         Padding(
           padding: const EdgeInsets.only(bottom: 16),
-          child: Row(children: rowItems),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: rowItems,
+          ),
         ),
       );
     }
@@ -201,13 +216,15 @@ class ExpenseWidgets {
             color: TColor.secondaryText,
             fontSize: 14,
           ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 4),
         Text(
           amount,
           style: TextStyle(
             color: TColor.primaryText,
-            fontSize: 16,
+            fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
         ),

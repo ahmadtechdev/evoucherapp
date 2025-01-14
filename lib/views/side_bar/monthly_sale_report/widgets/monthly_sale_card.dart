@@ -1,8 +1,7 @@
-// widgets/monthly_sales_card.dart
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../../common/color_extension.dart';
 import '../controller/monthly_sale_controller.dart';
-
 
 class MonthlySalesCard extends StatelessWidget {
   final DateTime month;
@@ -16,6 +15,8 @@ class MonthlySalesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final salesData = controller.getSalesData(month);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -34,26 +35,26 @@ class MonthlySalesCard extends StatelessWidget {
           _buildHeader(),
           _buildVoucherItem(
             'Ticket Sales',
-            controller.getDummyAmount(),
+            NumberFormat('#,##0').format(salesData.ticketSales),
             Icons.airplane_ticket,
             TColor.secondary,
           ),
           _buildVoucherItem(
             'Hotel Bookings',
-            controller.getDummyAmount(),
+            NumberFormat('#,##0').format(salesData.hotelBookings),
             Icons.hotel,
             TColor.third,
           ),
           _buildVoucherItem(
             'Visa Services',
-            controller.getDummyAmount(),
+            NumberFormat('#,##0').format(salesData.visaServices),
             Icons.credit_card,
             TColor.fourth,
           ),
           const Divider(thickness: 1, height: 1),
           _buildVoucherItem(
             'Total',
-            _calculateTotal(),
+            NumberFormat('#,##0').format(salesData.total),
             Icons.summarize,
             TColor.primary,
             isLast: true,
@@ -91,22 +92,22 @@ class MonthlySalesCard extends StatelessWidget {
   }
 
   Widget _buildVoucherItem(
-      String title,
-      String amount,
-      IconData icon,
-      Color color, {
-        bool isLast = false,
-      }) {
+    String title,
+    String amount,
+    IconData icon,
+    Color color, {
+    bool isLast = false,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         border: !isLast
             ? Border(
-          bottom: BorderSide(
-            color: Colors.grey.withOpacity(0.2),
-            width: 1,
-          ),
-        )
+                bottom: BorderSide(
+                  color: Colors.grey.withOpacity(0.2),
+                  width: 1,
+                ),
+              )
             : null,
       ),
       child: Row(
@@ -146,11 +147,5 @@ class MonthlySalesCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _calculateTotal() {
-    // Convert string to int, multiply by 3, then convert back to string
-    final amount = int.parse(controller.getDummyAmount());
-    return (amount * 3).toString();
   }
 }

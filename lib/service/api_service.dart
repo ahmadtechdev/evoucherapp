@@ -387,12 +387,80 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        return response.data; 
+        return response.data;
       } else {
         print('Error: ${response.statusCode} - ${response.statusMessage}');
       }
     } catch (e) {
       print('Exception: $e');
+    }
+  }
+
+  // monthly sale report
+  Future<dynamic> monthlySalesReport(String fromDate, String toDate) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    // Define headers
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
+    };
+
+    var data = json.encode({
+      "fromDate": fromDate,
+      "toDate": toDate,
+    });
+
+    var dio = Dio();
+    var response = await dio.post(
+      "${baseUrl2}monthlySaleReport",
+      options: Options(
+        headers: headers,
+      ),
+      data: data,
+    );
+
+    if (response.statusCode == 200) {
+      print(response.data);
+      return response.data;
+    } else {
+      print(response.statusMessage);
+      return null; // Return null or handle errors appropriately
+    }
+  }
+
+//  ExpensesReport
+  Future<dynamic> Expenses_Report(String fromDate, String toDate) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    // Define headers
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
+    };
+
+    var data = json.encode({
+      "fromDate": fromDate,
+      "toDate": toDate,
+    });
+
+    var dio = Dio();
+    var response = await dio.post(
+      "${baseUrl2}expensesReport",
+      options: Options(
+        headers: headers,
+      ),
+      data: data,
+    );
+
+    if (response.statusCode == 200) {
+      print(response.data);
+      return response.data;
+    } else {
+      print(response.statusMessage);
+      return null; // Return null or handle errors appropriately
     }
   }
 }

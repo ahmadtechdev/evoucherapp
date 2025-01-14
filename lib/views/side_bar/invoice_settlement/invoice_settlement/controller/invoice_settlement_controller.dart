@@ -11,6 +11,7 @@ class InvoiceSettlementController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    
 
     // Set dateFrom to the first day of the current month
     dateFrom.value = DateTime(DateTime.now().year, DateTime.now().month);

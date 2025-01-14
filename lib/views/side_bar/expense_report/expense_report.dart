@@ -28,19 +28,26 @@ class ExpenseComparisonReport extends StatelessWidget {
           _buildDateSelectionHeader(),
           Expanded(
             child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              
               final months = controller.getMonthsBetween();
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: months.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return ExpenseWidgets.buildTotalSummaryCard(controller);
-                  }
-                  return ExpenseWidgets.buildMonthCard(
-                    months[index - 1],
-                    controller,
-                  );
-                },
+              return RefreshIndicator(
+                onRefresh: () => controller.fetchExpenseData(),
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: months.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return ExpenseWidgets.buildTotalSummaryCard(controller);
+                    }
+                    return ExpenseWidgets.buildMonthCard(
+                      months[index - 1],
+                      controller,
+                    );
+                  },
+                ),
               );
             }),
           ),

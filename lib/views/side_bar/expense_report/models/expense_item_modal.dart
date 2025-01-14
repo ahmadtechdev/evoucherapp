@@ -4,10 +4,14 @@ class ExpenseItemModel {
   final String name;
   final double amount;
   final IconData icon;
+  final double total;
+
 
   ExpenseItemModel({
     required this.name,
     required this.amount,
+    required this.total,
+
     this.icon = Icons.monetization_on
   });
 
@@ -15,7 +19,7 @@ class ExpenseItemModel {
     return ExpenseItemModel(
       name: json['name'] ?? '',
       amount: (json['amount'] ?? 0.0).toDouble(),
-      icon: json['icon'] ?? Icons.monetization_on,
+      icon: json['icon'] ?? Icons.monetization_on, total: (json['amount'] ?? 0.0).toDouble(),
     );
   }
 
