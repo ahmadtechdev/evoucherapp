@@ -21,9 +21,14 @@ class RecoveryListsScreen extends StatelessWidget {
         backgroundColor: TColor.primary,
         foregroundColor: TColor.white,
         title: const Text('Recovery List'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => controller.fetchRecoveryLists(),
+          ),
+        ],
       ),
       drawer: const CustomDrawer(currentIndex: 10),
-
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -36,28 +41,52 @@ class RecoveryListsScreen extends StatelessWidget {
             ),
             Expanded(
               child: Obx(() {
-                final items = controller.filteredList;
-                return ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    return RecoveryListCard(
-                      rlName: item.rlName,
-                      dateCreated: item.dateCreated,
-                      totalAmount: item.totalAmount,
-                      received: item.received,
-                      remaining: item.remaining,
-                      onGetPdfPressed: () => controller.exportToPDF(context),
-                      onDetailsPressed: () {_showDetailsDialog(context, item);
-                      },
-                      onUpdatePressed: () {
-                        _showAddEditDialog(context,
-                            existingItem: item, index: index);
+                if (controller.isLoading.value) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: TColor.primary,
+                    ),
+                  );
+                }
 
-                      },
-                      onDeletePressed: () => controller.deleteRecoveryItem(index),
-                    );
-                  },
+                final items = controller.filteredList;
+                if (items.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No recovery lists found',
+                      style: TextStyle(
+                        color: TColor.primaryText,
+                        fontSize: 16,
+                      ),
+                    ),
+                  );
+                }
+
+                return RefreshIndicator(
+                  onRefresh: controller.fetchRecoveryLists,
+                  child: ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      return RecoveryListCard(
+                        rlName: item.rlName,
+                        dateCreated: item.dateCreated,
+                        totalAmount: item.totalAmount,
+                        received: item.received,
+                        remaining: item.remaining,
+                        onGetPdfPressed: () => controller.exportToPDF(context),
+                        onDetailsPressed: () =>
+                            _showDetailsDialog(context, item),
+                        onUpdatePressed: () => _showAddEditDialog(
+                          context,
+                          existingItem: item,
+                          index: index,
+                        ),
+                        onDeletePressed: () =>
+                            controller.deleteRecoveryItem(index),
+                      );
+                    },
+                  ),
                 );
               }),
             ),
@@ -110,6 +139,7 @@ class RecoveryListsScreen extends StatelessWidget {
       },
     );
   }
+
   Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -139,17 +169,24 @@ class RecoveryListsScreen extends StatelessWidget {
       ),
     );
   }
-  void _showAddEditDialog(BuildContext context, {RecoveryListModel? existingItem, int? index}) {
-    final nameController = TextEditingController(text: existingItem?.rlName ?? '');
-    final dateController = TextEditingController(text: existingItem?.dateCreated ?? '');
-    final totalAmountController = TextEditingController(text: existingItem?.totalAmount.toStringAsFixed(2) ?? '');
-    final receivedController = TextEditingController(text: existingItem?.received.toStringAsFixed(2) ?? '');
+
+  void _showAddEditDialog(BuildContext context,
+      {RecoveryListModel? existingItem, int? index}) {
+    final nameController =
+        TextEditingController(text: existingItem?.rlName ?? '');
+    final dateController =
+        TextEditingController(text: existingItem?.dateCreated ?? '');
+    final totalAmountController = TextEditingController(
+        text: existingItem?.totalAmount.toStringAsFixed(2) ?? '');
+    final receivedController = TextEditingController(
+        text: existingItem?.received.toStringAsFixed(2) ?? '');
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 10,
           backgroundColor: TColor.white,
           child: Padding(
@@ -158,22 +195,41 @@ class RecoveryListsScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(existingItem == null ? 'Add Recovery List' : 'Edit Recovery List', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text(
+                      existingItem == null
+                          ? 'Add Recovery List'
+                          : 'Edit Recovery List',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
-                  RoundTextField(hintText: "Account Name", controller: nameController),
+                  RoundTextField(
+                      hintText: "Account Name", controller: nameController),
                   const SizedBox(height: 12),
-                  RoundTextField(hintText: "Date Created", controller: dateController), // Use DateSelector as needed
+                  RoundTextField(
+                      hintText: "Date Created",
+                      controller: dateController), // Use DateSelector as needed
                   const SizedBox(height: 12),
-                  RoundTextField(hintText: "Total Amount", keyboardType: const TextInputType.numberWithOptions(decimal: true), controller: totalAmountController),
+                  RoundTextField(
+                      hintText: "Total Amount",
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      controller: totalAmountController),
                   const SizedBox(height: 12),
-                  RoundTextField(hintText: "Received Amount", keyboardType: const TextInputType.numberWithOptions(decimal: true), controller: receivedController),
+                  RoundTextField(
+                      hintText: "Received Amount",
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      controller: receivedController),
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        style: TextButton.styleFrom(foregroundColor: TColor.third, textStyle: const TextStyle(fontWeight: FontWeight.bold)),
+                        style: TextButton.styleFrom(
+                            foregroundColor: TColor.third,
+                            textStyle:
+                                const TextStyle(fontWeight: FontWeight.bold)),
                         child: const Text('Cancel'),
                       ),
                       ElevatedButton(
@@ -181,9 +237,14 @@ class RecoveryListsScreen extends StatelessWidget {
                           final newItem = RecoveryListModel(
                             rlName: nameController.text,
                             dateCreated: dateController.text,
-                            totalAmount: double.parse(totalAmountController.text),
+                            totalAmount:
+                                double.parse(totalAmountController.text),
                             received: double.parse(receivedController.text),
-                            remaining: double.parse(totalAmountController.text) - double.parse(receivedController.text),
+                            remaining:
+                                double.parse(totalAmountController.text) -
+                                    double.parse(receivedController.text),
+                            id: '',
+                            formatted: {},
                           );
 
                           if (existingItem == null) {
@@ -194,7 +255,13 @@ class RecoveryListsScreen extends StatelessWidget {
 
                           Navigator.of(context).pop();
                         },
-                        style: ElevatedButton.styleFrom(backgroundColor: TColor.secondary, foregroundColor: TColor.white, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10), textStyle: const TextStyle(fontWeight: FontWeight.bold)),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: TColor.secondary,
+                            foregroundColor: TColor.white,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            textStyle:
+                                const TextStyle(fontWeight: FontWeight.bold)),
                         child: const Text('Save'),
                       ),
                     ],
@@ -207,7 +274,4 @@ class RecoveryListsScreen extends StatelessWidget {
       },
     );
   }
-
-
-
 }

@@ -2,11 +2,11 @@ import 'package:evoucher/views/side_bar/incomes_report/widget/month_card_widget.
 import 'package:evoucher/views/side_bar/incomes_report/widget/total_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../../../common/color_extension.dart';
 import '../../../common/drawer.dart';
 import '../../../common_widget/dart_selector2.dart';
 import 'controller/income_controller.dart';
-
 
 class IncomesComparisonReport extends GetView<IncomesReportController> {
   const IncomesComparisonReport({super.key});
@@ -61,134 +61,111 @@ class IncomesComparisonReport extends GetView<IncomesReportController> {
             children: [
               Expanded(
                 child: Obx(() => DateSelector2(
-                  label: 'From Month',
-                  fontSize: 12,
-                  initialDate: controller.fromDate.value,
-                  selectMonthOnly: true,
-                  onDateChanged: controller.updateFromDate,
-                )),
+                      label: 'From Month',
+                      fontSize: 12,
+                      initialDate: controller.fromDate.value,
+                      selectMonthOnly: true,
+                      onDateChanged: controller.updateFromDate,
+                    )),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Obx(() => DateSelector2(
-                  label: 'To Month',
-                  fontSize: 12,
-                  initialDate: controller.toDate.value,
-                  selectMonthOnly: true,
-                  onDateChanged: controller.updateToDate,
-                )),
+                      label: 'To Month',
+                      fontSize: 12,
+                      initialDate: controller.toDate.value,
+                      selectMonthOnly: true,
+                      onDateChanged: controller.updateToDate,
+                    )),
               ),
             ],
           ),
           const SizedBox(height: 16),
           Obx(() => Text(
-            controller.getFormattedDateRange(),
-            style: TextStyle(
-              color: TColor.primaryText,
-              fontWeight: FontWeight.w500,
-            ),
-          )),
+                controller.errorMessage.isNotEmpty
+                    ? controller.errorMessage.value
+                    : 'From ${DateFormat('MMM yyyy').format(controller.fromDate.value)} To ${DateFormat('MMM yyyy').format(controller.toDate.value)}',
+                style: TextStyle(
+                  color: TColor.primaryText,
+                  fontWeight: FontWeight.w500,
+                ),
+              )),
         ],
       ),
     );
   }
 
   Widget _buildTotalSummaryCard() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: TColor.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: TColor.primary.withOpacity(0.2), width: 2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Total Incomes Summary',
-            style: TextStyle(
-              color: TColor.primaryText,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+    return Obx(() {
+      final totals = controller.getTotalSummary();
+      if (totals.isEmpty) {
+        return const Center(child: Text('No data available.'));
+      }
+
+      return Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: TColor.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: TColor.primary.withOpacity(0.2), width: 2),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Total Incomes Summary',
+              style: TextStyle(
+                color: TColor.primaryText,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: TotalItemWidget(
-                  label: 'Package Income',
-                  amount: '396,230.00',
-                  icon: Icons.receipt,
-                ),
+            const SizedBox(height: 16),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio:
+                    0.9, // Changed from 1.2 to 1.0 for more height
+                crossAxisSpacing: 12, // Increased spacing
+                mainAxisSpacing: 12,
               ),
-              Expanded(
-                child: TotalItemWidget(
-                  label: 'Ticket Income',
-                  amount: '72,698.00',
-                  icon: Icons.monetization_on,
-                ),
-              ),
-              Expanded(
-                child: TotalItemWidget(
-                  label: 'Hotel Incomes',
-                  amount: '241,671.00',
-                  icon: Icons.hotel,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const Row(
-            children: [
-              Expanded(
-                child: TotalItemWidget(
-                  label: 'Visa Incomes',
-                  amount: '53,786.00',
-                  icon: Icons.credit_card,
-                ),
-              ),
-              Expanded(
-                child: TotalItemWidget(
-                  label: 'Other Incomes',
-                  amount: '2,793.00',
-                  icon: Icons.attach_money,
-                ),
-              ),
-              Expanded(
-                child: TotalItemWidget(
-                  label: 'Transport Income',
-                  amount: '22,210.00',
-                  icon: Icons.directions_car,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const Row(
-            children: [
-              Expanded(
-                child: TotalItemWidget(
-                  label: 'Fine Penalties',
-                  amount: '53,786.00',
-                  icon: Icons.close,
-                ),
-              ),
-              Expanded(
-                child: TotalItemWidget(
-                  label: 'Other Penalties',
-                  amount: '2,793.00',
-                  icon: Icons.devices_other,
-                ),
-              ),
-              Expanded(child: SizedBox()),
-            ],
-          ),
-        ],
-      ),
-    );
+              itemCount: totals.length,
+              itemBuilder: (context, index) {
+                final entry = totals.entries.elementAt(index);
+                return TotalItemWidget(
+                  label: entry.key,
+                  amount: entry.value,
+                  icon: _getIconForCategory(entry.key),
+                  total: entry.value,
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      );
+    });
+  }
+
+  IconData _getIconForCategory(String category) {
+    switch (category) {
+      case 'Package Income':
+        return Icons.receipt;
+      case 'Ticket Income':
+        return Icons.monetization_on;
+      case 'Hotel Incomes':
+        return Icons.hotel;
+      case 'Visa Incomes':
+        return Icons.credit_card;
+      case 'Other Incomes':
+        return Icons.attach_money;
+      case 'Transport Income':
+        return Icons.directions_car;
+      default:
+        return Icons.device_unknown;
+    }
   }
 }

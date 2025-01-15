@@ -88,17 +88,20 @@ class _TransactionReportScreenState extends State<TransactionReportScreen> {
             // In TransactionReportScreen
             Expanded(
               child: Obx(
-                () => ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: transactionController.transactions.length,
-                  itemBuilder: (context, index) {
-                    return CollapsibleTransactionCard(
-                      transaction: transactionController.transactions[index],
-                      index: index,
-                      controller: transactionController,
-                    );
-                  },
-                ),
+                () => transactionController.isLoading.value
+                    ? Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: transactionController.transactions.length,
+                        itemBuilder: (context, index) {
+                          return CollapsibleTransactionCard(
+                            transaction:
+                                transactionController.transactions[index],
+                            index: index,
+                            controller: transactionController,
+                          );
+                        },
+                      ),
               ),
             ),
             _buildTotalSection(),
@@ -113,7 +116,16 @@ class _TransactionReportScreenState extends State<TransactionReportScreen> {
     return DateSelector2(
         fontSize: 14,
         initialDate: selectedDate,
-        onDateChanged: onChanged,
+        onDateChanged: (date) {
+          onChanged(date);
+          // Format dates as required by API (YYYY-MM-DD)
+          String formattedFromDate = fromDate.toString().split(' ')[0];
+          String formattedToDate = toDate.toString().split(' ')[0];
+          transactionController.fetchTransactions(
+            fromDate: formattedFromDate,
+            toDate: formattedToDate,
+          );
+        },
         label: label);
   }
 
@@ -144,26 +156,45 @@ class _TransactionReportScreenState extends State<TransactionReportScreen> {
   }
 
   Widget _buildTotalSection() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: TColor.white,
-        boxShadow: [
-          BoxShadow(
-            color: TColor.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          _buildTotalItem('Total Purchases', 1060.00, TColor.third),
-          _buildTotalItem('Total Sales', 1210.00, TColor.secondary),
-          _buildTotalItem('Total P/L', 150.00, TColor.secondary),
-        ],
-      ),
-    );
+    return Obx(() {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: TColor.white,
+          boxShadow: [
+            BoxShadow(
+              color: TColor.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            _buildTotalItem(
+              'Total Purchases',
+              transactionController.parseAmount(
+                  transactionController.grandTotals['total_purchases'] ??
+                      '0.00'),
+              TColor.third,
+            ),
+            _buildTotalItem(
+              'Total Sales',
+              transactionController.parseAmount(
+                  transactionController.grandTotals['total_sales'] ?? '0.00'),
+              TColor.secondary,
+            ),
+            _buildTotalItem(
+              'Total P/L',
+              transactionController.parseAmount(
+                  transactionController.grandTotals['total_profit_loss'] ??
+                      '0.00'),
+              TColor.secondary,
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildTotalItem(String label, double amount, Color color) {
@@ -180,10 +211,10 @@ class _TransactionReportScreenState extends State<TransactionReportScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Rs ${amount.toStringAsFixed(2)}',
+            'Rs ${amount.toStringAsFixed(1)}',
             style: TextStyle(
               color: color,
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
           ),

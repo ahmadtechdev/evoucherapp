@@ -463,6 +463,105 @@ class ApiService {
       return null; // Return null or handle errors appropriately
     }
   }
+
+  Future<dynamic> recoveryLists(String fromDate, String toDate) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    // Define headers
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
+    };
+
+    var data = json.encode({
+      "fromDate": fromDate,
+      "toDate": toDate,
+    });
+
+    var dio = Dio();
+    var response = await dio.post(
+      "${baseUrl2}recoveryLists",
+      options: Options(
+        headers: headers,
+      ),
+      data: data,
+    );
+
+    if (response.statusCode == 200) {
+      print(response.data);
+      return response.data;
+    } else {
+      print(response.statusMessage);
+      return null; // Return null or handle errors appropriately
+    }
+  }
+
+  Future<dynamic> incomesReport(String fromDate, String toDate) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    // Define headers
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
+    };
+
+    var data = json.encode({
+      "fromDate": fromDate,
+      "toDate": toDate,
+    });
+
+    var dio = Dio();
+    var response = await dio.post(
+      "${baseUrl2}incomesReport",
+      options: Options(
+        headers: headers,
+      ),
+      data: data,
+    );
+
+    if (response.statusCode == 200) {
+      print(response.data);
+      return response.data;
+    } else {
+      print(response.statusMessage);
+      return null; // Return null or handle errors appropriately
+    }
+  }
+  
+  Future<dynamic> allTicketVoucher({required String fromDate, required String toDate}) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    // Define headers
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
+    };
+
+    var data = json.encode({
+      "fromDate": fromDate,
+      "toDate": toDate,
+    });
+
+    var dio = Dio();
+    var response = await dio.post(
+      "${baseUrl2}allTicketVoucher",
+      options: Options(
+        headers: headers,
+      ),
+      data: data,
+    );
+
+    if (response.statusCode == 200) {
+      print(response.data);
+      return response.data;
+    } else {
+      print(response.statusMessage);
+      return null; // Return null or handle errors appropriately
+    }
+  }
 }
 
 // Custom Exception Classes

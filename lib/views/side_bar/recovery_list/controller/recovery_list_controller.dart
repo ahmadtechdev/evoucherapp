@@ -1,6 +1,6 @@
-
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:evoucher/service/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -14,163 +14,54 @@ import 'package:pdf/widgets.dart' as pw;
 class RecoveryListController extends GetxController {
   var recoveryList = <RecoveryListModel>[].obs;
   var searchQuery = ''.obs;
+  var isLoading = false.obs;
+  final ApiService _apiService = ApiService();
 
   @override
   void onInit() {
     super.onInit();
-    loadInitialData();
+    fetchRecoveryLists();
   }
 
-  void loadInitialData() {
-    recoveryList.addAll([
-      RecoveryListModel(rlName: 'Ali Ameen',
-          dateCreated: 'Fri, 23 Feb 2024',
-          totalAmount: 250000.00,
-          received: 150000.00,
-          remaining: 100000.00),
-      // Add other items...
-      RecoveryListModel(
-        rlName: 'Vendors',
-        dateCreated: 'Mon, 11 Sep 2023',
-        totalAmount: 142000.00,
-        received: 10000.00,
-        remaining: 132000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'John Doe',
-        dateCreated: 'Wed, 15 Mar 2023',
-        totalAmount: 120000.00,
-        received: 80000.00,
-        remaining: 40000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Jane Smith',
-        dateCreated: 'Thu, 10 Aug 2023',
-        totalAmount: 180000.00,
-        received: 100000.00,
-        remaining: 80000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'ABC Corp',
-        dateCreated: 'Tue, 02 May 2023',
-        totalAmount: 300000.00,
-        received: 250000.00,
-        remaining: 50000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'XYZ Pvt Ltd',
-        dateCreated: 'Fri, 22 Sep 2023',
-        totalAmount: 220000.00,
-        received: 170000.00,
-        remaining: 50000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Mike Ross',
-        dateCreated: 'Mon, 06 Nov 2023',
-        totalAmount: 50000.00,
-        received: 20000.00,
-        remaining: 30000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Harvey Specter',
-        dateCreated: 'Sat, 18 Feb 2024',
-        totalAmount: 80000.00,
-        received: 60000.00,
-        remaining: 20000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Rachel Zane',
-        dateCreated: 'Wed, 12 Jul 2023',
-        totalAmount: 150000.00,
-        received: 75000.00,
-        remaining: 75000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Donna Paulsen',
-        dateCreated: 'Sun, 01 Oct 2023',
-        totalAmount: 95000.00,
-        received: 45000.00,
-        remaining: 50000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Louis Litt',
-        dateCreated: 'Fri, 29 Sep 2023',
-        totalAmount: 75000.00,
-        received: 25000.00,
-        remaining: 50000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Pearson Hardman',
-        dateCreated: 'Tue, 08 Aug 2023',
-        totalAmount: 120000.00,
-        received: 50000.00,
-        remaining: 70000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Global Ventures',
-        dateCreated: 'Thu, 25 May 2023',
-        totalAmount: 200000.00,
-        received: 100000.00,
-        remaining: 100000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Tech Solutions',
-        dateCreated: 'Mon, 20 Mar 2023',
-        totalAmount: 170000.00,
-        received: 120000.00,
-        remaining: 50000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Innovate Ltd',
-        dateCreated: 'Fri, 10 Nov 2023',
-        totalAmount: 240000.00,
-        received: 200000.00,
-        remaining: 40000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Prime Traders',
-        dateCreated: 'Wed, 16 Aug 2023',
-        totalAmount: 190000.00,
-        received: 90000.00,
-        remaining: 100000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Smart Industries',
-        dateCreated: 'Sat, 30 Sep 2023',
-        totalAmount: 130000.00,
-        received: 70000.00,
-        remaining: 60000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Future Corp',
-        dateCreated: 'Tue, 14 Feb 2023',
-        totalAmount: 220000.00,
-        received: 180000.00,
-        remaining: 40000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Elite Group',
-        dateCreated: 'Thu, 22 Jun 2023',
-        totalAmount: 160000.00,
-        received: 80000.00,
-        remaining: 80000.00,
-      ),
-      RecoveryListModel(
-        rlName: 'Pioneer Inc',
-        dateCreated: 'Sun, 05 Mar 2023',
-        totalAmount: 145000.00,
-        received: 45000.00,
-        remaining: 100000.00,
-      ),
-    ]);
+  Future<void> fetchRecoveryLists() async {
+    try {
+      isLoading.value = true;
+
+      // Get current date for the API request
+      final now = DateTime.now();
+      final fromDate = '2023-01-01'; // You can adjust this as needed
+      final toDate =
+          '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+
+      final response = await _apiService.recoveryLists(fromDate, toDate);
+
+      if (response != null && response['status'] == 'success') {
+        final List<dynamic> listsJson = response['data']['lists'];
+        recoveryList.value =
+            listsJson.map((json) => RecoveryListModel.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to load recovery lists');
+      }
+    } catch (e) {
+      debugPrint('Error fetching recovery lists: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to load recovery lists',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   List<RecoveryListModel> get filteredList {
     if (searchQuery.value.isEmpty) {
       return recoveryList;
     }
-    return recoveryList.where((item) =>
-        item.rlName.toLowerCase().contains(searchQuery.value.toLowerCase()))
+    return recoveryList
+        .where((item) =>
+            item.rlName.toLowerCase().contains(searchQuery.value.toLowerCase()))
         .toList();
   }
 
@@ -230,8 +121,7 @@ class RecoveryListController extends GetxController {
             ],
           );
         },
-        build: (pw.Context context) =>
-        [
+        build: (pw.Context context) => [
           pw.TableHelper.fromTextArray(
             context: context,
             data: <List<String>>[
@@ -242,14 +132,13 @@ class RecoveryListController extends GetxController {
                 'Received',
                 'Remaining'
               ],
-              ...(recoveryList.map((item) =>
-              [
-                item.rlName,
-                item.dateCreated,
-                '\$${item.totalAmount.toStringAsFixed(2)}',
-                '\$${item.received.toStringAsFixed(2)}',
-                '\$${item.remaining.toStringAsFixed(2)}',
-              ])),
+              ...(recoveryList.map((item) => [
+                    item.rlName,
+                    item.dateCreated,
+                    '\$${item.totalAmount.toStringAsFixed(2)}',
+                    '\$${item.received.toStringAsFixed(2)}',
+                    '\$${item.remaining.toStringAsFixed(2)}',
+                  ])),
             ],
             headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
             cellStyle: const pw.TextStyle(),
@@ -265,9 +154,7 @@ class RecoveryListController extends GetxController {
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
               pw.Text(
-                'Total Outstanding: \$${recoveryList.fold(
-                    0.0, (sum, item) => sum + item.remaining).toStringAsFixed(
-                    2)}',
+                'Total Outstanding: \$${recoveryList.fold(0.0, (sum, item) => sum + item.remaining).toStringAsFixed(2)}',
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
             ],
@@ -287,48 +174,43 @@ class RecoveryListController extends GetxController {
         // Show preview and save confirmation
         await showDialog(
           context: context,
-          builder: (context) =>
-              AlertDialog(
-                backgroundColor: TColor.white,
-                title: Row(
-                  children: [
-                    Icon(Icons.check_circle, color: TColor.secondary, size: 28),
-                    const SizedBox(width: 8),
-                    Text(
-                      'PDF Generated',
-                      style: TextStyle(color: TColor.primaryText,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
+          builder: (context) => AlertDialog(
+            backgroundColor: TColor.white,
+            title: Row(
+              children: [
+                Icon(Icons.check_circle, color: TColor.secondary, size: 28),
+                const SizedBox(width: 8),
+                Text(
+                  'PDF Generated',
+                  style: TextStyle(
+                      color: TColor.primaryText, fontWeight: FontWeight.bold),
                 ),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Your PDF has been successfully generated',
-                      style: TextStyle(color: TColor.secondaryText),
-                    ),
-
-                  ],
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Your PDF has been successfully generated',
+                  style: TextStyle(color: TColor.secondaryText),
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('Close', style: TextStyle(color: TColor.third)),
-                  ),
-
-                ],
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Close', style: TextStyle(color: TColor.third)),
               ),
+            ],
+          ),
         );
       } catch (e) {
-
         CustomSnackBar(
             message: "Failed to generate PDF: $e",
-            backgroundColor: TColor.third
-        );
+            backgroundColor: TColor.third);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

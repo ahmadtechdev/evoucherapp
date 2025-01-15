@@ -1,9 +1,12 @@
+// Update in MonthCardWidget
+
+import 'package:evoucher/common/color_extension.dart';
+import 'package:evoucher/views/side_bar/incomes_report/controller/income_controller.dart';
+import 'package:evoucher/views/side_bar/incomes_report/widget/income_card_widget.dart';
+import 'package:evoucher/views/side_bar/incomes_report/widget/total_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../common/color_extension.dart';
-import 'income_card_widget.dart';
-import '../controller/income_controller.dart';
-
+import 'package:intl/intl.dart';
 
 class MonthCardWidget extends GetView<IncomesReportController> {
   final DateTime month;
@@ -15,6 +18,10 @@ class MonthCardWidget extends GetView<IncomesReportController> {
 
   @override
   Widget build(BuildContext context) {
+    final monthStr = DateFormat('MMM yyyy').format(month);
+    final monthData = controller.getIncomeDataForMonth(monthStr);
+    final monthTotal = controller.getTotalForMonth(monthStr);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -43,7 +50,7 @@ class MonthCardWidget extends GetView<IncomesReportController> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${controller.getMonthName(month.month)} ${month.year}',
+                  monthStr,
                   style: TextStyle(
                     color: TColor.primary,
                     fontSize: 18,
@@ -54,58 +61,11 @@ class MonthCardWidget extends GetView<IncomesReportController> {
               ],
             ),
           ),
-          IncomeCardWidget(
-            title: 'Package Income',
-            amount: '396,230.00',
-            icon: Icons.receipt,
-            color: TColor.primary,
-          ),
-          IncomeCardWidget(
-            title: 'Ticket Income',
-            amount: '72,698.00',
-            icon: Icons.monetization_on,
-            color: TColor.secondary,
-          ),
-          IncomeCardWidget(
-            title: 'Hotel Incomes',
-            amount: '241,671.00',
-            icon: Icons.hotel,
-            color: TColor.third,
-          ),
-          IncomeCardWidget(
-            title: 'Visa Incomes',
-            amount: '53,786.00',
-            icon: Icons.credit_card,
-            color: TColor.fourth,
-          ),
-          IncomeCardWidget(
-            title: 'Other Incomes',
-            amount: '0.00',
-            icon: Icons.attach_money,
-            color: TColor.primary,
-          ),
-          IncomeCardWidget(
-            title: 'Transport Income',
-            amount: '-22,210.00',
-            icon: Icons.directions_car,
-            color: TColor.secondary,
-          ),
-          IncomeCardWidget(
-            title: 'Fine Penalties',
-            amount: '0.00',
-            icon: Icons.close,
-            color: TColor.secondary,
-          ),
-          IncomeCardWidget(
-            title: 'Other Penalties',
-            amount: '-2.00',
-            icon: Icons.devices_other,
-            color: TColor.secondary,
-          ),
+          ...buildIncomeItems(monthData),
           const Divider(thickness: 2, height: 1),
           IncomeCardWidget(
             title: 'Total',
-            amount: '396,230.00',
+            amount: monthTotal,
             icon: Icons.summarize,
             color: TColor.primary,
             isLast: true,
@@ -113,5 +73,98 @@ class MonthCardWidget extends GetView<IncomesReportController> {
         ],
       ),
     );
+  }
+
+  List<Widget> buildIncomeItems(Map<String, dynamic> monthData) {
+    final incomeTypes = {
+      'Package Income': Icons.receipt,
+      'Ticket Income': Icons.monetization_on,
+      'Hotel Incomes': Icons.hotel,
+      'Visa Incomes': Icons.credit_card,
+      'Other Incomes': Icons.attach_money,
+      'Transport Income': Icons.directions_car,
+      'Fine Penalties': Icons.close,
+      'Other Penalties': Icons.devices_other,
+    };
+
+    return incomeTypes.entries.map((entry) {
+      final data =
+          monthData[entry.key] ?? {'amount': '0.00', 'is_negative': false};
+      return IncomeCardWidget(
+        title: entry.key,
+        amount: data['amount'],
+        icon: entry.value,
+        color: TColor.primary,
+      );
+    }).toList();
+  }
+}
+
+// Update in IncomesComparisonReport class
+Widget _buildTotalSummaryCard() {
+  return Obx(() {
+    final totals = IncomesReportController().getTotalSummary();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: TColor.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: TColor.primary.withOpacity(0.2), width: 2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Total Incomes Summary',
+            style: TextStyle(
+              color: TColor.primaryText,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: totals.entries.map((entry) {
+              return Expanded(
+                child: TotalItemWidget(
+                  label: entry.key,
+                  total: entry.value,
+                  icon: getIconForIncomeType(entry.key),
+                  amount: '',
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  });
+}
+
+IconData getIconForIncomeType(String type) {
+  switch (type) {
+    case 'Package Income':
+      return Icons.receipt;
+    case 'Ticket Income':
+      return Icons.monetization_on;
+    case 'Hotel Incomes':
+      return Icons.hotel;
+    case 'Visa Incomes':
+      return Icons.credit_card;
+    case 'Other Incomes':
+      return Icons.attach_money;
+    case 'Transport Income':
+      return Icons.directions_car;
+    case 'Fine Penalties':
+      return Icons.close;
+    case 'Other Penalties':
+      return Icons.devices_other;
+    default:
+      return Icons.attach_money;
   }
 }
