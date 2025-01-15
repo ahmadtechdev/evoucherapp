@@ -11,10 +11,16 @@ class TransactionReportScreen extends StatefulWidget {
 }
 
 class _TransactionReportScreenState extends State<TransactionReportScreen> {
-  DateTime fromDate = DateTime(2024, 11, 1);
-  DateTime toDate = DateTime(2024, 12, 13);
+  DateTime toDate = DateTime.now();
+  DateTime fromDate = DateTime.now();
   final TransactionController transactionController =
       Get.put(TransactionController());
+
+  @override
+  void initState() {
+    super.initState();
+    fromDate = DateTime(toDate.year, toDate.month, 1);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -511,15 +517,15 @@ class CollapsibleTransactionCard extends StatelessWidget {
             label,
             style: TextStyle(
               color: TColor.secondaryText,
-              fontSize: 12,
+              fontSize: 14,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            'Rs ${amount.toStringAsFixed(2)}',
+            'Rs ${amount.toStringAsFixed(1)}',
             style: TextStyle(
               color: color,
-              fontSize: 16,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
