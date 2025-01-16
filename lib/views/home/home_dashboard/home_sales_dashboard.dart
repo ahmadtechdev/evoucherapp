@@ -1,5 +1,5 @@
-import 'package:evoucher/views/home/home_dashboard/grand_total_report.dart';
-import 'package:evoucher/views/home/home_dashboard/visa_sales_report.dart';
+import 'package:evoucher/views/home/home_dashboard/all_grand_sales_report/grand_total_report.dart';
+import 'package:evoucher/views/home/home_dashboard/all_visa_sales_report/visa_sales_report.dart';
 import 'package:flutter/material.dart';
 
 import '../../../common/color_extension.dart';
@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 
 import 'all_ticket_sales_report/all_ticket_sales_report.dart';
 import 'controller/dashboard_controller.dart';
-import 'hotel_sales_report.dart';
+import 'all_hotle_sales_report/hotel_sales_report.dart';
 
 class SalesDashboardWidget extends StatefulWidget {
   const SalesDashboardWidget({super.key});
@@ -143,11 +143,11 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
         }),
         _buildSalesCard('Hotel Sales', 'PKR ${data.hotel.toStringAsFixed(1)}',
             Icons.business, TColor.secondary, padding, fontSize, iconSize, () {
-          Get.to(() => const HotelSalesReport());
+          Get.to(() => HotelSalesReport());
         }),
         _buildSalesCard('Visa Sales', 'PKR ${data.visa.toStringAsFixed(1)}',
             Icons.credit_card, TColor.third, padding, fontSize, iconSize, () {
-          Get.to(() => const VisaSalesReport());
+          Get.to(() => VisaSalesReport());
         }),
         _buildSalesCard(
             'Grand Total',
@@ -157,7 +157,7 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
             padding,
             fontSize,
             iconSize, () {
-          Get.to(() => const GrandTotalReport());
+          Get.to(() => GrandTotalReport());
         }),
       ],
     );

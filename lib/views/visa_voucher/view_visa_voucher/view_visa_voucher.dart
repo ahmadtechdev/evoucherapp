@@ -45,8 +45,11 @@ class ViewVisaVoucher extends StatelessWidget {
                       child: DateSelector2(
                         label: 'From Date',
                         fontSize: 14,
-                        initialDate: DateTime.now(),
-                        onDateChanged: (DateTime value) {},
+                        initialDate: controller.fromDate.value,
+                        onDateChanged: (DateTime value) {
+                          controller.updateDateRange(
+                              value, controller.toDate.value);
+                        },
                       ),
                     ),
                     const SizedBox(width: 15),
@@ -54,8 +57,11 @@ class ViewVisaVoucher extends StatelessWidget {
                       child: DateSelector2(
                         label: 'To Date',
                         fontSize: 14,
-                        initialDate: DateTime.now(),
-                        onDateChanged: (DateTime value) {},
+                        initialDate: controller.toDate.value,
+                        onDateChanged: (DateTime value) {
+                          controller.updateDateRange(
+                              controller.fromDate.value, value);
+                        },
                       ),
                     ),
                   ],
@@ -64,25 +70,69 @@ class ViewVisaVoucher extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Obx(
-              () {
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: controller.ticketVouchers.length,
-                  itemBuilder: (context, index) {
-                    var ticket = controller.ticketVouchers[index];
-                    return _buildVoucherCard(ticket, context);
-                  },
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (controller.errorMessage.isNotEmpty) {
+                return Center(
+                  child: Text(
+                    controller.errorMessage.value,
+                    style: TextStyle(color: TColor.textField),
+                  ),
                 );
-              },
-            ),
+              }
+
+              if (controller.ticketVouchers.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.search_off_rounded,
+                        size: 60,
+                        color: TColor.secondaryText.withOpacity(0.5),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No Records Found',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: TColor.secondaryText,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'There are no visa vouchers in this date range',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: TColor.secondaryText.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: controller.ticketVouchers.length,
+                itemBuilder: (context, index) {
+                  var ticket = controller.ticketVouchers[index];
+                  return _buildVoucherCard(ticket, context);
+                },
+              );
+            }),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildVoucherCard(Map<String, String> ticket, BuildContext context) {
+  // Update the _buildVoucherCard method to handle the new data structure
+  Widget _buildVoucherCard(Map<String, dynamic> ticket, BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -101,7 +151,9 @@ class ViewVisaVoucher extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: TColor.primary.withOpacity(0.05),
+              color: ticket['needs_attention'] == true
+                  ? Colors.red.withOpacity(0.1)
+                  : TColor.primary.withOpacity(0.05),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -109,22 +161,29 @@ class ViewVisaVoucher extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Icons.confirmation_number, color: TColor.primary),
+                Icon(Icons.confirmation_number,
+                    color: ticket['needs_attention'] == true
+                        ? Colors.red
+                        : TColor.primary),
                 const SizedBox(width: 10),
                 Text(
-                  'VV ID: ${ticket['VV_ID']}',
+                  ticket['VV_ID'],
                   style: TextStyle(
-                    color: TColor.primary,
+                    color: ticket['needs_attention'] == true
+                        ? Colors.red
+                        : TColor.primary,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: Icon(Icons.visibility, color: TColor.primary),
+                  icon: Icon(Icons.visibility,
+                      color: ticket['needs_attention'] == true
+                          ? Colors.red
+                          : TColor.primary),
                   onPressed: () {
-                    // Implement view action
-                    Get.to(()=> const SingleVisaView());
+                    Get.to(() => const SingleVisaView());
                   },
                 ),
               ],
@@ -135,25 +194,40 @@ class ViewVisaVoucher extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInfoRow(
-                    Icons.person, 'Customer', ticket['customer'] ?? ''),
+                _buildInfoRow(Icons.calendar_today, 'Date', ticket['date']),
+                const SizedBox(height: 12),
+                _buildInfoRow(Icons.person, 'Customer', ticket['customer']),
+                const SizedBox(height: 12),
+                _buildInfoRow(Icons.person_add, 'Added by', ticket['added_by']),
+                if (ticket['changes_by'] != null) ...[
+                  const SizedBox(height: 12),
+                  _buildInfoRow(
+                      Icons.edit, 'Modified by', ticket['changes_by']),
+                ],
                 const SizedBox(height: 12),
                 _buildInfoRow(
-                    Icons.person_add, 'Added by', ticket['added_by'] ?? ''),
+                    Icons.description, 'Description', ticket['description']),
                 const SizedBox(height: 12),
-                _buildInfoRow(Icons.description, 'Description',
-                    ticket['description'] ?? ''),
-                const SizedBox(height: 12),
-                _buildInfoRow(Icons.business, 'Supplier Account',
-                    ticket['supplier'] ?? ''),
+                _buildInfoRow(
+                    Icons.business, 'Supplier Account', ticket['supplier']),
                 const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
-                      child: _buildInfoRow(
-                        Icons.check_circle,
-                        'Visa Status',
-                        ticket['visa_status'] ?? 'Pending',
+                      child: Column(
+                        children: [
+                          _buildInfoRow(
+                            Icons.check_circle,
+                            'Visa Status',
+                            ticket['visa_status'],
+                          ),
+                          const SizedBox(height: 8),
+                          _buildInfoRow(
+                            Icons.assignment_ind,
+                            'Assignment',
+                            ticket['assign_status'],
+                          ),
+                        ],
                       ),
                     ),
                     Text(
@@ -170,15 +244,14 @@ class ViewVisaVoucher extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                        child: _buildActionButton('Invoice ', Icons.receipt,
-                            onPressed: () {
-                      generateAndPreviewInvoice(context);
-                    })),
-                    // const SizedBox(width: 12),
-                    // Expanded(
-                    //   child:
-                    //       _buildActionButton('Invoice 2', Icons.receipt_long),
-                    // ),
+                      child: _buildActionButton(
+                        'Invoice ',
+                        Icons.receipt,
+                        onPressed: () {
+                          generateAndPreviewInvoice(context);
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -389,12 +462,11 @@ class ViewVisaVoucher extends StatelessWidget {
                 columnWidths: {
                   0: const pw.FlexColumnWidth(1),
                   1: const pw.FlexColumnWidth(1),
-
                 },
                 border: pw.TableBorder.all(width: 0.5),
                 children: [
                   _buildTableRow(
-                    ['Visa Invoice Date','Account Name'],
+                    ['Visa Invoice Date', 'Account Name'],
                     isHeader: true,
                     fontSize: 10,
                   ),

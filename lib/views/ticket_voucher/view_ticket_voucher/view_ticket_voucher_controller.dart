@@ -1,66 +1,56 @@
 import 'package:get/get.dart';
+import 'package:evoucher/service/api_service.dart';
 
 class TicketVoucherController extends GetxController {
-  var ticketVouchers = <Map<String, String>>[].obs;
-  var totalReceipt = 0.0.obs;
-  var fromDate = '12/01/2024'.obs;
-  var toDate = '12/17/2024'.obs;
+  final ApiService _apiService = ApiService();
+  var ticketVouchers = <Map<String, dynamic>>[].obs;
+  var isLoading = false.obs;
+  var fromDate = DateTime.now().obs;
+  var toDate = DateTime.now().obs;
+  var totalRecords = 0.obs;
 
   @override
   void onInit() {
+    fromDate.value = DateTime(DateTime.now().year, DateTime.now().month, 1);
     super.onInit();
-    // Initialize ticket vouchers data
-    ticketVouchers.addAll([
-      {
-        'tv_id': 'TV 917',
-        'customer': 'Princess Tourism',
-        'pnr': 'EK176H5ZR1UA7',
-        'description': 'ZAID KHAN-17657334472524-DXB-KHI-EK',
-        'supplier': 'EMIRATES 13DEC2024 TESTING',
-        'added_by': 'Umer Liaqat',
-        'price': '84415.00',
-      },
-      {
-        'tv_id': 'TV 916',
-        'customer': 'Princess Tourism',
-        'pnr': 'EK176HZP7MUA4',
-        'description': 'ZAFFAR IQBAL-17657334472513-KHI-JED-EK',
-        'supplier': 'EMIRATES 13DEC2024 TESTING',
-        'added_by': 'Umer Liaqat',
-        'price': '135085.00',
-      },
-      {
-        'tv_id': 'TV 901',
-        'customer': 'Afaq Travels',
-        'pnr': 'zain-LHE-DXB-PK',
-        'description': 'zain-LHE-DXB-PK',
-        'supplier': 'HBL CARD',
-        'added_by': 'Umer Liaqat',
-        'price': '80100.00',
-      },
-      {
-        'tv_id': 'TV 900',
-        'customer': 'Afaq Travels',
-        'pnr': 'zain-LHE-DXB-PK',
-        'description': 'zain-LHE-DXB-PK',
-        'supplier': 'HBL CARD',
-        'added_by': 'Umer Liaqat',
-        'price': '80100.00',
-      },
-    ]);
-
-    // Calculate total receipt
-    _calculateTotalReceipt();
+    fetchTicketVouchers();
   }
 
-  void _calculateTotalReceipt() {
-    totalReceipt.value = ticketVouchers.fold(0.0, (sum, ticket) {
-      return sum + double.parse(ticket['price']!);
-    });
+  String formatDate(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
-  void updateDateRange(String from, String to) {
+  Future<void> fetchTicketVouchers() async {
+    try {
+      isLoading.value = true;
+
+      final response = await _apiService.fetchDateRangeReport(
+          endpoint: 'allVouchers',
+          fromDate: formatDate(fromDate.value),
+          toDate: formatDate(toDate.value),
+          additionalParams: {'voucherType': 'tv'});
+
+      if (response['status'] == 'success') {
+        ticketVouchers.value =
+            List<Map<String, dynamic>>.from(response['data']);
+        totalRecords.value = response['total_records'] ?? 0;
+      } else {
+        throw 'Failed to fetch ticket vouchers';
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to fetch ticket vouchers: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void updateDateRange(DateTime from, DateTime to) {
     fromDate.value = from;
     toDate.value = to;
+    fetchTicketVouchers();
   }
 }

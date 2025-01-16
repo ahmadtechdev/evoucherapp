@@ -11,10 +11,10 @@ class InvoiceSettlementController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    
 
     // Set dateFrom to the first day of the current month
     dateFrom.value = DateTime(DateTime.now().year, DateTime.now().month);
+    fetchInvoices();
 
     // Optionally, you can log or initialize other data here
   }
@@ -36,11 +36,10 @@ class InvoiceSettlementController extends GetxController {
 
       // Call the API service method
       final response = await ApiService().fetchDateRangeReport(
-        endpoint: 'invoiceSettlementVoucher',
-        fromDate: fromDate,
-        toDate: toDate,
-        additionalParams: {'account': selectedAccount.value}
-      );
+          endpoint: 'invoiceSettlementVoucher',
+          fromDate: fromDate,
+          toDate: toDate,
+          additionalParams: {'account': selectedAccount.value});
 
       if (response != null && response['status'] == 'success') {
         print(response);

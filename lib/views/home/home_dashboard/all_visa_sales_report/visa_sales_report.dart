@@ -1,20 +1,18 @@
 import 'package:evoucher/common_widget/dart_selector2.dart';
-import 'package:evoucher/views/home/home_dashboard/all_ticket_sales_report/all_ticket_sale_controller.dart';
+import 'package:evoucher/views/home/home_dashboard/all_visa_sales_report/all_visa_sale_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../common/color_extension.dart';
 
-class TransactionReportScreen extends StatefulWidget {
+class VisaSalesReport extends StatefulWidget {
   @override
-  State<TransactionReportScreen> createState() =>
-      _TransactionReportScreenState();
+  State<VisaSalesReport> createState() => _VisaSalesReportState();
 }
 
-class _TransactionReportScreenState extends State<TransactionReportScreen> {
+class _VisaSalesReportState extends State<VisaSalesReport> {
   DateTime toDate = DateTime.now();
   DateTime fromDate = DateTime.now();
-  final TransactionController transactionController =
-      Get.put(TransactionController());
+  final AllVisaSaleController Controller = Get.put(AllVisaSaleController());
 
   @override
   void initState() {
@@ -30,7 +28,7 @@ class _TransactionReportScreenState extends State<TransactionReportScreen> {
         centerTitle: true,
         backgroundColor: TColor.primary,
         foregroundColor: TColor.white,
-        title: const Text('Ticket Sales Report'),
+        title: const Text('Visa Sales Report'),
       ),
       body: SafeArea(
         child: Column(
@@ -91,12 +89,11 @@ class _TransactionReportScreenState extends State<TransactionReportScreen> {
                 ],
               ),
             ),
-            // In TransactionReportScreen
             Expanded(
               child: Obx(
-                () => transactionController.isLoading.value
+                () => Controller.isLoading.value
                     ? Center(child: CircularProgressIndicator())
-                    : transactionController.transactions.isEmpty
+                    : Controller.transactions.isEmpty
                         ? Center(
                             child: Text(
                               "No records in this range",
@@ -108,14 +105,12 @@ class _TransactionReportScreenState extends State<TransactionReportScreen> {
                           )
                         : ListView.builder(
                             padding: const EdgeInsets.all(16),
-                            itemCount:
-                                transactionController.transactions.length,
+                            itemCount: Controller.transactions.length,
                             itemBuilder: (context, index) {
                               return CollapsibleTransactionCard(
-                                transaction:
-                                    transactionController.transactions[index],
+                                transaction: Controller.transactions[index],
                                 index: index,
-                                controller: transactionController,
+                                controller: Controller,
                               );
                             },
                           ),
@@ -138,7 +133,7 @@ class _TransactionReportScreenState extends State<TransactionReportScreen> {
           // Format dates as required by API (YYYY-MM-DD)
           String formattedFromDate = fromDate.toString().split(' ')[0];
           String formattedToDate = toDate.toString().split(' ')[0];
-          transactionController.fetchTransactions(
+          Controller.fetchTransactions(
             fromDate: formattedFromDate,
             toDate: formattedToDate,
           );
@@ -190,22 +185,20 @@ class _TransactionReportScreenState extends State<TransactionReportScreen> {
           children: [
             _buildTotalItem(
               'Total Purchases',
-              transactionController.parseAmount(
-                  transactionController.grandTotals['total_purchases'] ??
-                      '0.00'),
+              Controller.parseAmount(
+                  Controller.grandTotals['total_purchases'] ?? '0.00'),
               TColor.third,
             ),
             _buildTotalItem(
               'Total Sales',
-              transactionController.parseAmount(
-                  transactionController.grandTotals['total_sales'] ?? '0.00'),
+              Controller.parseAmount(
+                  Controller.grandTotals['total_sales'] ?? '0.00'),
               TColor.secondary,
             ),
             _buildTotalItem(
               'Total P/L',
-              transactionController.parseAmount(
-                  transactionController.grandTotals['total_profit_loss'] ??
-                      '0.00'),
+              Controller.parseAmount(
+                  Controller.grandTotals['total_profit_loss'] ?? '0.00'),
               TColor.secondary,
             ),
           ],
@@ -244,7 +237,7 @@ class _TransactionReportScreenState extends State<TransactionReportScreen> {
 class CollapsibleTransactionCard extends StatelessWidget {
   final Map<String, dynamic> transaction;
   final int index;
-  final TransactionController controller;
+  final AllVisaSaleController controller;
 
   const CollapsibleTransactionCard({
     Key? key,

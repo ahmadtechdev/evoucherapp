@@ -13,7 +13,8 @@ class DailyCashActivity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DailyCashActivityController controller = Get.put(DailyCashActivityController());
+    final DailyCashActivityController controller =
+        Get.put(DailyCashActivityController());
 
     return Scaffold(
       backgroundColor: TColor.white,
@@ -31,16 +32,19 @@ class DailyCashActivity extends StatelessWidget {
             _buildDateSelector(controller, context),
             _buildDateDisplay(controller),
             _buildSummaryGrid(),
-            _buildSection('Cash Received', TColor.secondary, controller.receivedTransactions),
-            _buildSection('Cash Paid', TColor.third, controller.paidTransactions),
-            _buildTotalSummary(controller),
+            Obx(() => _buildSection('Cash Received', TColor.secondary,
+                controller.receivedTransactions)),
+            Obx(() => _buildSection(
+                'Cash Paid', TColor.third, controller.paidTransactions)),
+            // _buildTotalSummary(controller),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDateSelector(DailyCashActivityController controller, BuildContext context) {
+  Widget _buildDateSelector(
+      DailyCashActivityController controller, BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -65,7 +69,8 @@ class DailyCashActivity extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: () => controller.printReport(),
             icon: const Icon(Icons.print, color: Colors.white),
-            label: const Text('Print Report', style: TextStyle(color: Colors.white)),
+            label: const Text('Print Report',
+                style: TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor: TColor.secondary,
               shape: RoundedRectangleBorder(
@@ -92,26 +97,45 @@ class DailyCashActivity extends StatelessWidget {
   }
 
   Widget _buildSummaryGrid() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: GridView.count(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 1.5,
-        children: [
-          _buildSummaryCard('Opening Balance', 'PKR 39,901 Cr', TColor.primary, Icons.account_balance),
-          _buildSummaryCard('Total Cash Received', 'Rs. 25.00', TColor.secondary, Icons.arrow_downward),
-          _buildSummaryCard('Total Cash Paid', 'Rs. 25.00', TColor.third, Icons.arrow_upward),
-          _buildSummaryCard('Closing Balance', 'Rs. -39,901', TColor.fourth, Icons.account_balance_wallet),
-        ],
-      ),
-    );
+    final DailyCashActivityController controller =
+        Get.put(DailyCashActivityController());
+    return Obx(() => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 1.5,
+            children: [
+              _buildSummaryCard(
+                  'Opening Balance',
+                  controller.openingBalance.value,
+                  TColor.primary,
+                  Icons.account_balance),
+              _buildSummaryCard(
+                  'Total Cash Received',
+                  'Rs. ${controller.totalReceivedAmount.value}',
+                  TColor.secondary,
+                  Icons.arrow_downward),
+              _buildSummaryCard(
+                  'Total Cash Paid',
+                  'Rs. ${controller.totalPaidAmount.value}',
+                  TColor.third,
+                  Icons.arrow_upward),
+              _buildSummaryCard(
+                  'Closing Balance',
+                  controller.closingBalanceAmount.value,
+                  TColor.fourth,
+                  Icons.account_balance_wallet),
+            ],
+          ),
+        ));
   }
 
-  Widget _buildSummaryCard(String title, String amount, Color color, IconData icon) {
+  Widget _buildSummaryCard(
+      String title, String amount, Color color, IconData icon) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       decoration: BoxDecoration(
@@ -159,7 +183,8 @@ class DailyCashActivity extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(String title, Color color, List<DailyCashActivityModel> transactions) {
+  Widget _buildSection(
+      String title, Color color, List<DailyCashActivityModel> transactions) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
@@ -174,13 +199,15 @@ class DailyCashActivity extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          ...transactions.map((transaction) => _buildTransactionCard(transaction, color)),
+          ...transactions
+              .map((transaction) => _buildTransactionCard(transaction, color)),
         ],
       ),
     );
   }
 
-  Widget _buildTransactionCard(DailyCashActivityModel transaction, Color color) {
+  Widget _buildTransactionCard(
+      DailyCashActivityModel transaction, Color color) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 4,
@@ -196,19 +223,23 @@ class DailyCashActivity extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  transaction.voucherNo,
-                  style: TextStyle(
-                    color: TColor.primaryText,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    transaction.vNumber,
+                    style: TextStyle(
+                      color: TColor.primaryText,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -226,28 +257,24 @@ class DailyCashActivity extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      transaction.account,
-                      style: TextStyle(
-                        color: TColor.primaryText,
-                        fontSize: 16,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        transaction.account,
+                        style: TextStyle(
+                          color: TColor.primaryText,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      transaction.description,
-                      style: TextStyle(
-                        color: TColor.secondaryText,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
+                      const SizedBox(height: 4),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Text(
                   'Rs. ${transaction.amount}',
                   style: TextStyle(
@@ -258,37 +285,45 @@ class DailyCashActivity extends StatelessWidget {
                 ),
               ],
             ),
+            Text(
+              transaction.description,
+              style: TextStyle(
+                color: TColor.secondaryText,
+                fontSize: 14,
+              ),
+              softWrap: true,
+              overflow: TextOverflow.visible,
+            ),
           ],
         ),
       ),
     );
   }
-
-  Widget _buildTotalSummary(DailyCashActivityController controller) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildTotalItem('Total Received', '${controller.totalReceived}', TColor.secondary),
-          _buildTotalItem('Total Paid', '${controller.totalPaid}', TColor.third),
-          _buildTotalItem('Closing Balance', '${controller.closingBalance}', TColor.fourth),
-        ],
-      ),
-    );
-  }
+// Widget _buildTotalSummary(DailyCashActivityController controller) {
+  //   return Container(
+  //     margin: const EdgeInsets.all(16),
+  //     padding: const EdgeInsets.all(16),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.1),
+  //           blurRadius: 8,
+  //           offset: const Offset(0, 2),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //       children: [
+  //         _buildTotalItem('Total Received', '${controller.totalReceived}', TColor.secondary),
+  //         _buildTotalItem('Total Paid', '${controller.totalPaid}', TColor.third),
+  //         _buildTotalItem('Closing Balance', '${controller.closingBalance}', TColor.fourth),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildTotalItem(String label, String value, Color color) {
     return Column(

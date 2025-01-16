@@ -1,24 +1,21 @@
 import 'package:evoucher/common/color_extension.dart';
 import 'package:evoucher/common_widget/dart_selector2.dart';
+import 'package:evoucher/views/hotel_voucher/view_hotel_voucher/hotel_invoices_view/view/single_hotel_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
-import 'hotel_invoices_view/view/single_hotel_view.dart';
 import 'invoices_functions_class.dart';
 import 'view_hotel_voucher_controller.dart';
 
-
 class ViewHotelVoucher extends StatelessWidget {
   final HotelVoucherController controller = Get.put(HotelVoucherController());
-
-  // Create an instance of the InvoiceGenerator class
   final invoiceGenerator = InvoiceGenerator();
+
   ViewHotelVoucher({super.key});
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       backgroundColor: TColor.white,
       appBar: AppBar(
@@ -47,8 +44,11 @@ class ViewHotelVoucher extends StatelessWidget {
                       child: DateSelector2(
                         label: 'From Date',
                         fontSize: 14,
-                        initialDate: DateTime.now(),
-                        onDateChanged: (DateTime value) {},
+                        initialDate: controller.fromDate.value,
+                        onDateChanged: (DateTime value) {
+                          controller.updateDateRange(
+                              value, controller.toDate.value);
+                        },
                       ),
                     ),
                     const SizedBox(width: 15),
@@ -56,8 +56,11 @@ class ViewHotelVoucher extends StatelessWidget {
                       child: DateSelector2(
                         label: 'To Date',
                         fontSize: 14,
-                        initialDate: DateTime.now(),
-                        onDateChanged: (DateTime value) {},
+                        initialDate: controller.toDate.value,
+                        onDateChanged: (DateTime value) {
+                          controller.updateDateRange(
+                              controller.fromDate.value, value);
+                        },
                       ),
                     ),
                   ],
@@ -66,25 +69,74 @@ class ViewHotelVoucher extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Obx(
-              () {
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: controller.ticketVouchers.length,
-                  itemBuilder: (context, index) {
-                    var ticket = controller.ticketVouchers[index];
-                    return _buildVoucherCard(ticket, context);
-                  },
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (controller.hasError.value) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(controller.errorMessage.value),
+                      ElevatedButton(
+                        onPressed: controller.fetchVouchers,
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
                 );
-              },
-            ),
+              }
+
+              if (controller.vouchers.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.search_off_rounded,
+                        size: 60,
+                        color: TColor.secondaryText.withOpacity(0.5),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No Records Found',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: TColor.secondaryText,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'There are no hotel vouchers in this date range',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: TColor.secondaryText.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: controller.vouchers.length,
+                itemBuilder: (context, index) {
+                  var voucher = controller.vouchers[index];
+                  return _buildVoucherCard(voucher, context);
+                },
+              );
+            }),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildVoucherCard(Map<String, String> ticket, BuildContext context) {
+  Widget _buildVoucherCard(Map<String, dynamic> voucher, BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -103,7 +155,9 @@ class ViewHotelVoucher extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: TColor.primary.withOpacity(0.1),
+              color: voucher['needs_attention'] == true
+                  ? Colors.red.withOpacity(0.1)
+                  : TColor.primary.withOpacity(0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -111,22 +165,34 @@ class ViewHotelVoucher extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Icons.confirmation_number, color: TColor.primary),
+                Icon(Icons.confirmation_number,
+                    color: voucher['needs_attention'] == true
+                        ? Colors.red
+                        : TColor.primary),
                 const SizedBox(width: 10),
                 Text(
-                  'HV ID: ${ticket['hv_id']}',
+                  voucher['hv_id'],
                   style: TextStyle(
-                    color: TColor.primary,
+                    color: voucher['needs_attention'] == true
+                        ? Colors.red
+                        : TColor.primary,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const Spacer(),
+                Text(
+                  voucher['date'],
+                  style: TextStyle(
+                    color: TColor.secondaryText,
+                    fontSize: 14,
+                  ),
+                ),
                 IconButton(
                   icon: Icon(Icons.visibility, color: TColor.primary),
                   onPressed: () {
-                    // Implement view action
-                    Get.to(()=> const SingleHotelView());
+                    // Navigate to single hotel view
+                    Get.to(() => const SingleHotelView());
                   },
                 ),
               ],
@@ -137,23 +203,22 @@ class ViewHotelVoucher extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _buildInfoRow(Icons.person, 'Customer', voucher['customer']),
+                const SizedBox(height: 12),
                 _buildInfoRow(
-                    Icons.person, 'Customer', ticket['customer'] ?? ''),
+                    Icons.description, 'Description', voucher['description']),
                 const SizedBox(height: 12),
-                _buildInfoRow(Icons.description, 'Description',
-                    ticket['description'] ?? ''),
-                const SizedBox(height: 12),
-                _buildInfoRow(Icons.business, 'Supplier Account',
-                    ticket['supplier'] ?? ''),
+                _buildInfoRow(
+                    Icons.business, 'Supplier Account', voucher['supplier']),
                 const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
-                      child: _buildInfoRow(Icons.person_add, 'Added by',
-                          ticket['added_by'] ?? ''),
+                      child: _buildInfoRow(
+                          Icons.person_add, 'Added by', voucher['added_by']),
                     ),
                     Text(
-                      'PKR ${ticket['price']}',
+                      'PKR ${NumberFormat('#,##0.00').format(double.parse(voucher['price']))}',
                       style: TextStyle(
                         color: TColor.primary,
                         fontSize: 16,
@@ -162,23 +227,42 @@ class ViewHotelVoucher extends StatelessWidget {
                     ),
                   ],
                 ),
+                if (voucher['is_refunded'] == true)
+                  Container(
+                    margin: const EdgeInsets.only(top: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'Refunded',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
                       child: _buildActionButton(
-                          'New Invoice', Icons.receipt, TColor.secondary, onPressed: () {
-                        // generateAndPreviewNewHotelInvoice(context);
-                        invoiceGenerator.generateAndPreviewNewHotelInvoice(context);
+                          'New Invoice', Icons.receipt, TColor.secondary,
+                          onPressed: () {
+                        invoiceGenerator
+                            .generateAndPreviewNewHotelInvoice(context);
                       }),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildActionButton(
-                          'Hotel Invoice', Icons.receipt_long, TColor.black, onPressed: () {
-                        invoiceGenerator.generateAndPreviewDefiniteHotelInvoice(context);
-    }
-                      ),
+                          'Hotel Invoice', Icons.receipt_long, TColor.black,
+                          onPressed: () {
+                        invoiceGenerator
+                            .generateAndPreviewDefiniteHotelInvoice(context);
+                      }),
                     ),
                   ],
                 ),
@@ -187,15 +271,19 @@ class ViewHotelVoucher extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildActionButton(
-                          'Hotel Voucher', Icons.visibility, TColor.primary,  onPressed: (){
-                            invoiceGenerator.generateAndPreviewHotelVoucher(context);
+                          'Hotel Voucher', Icons.visibility, TColor.primary,
+                          onPressed: () {
+                        invoiceGenerator
+                            .generateAndPreviewHotelVoucher(context);
                       }),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildActionButton(
-                          'Foreign Invoice', Icons.visibility, Colors.red,  onPressed: (){
-                            invoiceGenerator.generateAndPreviewForeignInvoice(context);
+                          'Foreign Invoice', Icons.visibility, Colors.red,
+                          onPressed: () {
+                        invoiceGenerator
+                            .generateAndPreviewForeignInvoice(context);
                       }),
                     ),
                   ],
@@ -242,8 +330,8 @@ class ViewHotelVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(
-      String label, IconData icon, Color backgroundColor, {VoidCallback? onPressed}) {
+  Widget _buildActionButton(String label, IconData icon, Color backgroundColor,
+      {VoidCallback? onPressed}) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -271,5 +359,4 @@ class ViewHotelVoucher extends StatelessWidget {
       ),
     );
   }
-
 }

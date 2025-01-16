@@ -50,7 +50,7 @@ class InvoiceSettlement extends StatelessWidget {
                       if (controller.invoices.isEmpty) {
                         return Center(
                           child: Text(
-                            'No Record',
+                            'No Record In This Range',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -102,6 +102,7 @@ class InvoiceSettlement extends StatelessWidget {
               initialDate: controller.dateFrom.value,
               onDateChanged: (date) {
                 controller.setDateRange(date, controller.dateTo.value);
+                controller.fetchInvoices();
               },
               label: "FROM: ",
             ),
@@ -113,6 +114,7 @@ class InvoiceSettlement extends StatelessWidget {
               initialDate: controller.dateTo.value,
               onDateChanged: (date) {
                 controller.setDateRange(controller.dateFrom.value, date);
+                controller.fetchInvoices();
               },
               label: "TO:  ",
             ),
