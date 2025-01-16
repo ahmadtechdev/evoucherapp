@@ -33,7 +33,8 @@ class RecoveryListController extends GetxController {
       final toDate =
           '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 
-      final response = await _apiService.recoveryLists(fromDate, toDate);
+      final response = await _apiService.fetchDateRangeReport(
+          endpoint: "recoveryLists", fromDate: fromDate, toDate: toDate);
 
       if (response != null && response['status'] == 'success') {
         final List<dynamic> listsJson = response['data']['lists'];

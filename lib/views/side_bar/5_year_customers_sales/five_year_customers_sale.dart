@@ -13,7 +13,8 @@ class FiveYearsCustomerSale extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FiveYearCustomersSalesController controller = Get.put(FiveYearCustomersSalesController());
+    final FiveYearCustomersSalesController controller =
+    Get.put(FiveYearCustomersSalesController());
 
     return Scaffold(
       backgroundColor: TColor.white,
@@ -30,6 +31,12 @@ class FiveYearsCustomerSale extends StatelessWidget {
             SearchDropdownWidget(controller: controller),
             Expanded(
               child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: controller.filteredData.length,
@@ -63,10 +70,20 @@ class FiveYearsCustomerSale extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(sale.name,
+                                Expanded(
+                                  child: Text(
+                                    sale.name,
                                     style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                Text(sale.total.toStringAsFixed(2)),
+                                        fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  sale.total.toStringAsFixed(2),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -74,27 +91,27 @@ class FiveYearsCustomerSale extends StatelessWidget {
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               children: controller.years.map((year) {
-                                return Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      year,
-                                      style: TextStyle(
-                                        color: TColor.secondaryText,
-                                        fontWeight: FontWeight.w500,
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        year,
+                                        style: TextStyle(
+                                          color: TColor.secondaryText,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      sale.yearlySales[year]
-                                              ?.toStringAsFixed(2) ??
-                                          "0.00",
-                                      style: TextStyle(
-                                        color: TColor.primaryText,
-                                        fontWeight: FontWeight.w600,
+                                      Text(
+                                        (sale.yearlySales[year] ?? 0.0).toStringAsFixed(2),
+                                        style: TextStyle(
+                                          color: TColor.primaryText,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 );
                               }).toList(),
                             ),
@@ -111,4 +128,5 @@ class FiveYearsCustomerSale extends StatelessWidget {
       ),
     );
   }
+
 }

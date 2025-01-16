@@ -30,7 +30,5 @@ class AuthController extends GetxController {
     _apiService.updateBaseUrl(baseUrl.value);
   }
 
-  Future<Map<String, dynamic>> login(Map<String, dynamic> body) async {
-    return await _apiService.postLogin(endpoint: "token", body: body);
-  }
+
 }

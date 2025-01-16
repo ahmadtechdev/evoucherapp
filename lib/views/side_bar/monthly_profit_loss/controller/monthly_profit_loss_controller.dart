@@ -1,43 +1,93 @@
 import 'package:get/get.dart';
+import '../../../../service/api_service.dart';
 import '../models/monthly_profit_loss_model.dart';
+import 'package:intl/intl.dart';
 
 class MonthlyProfitLossController extends GetxController {
   final fromDate = DateTime(2024, 1).obs;
   final toDate = DateTime(2024, 12).obs;
   final data = MonthlyProfitLossModel(
     name: 'Monthly Profit Loss',
-    expenses: {
-      '2024-01': {
-        'Staff Salaries': 115000.0,
-        'Fuel Allowance': 8500.0,
-      },
-      '2024-02': {
-        'Staff Salary': 20000.0,
-      },
-      '2024-07': {
-        'HUSSAIN ALI ISB EMP': 45000.0,
-      },
-      '2024-10': {
-        'Discount': 2269970.0,
-      },
-    },
-    incomes: {
-      '2024-01': {
-        'Package Income': 489457.0,
-        'Ticket Income': 266113.0,
-      },
-      '2024-02': {
-        'Hotel Incomes': 625221.0,
-        'Visa Incomes': 134500.0,
-      },
-      '2024-03': {
-        'Other Incomes': 81412.0,
-      },
-      '2024-04': {
-        'Transport Income': 22210.0,
-      },
-    },
+    expenses: {},
+    incomes: {},
   ).obs;
+
+  final isLoading = false.obs;
+  final ApiService _apiService = ApiService();
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    try {
+      isLoading.value = true;
+
+      final response = await _apiService.postRequest(
+        endpoint: 'monthlyProfitLoss',
+        body: {
+          "fromDate": DateFormat('yyyy-MM').format(fromDate.value),
+          "toDate": DateFormat('yyyy-MM').format(toDate.value),
+        },
+      );
+
+      // Transform API response to match MonthlyProfitLossModel format
+      Map<String, Map<String, double>> expenses = {};
+      Map<String, Map<String, double>> incomes = {};
+
+      // Process expenses
+      for (var expense in response['data']['expenses'] as List) {
+        String accountName = expense['account_name'];
+        Map<String, dynamic> monthlyAmounts = expense['monthly_amounts'];
+
+        monthlyAmounts.forEach((month, amount) {
+          // Convert month format from "Oct 2024" to "2024-10"
+          final parsedDate = DateFormat('MMM yyyy').parse(month);
+          final monthKey = DateFormat('yyyy-MM').format(parsedDate);
+
+          if (amount > 0) { // Only add non-zero amounts
+            expenses[monthKey] ??= {};
+            expenses[monthKey]![accountName] = amount.toDouble();
+          }
+        });
+      }
+
+      // Process incomes
+      for (var income in response['data']['incomes'] as List) {
+        String accountName = income['account_name'];
+        Map<String, dynamic> monthlyAmounts = income['monthly_amounts'];
+
+        monthlyAmounts.forEach((month, amount) {
+          // Convert month format from "Oct 2024" to "2024-10"
+          final parsedDate = DateFormat('MMM yyyy').parse(month);
+          final monthKey = DateFormat('yyyy-MM').format(parsedDate);
+
+          if (amount != 0) { // Include both positive and negative amounts
+            incomes[monthKey] ??= {};
+            incomes[monthKey]![accountName] = amount.toDouble();
+          }
+        });
+      }
+
+      // Update the model
+      data.value = MonthlyProfitLossModel(
+        name: 'Monthly Profit Loss',
+        expenses: expenses,
+        incomes: incomes,
+      );
+
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to fetch monthly profit loss  ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   List<DateTime> getMonthsBetween() {
     List<DateTime> months = [];
@@ -57,9 +107,11 @@ class MonthlyProfitLossController extends GetxController {
 
   void updateFromDate(DateTime date) {
     fromDate.value = date;
+    fetchData();
   }
 
   void updateToDate(DateTime date) {
     toDate.value = date;
+    fetchData();
   }
 }

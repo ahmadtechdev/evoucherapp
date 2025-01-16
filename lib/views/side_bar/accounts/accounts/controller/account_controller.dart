@@ -9,7 +9,8 @@ class AccountsRepository {
   AccountsRepository({required this.api});
 
   Future<List<AccountModel>> getAccounts({String? subheadName}) async {
-    final response = await api.fetchAccounts(subheadName: subheadName);
+    final response = await api.postRequest( endpoint: 'fetchAccounts',
+        body: subheadName != null ? {"subhead_name": subheadName} : {});
 
     if (response['status'] == 'success' && response['data'] != null) {
       return (response['data'] as List)

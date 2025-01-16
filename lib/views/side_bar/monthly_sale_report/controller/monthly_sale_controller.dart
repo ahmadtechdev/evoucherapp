@@ -38,7 +38,7 @@ class MonthlySalesController extends GetxController {
       String toDateStr = DateFormat('yyyy-MM').format(toDate.value);
 
       final response =
-          await apiService.monthlySalesReport(fromDateStr, toDateStr);
+          await apiService.fetchDateRangeReport(endpoint: 'monthlySaleReport', fromDate: fromDateStr, toDate: toDateStr);
 
       if (response != null && response['status'] == 'success') {
         // Clear existing data

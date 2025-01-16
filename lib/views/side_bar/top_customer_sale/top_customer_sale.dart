@@ -34,15 +34,22 @@ class CustomerReportScreen extends StatelessWidget {
                 onChange: controller.updateSearch,
               ),
               Expanded(
-                child: Obx(() => ListView(
-                  children: [
-                    ...controller.filteredActiveCustomers
-                        .map((customer) => CustomerCard(customer: customer)),
-                    _buildZeroSalesHeader(),
-                    ...controller.filteredZeroSaleCustomers
-                        .map((customer) => CustomerCard(customer: customer)),
-                  ],
-                )),
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  return ListView(
+                    children: [
+                      ...controller.filteredActiveCustomers
+                          .map((customer) => CustomerCard(customer: customer)),
+                      _buildZeroSalesHeader(),
+                      ...controller.filteredZeroSaleCustomers
+                          .map((customer) => CustomerCard(customer: customer)),
+                    ],
+                  );
+                }),
               ),
             ],
           ),

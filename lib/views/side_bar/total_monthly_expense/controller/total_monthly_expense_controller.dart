@@ -1,87 +1,67 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../service/api_service.dart';
 import '../models/total_monthly_expense_model.dart';
 
 class TotalMonthlyExpensesController extends GetxController {
   final fromDate = DateTime(2024, 1).obs;
   final toDate = DateTime(2024, 12).obs;
   final companies = <TotalMonthlyExpensesModel>[].obs;
+  final isLoading = false.obs;
+  final ApiService _apiService = ApiService();
 
   @override
   void onInit() {
     super.onInit();
-    loadInitialData();
+    loadData();
   }
 
-  void loadInitialData() {
-    // Sample data based on your request, with dummy data for each month
-    companies.value = [
-      TotalMonthlyExpensesModel(
-        name: 'travel High',
-        expenses: {
-          '2024-01': {'Dummy Expense': 500.0},
-          '2024-02': {'Dummy Expense': 500.0},
-          '2024-03': {'Dummy Expense': 500.0},
-          '2024-04': {'Dummy Expense': 500.0},
-          '2024-05': {'Dummy Expense': 500.0},
-          '2024-06': {'Dummy Expense': 500.0},
-          '2024-07': {'Dummy Expense': 500.0},
-          '2024-08': {'Dummy Expense': 500.0},
-          '2024-09': {'Dummy Expense': 500.0},
-          '2024-10': {'Dummy Expense': 500.0},
-          '2024-11': {'Dummy Expense': 500.0},
-          '2024-12': {'Dummy Expense': 500.0},
-        },
-      ),
-      TotalMonthlyExpensesModel(
-        name: 'Test travels',
-        expenses: {
-          '2024-01': {
-            'Fuel Allowance': 4000.0,
-            'Utility Bills': 3000.0,
-          },
-          '2024-02': {'Dummy Expense': 500.0},
-          '2024-03': {'Dummy Expense': 500.0},
-          '2024-04': {'Dummy Expense': 500.0},
-          '2024-05': {'Dummy Expense': 500.0},
-          '2024-06': {'Dummy Expense': 500.0},
-          '2024-07': {'Dummy Expense': 500.0},
-          '2024-08': {'Dummy Expense': 500.0},
-          '2024-09': {'Dummy Expense': 500.0},
-          '2024-10': {'Dummy Expense': 500.0},
-          '2024-11': {'Dummy Expense': 500.0},
-          '2024-12': {'Dummy Expense': 500.0},
-        },
-      ),
-      TotalMonthlyExpensesModel(
-        name: 'AGENT1 (Main Branch)',
-        expenses: {
-          '2024-01': {'Dummy Expense': 500.0},
-          '2024-02': {
-            'Fuel Allowance': 8000.0,
-            'Dummy Expense': 500.0,
-          },
-          '2024-03': {'Dummy Expense': 500.0},
-          '2024-04': {'Dummy Expense': 500.0},
-          '2024-05': {'Dummy Expense': 500.0},
-          '2024-06': {'Dummy Expense': 500.0},
-          '2024-07': {
-            'HUSSAIN ALI ISB EMP': 45000.0,
-            'Dummy Expense': 500.0,
-          },
-          '2024-08': {'Dummy Expense': 500.0},
-          '2024-09': {'Dummy Expense': 500.0},
-          '2024-10': {
-            'Discount': 2269970.0,
-            'Dummy Expense': 500.0,
-          },
-          '2024-11': {'Dummy Expense': 500.0},
-          '2024-12': {'Dummy Expense': 500.0},
-        },
-      ),
-    ];
+  Future<void> loadData() async {
+    try {
+      isLoading.value = true;
+
+      // Format dates for API request
+      final fromDateStr = DateFormat('yyyy-MM-dd')
+          .format(DateTime(fromDate.value.year, fromDate.value.month, 1));
+      final toDateStr = DateFormat('yyyy-MM-dd')
+          .format(DateTime(toDate.value.year, toDate.value.month + 1, 0));
+
+      // Make API request
+      final response = await _apiService.fetchDateRangeReport(
+        endpoint: 'totalExpensesReport',
+        fromDate: fromDateStr,
+        toDate: toDateStr,
+      );
+
+      if (response['status'] == 'success') {
+        final branchesData = response['data']['branches'] as Map<String, dynamic>;
+
+        // Transform API data into our model
+        final List<TotalMonthlyExpensesModel> newCompanies = [];
+
+        branchesData.forEach((branchName, branchData) {
+          newCompanies.add(
+            TotalMonthlyExpensesModel.fromApiData(branchName, branchData as Map<String, dynamic>),
+          );
+        });
+
+        companies.value = newCompanies;
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to load expenses  ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
-
-
 
   List<DateTime> getMonthsBetween() {
     List<DateTime> months = [];
@@ -100,23 +80,21 @@ class TotalMonthlyExpensesController extends GetxController {
   }
 
   double calculateCompanyTotalForMonth(TotalMonthlyExpensesModel company, String monthKey) {
-    double total = 0.0;
-    final monthExpenses = company.expenses[monthKey] ?? {};
-    monthExpenses.forEach((_, value) {
-      total += value;
-    });
-    return total;
-  }
-
-  double calculateTotalExpenses() {
-    return companies.fold(0.0, (sum, company) => sum + company.getTotalExpenses());
+    final monthExpenses = company.getExpensesForMonth(monthKey);
+    return monthExpenses.values.fold(0.0, (sum, value) => sum + value);
   }
 
   void updateFromDate(DateTime date) {
     fromDate.value = date;
+    loadData();
   }
 
   void updateToDate(DateTime date) {
     toDate.value = date;
+    loadData();
+  }
+
+  double calculateTotalExpenses() {
+    return companies.fold(0.0, (sum, company) => sum + company.getTotalExpenses());
   }
 }

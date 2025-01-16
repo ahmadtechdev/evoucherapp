@@ -42,7 +42,8 @@ class TransactionController extends GetxController {
   }) async {
     try {
       isLoading.value = true;
-      final response = await _apiService.allTicketVoucher(
+      final response = await _apiService.fetchDateRangeReport(
+        endpoint: "allTicketVoucher",
         fromDate: fromDate,
         toDate: toDate,
       );

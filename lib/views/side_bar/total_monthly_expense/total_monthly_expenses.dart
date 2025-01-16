@@ -5,6 +5,7 @@ import '../../../common/color_extension.dart';
 import '../../../common/drawer.dart';
 import '../../../common_widget/dart_selector2.dart';
 import 'controller/total_monthly_expense_controller.dart';
+import 'models/total_monthly_expense_model.dart';
 
 class TotalMonthlyExpenses extends StatelessWidget {
   TotalMonthlyExpenses({super.key});
@@ -27,6 +28,12 @@ class TotalMonthlyExpenses extends StatelessWidget {
           _buildDateSelectionHeader(),
           Expanded(
             child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
               return ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
@@ -39,7 +46,7 @@ class TotalMonthlyExpenses extends StatelessWidget {
                       _buildCompanyTotal(company),
                       const SizedBox(height: 24),
                     ],
-                  )),
+                  )).toList(),
                   _buildGrandTotal(),
                 ],
               );
@@ -108,9 +115,9 @@ class TotalMonthlyExpenses extends StatelessWidget {
     );
   }
 
-  Widget _buildMonthCard(dynamic company, DateTime month) {
+  Widget _buildMonthCard(TotalMonthlyExpensesModel company, DateTime month) {
     final monthKey = controller.getMonthKey(month);
-    final monthExpenses = company.expenses[monthKey] ?? {};
+    final monthExpenses = company.getExpensesForMonth(monthKey);
 
     if (monthExpenses.isEmpty) {
       return Container(); // Skip empty months
@@ -206,35 +213,31 @@ class TotalMonthlyExpenses extends StatelessWidget {
     );
   }
 
-  Widget _buildCompanyTotal(dynamic company) {
-    final total = company.getTotalExpenses();
+  Widget _buildCompanyTotal(TotalMonthlyExpensesModel company) {
     return Card(
       margin: const EdgeInsets.only(top: 8),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${company.name} Total: ',
-                style: TextStyle(
-                  color: TColor.primaryText,
-                  fontWeight: FontWeight.bold,
-                ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '${company.name} Total: ',
+              style: TextStyle(
+                color: TColor.primaryText,
+                fontWeight: FontWeight.bold,
               ),
-              Text(
-                'PKR ${total.toStringAsFixed(2)} Db',
-                style: TextStyle(
-                  color: TColor.primary,
-                  fontWeight: FontWeight.bold,
-                ),
+            ),
+            Text(
+              'PKR ${company.getTotalExpenses().toStringAsFixed(2)}',
+              style: TextStyle(
+                color: TColor.primary,
+                fontWeight: FontWeight.bold,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -258,7 +261,7 @@ class TotalMonthlyExpenses extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'PKR ${controller.calculateTotalExpenses().toStringAsFixed(2)} Db',
+              'PKR ${controller.calculateTotalExpenses().toStringAsFixed(2)}',
               style: TextStyle(
                 color: TColor.primary,
                 fontWeight: FontWeight.bold,

@@ -30,7 +30,7 @@ class ExpenseReportController extends GetxController {
       String toDateStr = DateFormat('yyyy-MM-dd').format(toDate.value);
 
       // Make API call
-      final response = await apiService.Expenses_Report(fromDateStr, toDateStr);
+      final response = await apiService.fetchDateRangeReport(endpoint: 'expensesReport',fromDate: fromDateStr, toDate: toDateStr);
 
       if (response != null && response['status'] == 'success') {
         // Parse expense accounts

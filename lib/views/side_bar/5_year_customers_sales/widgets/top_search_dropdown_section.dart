@@ -2,6 +2,7 @@
 
 import 'package:evoucher/common_widget/round_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import '../../../../common/color_extension.dart';
 import '../controller/five_years_customers_sales_controller.dart';
 
@@ -17,10 +18,12 @@ class SearchDropdownWidget extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child:SearchTextField(hintText: 'Search accounts...', onChange: (value) => controller.searchQuery.value = value)
+            child: SearchTextField(
+              hintText: 'Search accounts...',
+              onChange: (value) => controller.searchQuery.value = value,
+            ),
           ),
-
-          Container(
+          Obx(() => Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               color: TColor.textField,
@@ -38,13 +41,12 @@ class SearchDropdownWidget extends StatelessWidget {
                 }).toList(),
                 onChanged: (value) {
                   controller.selectedYear.value = value;
+                  controller.fetchFiveYearSales();
                 },
               ),
             ),
-          ),
-          const SizedBox(
-            width: 5,
-          )
+          )),
+          const SizedBox(width: 5),
         ],
       ),
     );

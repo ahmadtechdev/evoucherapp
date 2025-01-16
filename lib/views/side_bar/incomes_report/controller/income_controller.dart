@@ -29,7 +29,7 @@ class IncomesReportController extends GetxController {
       String toDateStr = DateFormat('yyyy-MM-dd').format(toDate.value);
 
       // Make API request
-      final response = await _apiService.incomesReport(fromDateStr, toDateStr);
+      final response = await _apiService.fetchDateRangeReport(endpoint: "incomesReport", fromDate: fromDateStr, toDate: toDateStr);
 
       if (response != null && response['status'] == 'success') {
         incomeData.value = response['data'];

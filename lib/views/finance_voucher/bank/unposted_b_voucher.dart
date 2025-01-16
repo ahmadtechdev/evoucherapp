@@ -27,7 +27,7 @@ class _UnpostedBVoucherState extends State<UnpostedBVoucher> {
   @override
   void initState() {
     super.initState();
-        fromDate = DateTime(DateTime.now().year, DateTime.now().month);
+    fromDate = DateTime(DateTime.now().year, DateTime.now().month);
     _fetchUnpostedVouchers();
   }
 
@@ -57,12 +57,15 @@ class _UnpostedBVoucherState extends State<UnpostedBVoucher> {
       String formattedFromDate = DateFormat('yyyy-MM-dd').format(fromDate);
       String formattedToDate = DateFormat('yyyy-MM-dd').format(toDate);
 
-      final response = await _apiService.fetchVoucherUnPosted(
-        fromDate: formattedFromDate,
-        toDate: formattedToDate,
-        voucherId: "",
-        voucherType: "bv",
-      );
+      final response = await _apiService.fetchDateRangeReport(
+          endpoint: "getVoucherUnPosted",
+          fromDate: formattedFromDate,
+          toDate: formattedToDate,
+          additionalParams: {
+            "voucher_id": "",
+            "voucher_type": "bv",
+          }
+          );
 
       if (response != null &&
           response['status'] == 'success' &&

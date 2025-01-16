@@ -35,10 +35,11 @@ class InvoiceSettlementController extends GetxController {
       final toDate = DateFormat('yyyy-MM-dd').format(dateTo.value);
 
       // Call the API service method
-      final response = await ApiService().invoiceSettlementVoucher(
+      final response = await ApiService().fetchDateRangeReport(
+        endpoint: 'invoiceSettlementVoucher',
         fromDate: fromDate,
         toDate: toDate,
-        account: selectedAccount.value,
+        additionalParams: {'account': selectedAccount.value}
       );
 
       if (response != null && response['status'] == 'success') {

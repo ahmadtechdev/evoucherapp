@@ -762,7 +762,7 @@ class EntryTicketController extends GetxController {
 
     try {
       // Call the POST request using the ApiService
-      final response = await apiService.postData(
+      final response = await apiService.postRequest(
         endpoint: 'ticketVoucher',
         body: requestBody,
       );

@@ -61,7 +61,7 @@ class _BankViewVoucherState extends State<BankViewVoucher> {
       String formattedToDate = DateFormat('yyyy-MM-dd').format(toDate);
 
       final response =
-          await _apiService.postLogin(endpoint: 'getVoucherPosted', body: {
+          await _apiService.postRequest(endpoint: 'getVoucherPosted', body: {
         "fromDate": formattedFromDate,
         "toDate": formattedToDate,
         "voucher_id": "",

@@ -57,11 +57,14 @@ class _UnPostedCVoucherState extends State<UnPostedCVoucher> {
       String formattedFromDate = DateFormat('yyyy-MM-dd').format(fromDate);
       String formattedToDate = DateFormat('yyyy-MM-dd').format(toDate);
 
-      final response = await _apiService.fetchVoucherUnPosted(
-        fromDate: formattedFromDate,
-        toDate: formattedToDate,
-        voucherId: "",
-        voucherType: "cv",
+      final response = await _apiService.fetchDateRangeReport(
+          endpoint: "getVoucherUnPosted",
+          fromDate: formattedFromDate,
+          toDate: formattedToDate,
+          additionalParams: {
+            "voucher_id": "",
+            "voucher_type": "cv",
+          }
       );
 
       if (response != null &&

@@ -60,7 +60,7 @@ class _SignInState extends State<SignIn> {
         "Password": txtPassword.text.trim(),
       };
 
-      final response = await _apiService.postLogin(endpoint: "token", body: body);
+      final response = await _apiService.postRequest(endpoint: "token", body: body);
 
       if (!mounted) return;
 

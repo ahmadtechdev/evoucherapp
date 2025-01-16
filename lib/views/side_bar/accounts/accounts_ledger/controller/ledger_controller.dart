@@ -8,13 +8,11 @@ class LedgerController extends GetxController {
   final String accountId;
   final String accountName;
 
-  LedgerController({
-    required this.accountId,
-    required this.accountName
-  });
+  LedgerController({required this.accountId, required this.accountName});
 
   // Observable variables
-  final Rx<DateTime> fromDate = DateTime.now().subtract(const Duration(days: 90)).obs;
+  final Rx<DateTime> fromDate =
+      DateTime.now().subtract(const Duration(days: 90)).obs;
   final Rx<DateTime> toDate = DateTime.now().obs;
   final RxList<LedgerVoucher> vouchers = <LedgerVoucher>[].obs;
   final RxList<LedgerVoucher> filteredVouchers = <LedgerVoucher>[].obs;
@@ -35,11 +33,15 @@ class LedgerController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final response = await apiService.fetchAccountLedger(
-        accountId: accountId,
-        fromDate: DateFormat('yyyy-MM-dd').format(fromDate.value),
-        toDate: DateFormat('yyyy-MM-dd').format(toDate.value),
-      );
+      final response = await apiService.fetchDateRangeReport(
+          endpoint: "accountLedger",
+          fromDate: DateFormat('yyyy-MM-dd').format(fromDate.value),
+          toDate: DateFormat('yyyy-MM-dd').format(toDate.value),
+          additionalParams: {
+            "from_date": DateFormat('yyyy-MM-dd').format(fromDate.value),
+            "to_date": DateFormat('yyyy-MM-dd').format(toDate.value),
+            'account_id': accountId
+          });
 
       if (response['status'] == 'success') {
         masterData.value = LedgerMasterData.fromJson(response['master_data']);
@@ -71,8 +73,8 @@ class LedgerController extends GetxController {
     } else {
       filteredVouchers.value = vouchers.where((voucher) {
         return voucher.description
-            .toLowerCase()
-            .contains(query.toLowerCase()) ||
+                .toLowerCase()
+                .contains(query.toLowerCase()) ||
             voucher.voucher.toLowerCase().contains(query.toLowerCase());
       }).toList();
     }

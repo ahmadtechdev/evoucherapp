@@ -38,7 +38,8 @@ class DailyActivityReportController extends GetxController {
       print('From Date: $formattedFromDate');
       print('To Date: $formattedToDate');
 
-      final response = await _apiService.fetchDailyActivity(
+      final response = await _apiService.fetchDateRangeReport(
+        endpoint: "dailyActivity",
         fromDate: formattedFromDate,
         toDate: formattedToDate,
       );

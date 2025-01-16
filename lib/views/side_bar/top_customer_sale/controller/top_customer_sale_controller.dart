@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../service/api_service.dart';
 import '../models/top_customer_sale_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -7,6 +9,8 @@ import 'package:printing/printing.dart';
 import 'package:intl/intl.dart';
 
 class CustomerReportController extends GetxController {
+  final ApiService apiService = ApiService();
+
   final selectedYear = 2024.obs;
   final searchQuery = ''.obs;
 
@@ -14,118 +18,66 @@ class CustomerReportController extends GetxController {
   final RxList<Customer> zeroSaleCustomers = <Customer>[].obs;
   final RxList<Customer> filteredActiveCustomers = <Customer>[].obs;
   final RxList<Customer> filteredZeroSaleCustomers = <Customer>[].obs;
+  final RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    initializeCustomers();
+    fetchCustomerReport();
   }
 
-  void initializeCustomers() {
-    final List<Map<String, dynamic>> activeCustomersData =[
-      {
-        'rank': 1,
-        'name': 'MOHSIN ALI',
-        'ticket': 0.00,
-        'hotel': 385000.00,
-        'visa': 0.00,
-        'transport': 0.00,
-        'other': 0.00,
-        'total': 385000.00,
-        'percentage': 42.2524
-      },
-      {
-        'rank': 2,
-        'name': 'AHMED C/O MUNIR',
-        'ticket': 60000.00,
-        'hotel': 100000.00,
-        'visa': 50480.00,
-        'transport': 0.00,
-        'other': 0.00,
-        'total': 210480.00,
-        'percentage': 23.0995
-      },
-      {
-        'rank': 3,
-        'name': 'HUSSNAIN ALI',
-        'ticket': 23860.00,
-        'hotel': 124000.00,
-        'visa': 32850.00,
-        'transport': 0.00,
-        'other': 0.00,
-        'total': 180710.00,
-        'percentage': 19.8323
-      },
-      {
-        'rank': 4,
-        'name': 'ALI AMEEN',
-        'ticket': 80000.00,
-        'hotel': 25000.00,
-        'visa': 30000.00,
-        'transport': 0.00,
-        'other': 0.00,
-        'total': 135000.00,
-        'percentage': 14.8158
-      },
-    ];
+  Future<void> fetchCustomerReport() async {
+    try {
+      isLoading.value = true;
 
-    final List<Map<String, dynamic>> zeroSaleCustomersData = [
-      {
-        'rank': 5,
-        'name': 'MR Afaq',
-        'ticket': 0.00,
-        'hotel': 0.00,
-        'visa': 0.00,
-        'transport': 0.00,
-        'other': 0.00,
-        'total': 0.00,
-        'percentage': 0.0000
-      },
-      {
-        'rank': 6,
-        'name': 'Mr. Adnan',
-        'ticket': 0.00,
-        'hotel': 0.00,
-        'visa': 0.00,
-        'transport': 0.00,
-        'other': 0.00,
-        'total': 0.00,
-        'percentage': 0.0000
-      },
-      {
-        'rank': 7,
-        'name': 'Mr. Adnan Kashif',
-        'ticket': 0.00,
-        'hotel': 0.00,
-        'visa': 0.00,
-        'transport': 0.00,
-        'other': 0.00,
-        'total': 0.00,
-        'percentage': 0.0000
-      },
-      {
-        'rank': 8,
-        'name': 'MEHRAN WALKING CUSTOMER',
-        'ticket': 0.00,
-        'hotel': 0.00,
-        'visa': 0.00,
-        'transport': 0.00,
-        'other': 0.00,
-        'total': 0.00,
-        'percentage': 0.0000
-      },
-    ];
+      final response = await apiService.postRequest(
+        endpoint: 'topCustomerReport',
+        body: {
+          'year': selectedYear.value.toString(),
+        },
+      );
 
-    activeCustomers.value = activeCustomersData.map((e) => Customer.fromJson(e)).toList();
-    zeroSaleCustomers.value = zeroSaleCustomersData.map((e) => Customer.fromJson(e)).toList();
+      if (response['status'] == 'success') {
+        final data = response['data'];
 
-    filteredActiveCustomers.value = activeCustomers;
-    filteredZeroSaleCustomers.value = zeroSaleCustomers;
+        // Parse non-zero sales customers
+        final nonZeroSales = (data['non_zero_sales'] as List)
+            .asMap()
+            .entries
+            .map((entry) => Customer.fromJson(entry.value, entry.key + 1))
+            .toList();
+
+        // Parse zero sales customers
+        final zeroSales = (data['zero_sales'] as List)
+            .asMap()
+            .entries
+            .map((entry) => Customer.fromJson(
+          entry.value,
+          nonZeroSales.length + entry.key + 1,
+        ))
+            .toList();
+
+        activeCustomers.value = nonZeroSales;
+        zeroSaleCustomers.value = zeroSales;
+        filteredActiveCustomers.value = nonZeroSales;
+        filteredZeroSaleCustomers.value = zeroSales;
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to fetch customer report: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void updateYear(int year) {
     selectedYear.value = year;
-    // Here you can add API call to fetch data for the selected year
+    fetchCustomerReport();
   }
 
   void updateSearch(String query) {

@@ -21,56 +21,17 @@ class ApiService {
 
   var dio = Dio();
 
-  // Reuse the existing `postLogin` method pattern for a generic POST request
-  Future<Map<String, dynamic>> postData({
+  // Generic function for date range based reports
+  Future<Map<String, dynamic>> postRequest({
     required String endpoint,
     required Map<String, dynamic> body,
+    // String? baseUrlOverride,
+    Duration timeout = const Duration(seconds: 90),
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final url = Uri.parse(baseUrl + endpoint);
-
-    try {
-      // Print request details for debugging
-      debugPrint('Request URL: $url');
-      debugPrint('Request Body: $body');
-
-      // Create request
-      final request = http.Request('POST', url);
-      request.headers.addAll({
-        'Content-Type': 'application/json',
-        'Authorization': token.isNotEmpty ? "Bearer $token" : "",
-      });
-
-      // Set the request body
-      request.body = json.encode(body);
-
-      // Send the request
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-
-      // Print response for debugging
-      debugPrint('Response Status Code: ${response.statusCode}');
-      debugPrint('Response Body: ${response.body}');
-
-      final responseData = json.decode(response.body);
-
-      if (response.statusCode == 200) {
-        return responseData;
-      } else {
-        throw Exception(responseData['message'] ?? 'Request failed');
-      }
-    } catch (e) {
-      debugPrint('API Error: $e');
-      throw Exception('Network error: Please check your internet connection');
-    }
-  }
-
-  Future<Map<String, dynamic>> postLogin(
-      {required String endpoint, required Map<String, dynamic> body}) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-    final url = Uri.parse(baseUrl + endpoint);
+    // final url = Uri.parse((baseUrlOverride ?? baseUrl2) + endpoint);
+    final url = Uri.parse((baseUrl2) + endpoint);
 
     try {
       // Validate input parameters
@@ -78,7 +39,7 @@ class ApiService {
         throw ArgumentError('Endpoint cannot be empty');
       }
 
-      // Print request details for debugging (only in debug mode)
+      // Print request details for debugging
       debugPrint('Request URL: $url');
       debugPrint('Request Body: $body');
 
@@ -95,7 +56,7 @@ class ApiService {
 
       // Send the request with a timeout
       final streamedResponse = await request.send().timeout(
-        const Duration(seconds: 30),
+        timeout,
         onTimeout: () {
           throw TimeoutException('The connection has timed out');
         },
@@ -104,7 +65,7 @@ class ApiService {
       // Convert streamed response to a regular response
       final response = await http.Response.fromStream(streamedResponse);
 
-      // Print response for debugging (only in debug mode)
+      // Print response for debugging
       debugPrint('Response Status Code: ${response.statusCode}');
       debugPrint('Response Body: ${response.body}');
 
@@ -147,12 +108,19 @@ class ApiService {
           'Connection timed out. Please check your internet.');
     } on SocketException {
       throw NetworkException('No internet connection. Please try again.');
+    } on FormatException catch (e) {
+      debugPrint('Format Error: $e');
+      throw FormatException('Invalid response format. Please try again.');
     } catch (e) {
       // Log the error (consider using a proper logging mechanism)
-      debugPrint('Login Error: $e');
+      debugPrint('API Error: $e');
 
       // Rethrow specific exceptions or wrap generic ones
-      if (e is UnauthorizedException) {
+      if (e is UnauthorizedException ||
+          e is BadRequestException ||
+          e is ForbiddenException ||
+          e is NotFoundException ||
+          e is ServerException) {
         rethrow;
       }
 
@@ -160,413 +128,32 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> fetchAccounts({String? subheadName}) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-    final url = Uri.parse('${baseUrl}fetchAccounts');
-
-    try {
-      // Prepare the request body
-      final body = subheadName != null ? {"subhead_name": subheadName} : {};
-
-      // Print request details for debugging
-      print('Request URL: $url');
-      print('Request Body: $body');
-
-      // Create request
-      final request = http.Request('POST', url);
-
-      // Add headers
-      request.headers.addAll({
-        'Content-Type': 'application/json',
-        'Authorization': token.isNotEmpty ? "Bearer $token" : "",
-      });
-
-      // Set the request body
-      request.body = json.encode(body);
-
-      // Send the request
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-
-      // Print response for debugging
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-
-      final responseData = json.decode(response.body);
-
-      if (response.statusCode == 200 && responseData['status'] == 'success') {
-        return responseData;
-      } else {
-        String errorMessage = responseData['message'] ?? 'Request failed';
-        throw Exception(errorMessage);
-      }
-    } catch (e) {
-      print('Network error: $e');
-      throw Exception('Network error: Please check your internet connection');
-    }
-  }
-
-  Future<Map<String, dynamic>> fetchAccountLedger(
-      {required String accountId,
-      required String fromDate,
-      required String toDate}) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-    final url = Uri.parse('${baseUrl}accountLedger');
-
-    try {
-      // Prepare the request body
-      final body = {
-        "account_id": accountId,
-        "from_date": fromDate,
-        "to_date": toDate
-      };
-
-      // Print request details for debugging
-      print('Request URL: $url');
-      print('Request Body: $body');
-
-      // Create request
-      final request = http.Request('POST', url);
-
-      // Add headers
-      request.headers.addAll({
-        'Content-Type': 'application/json',
-        'Authorization': token.isNotEmpty ? "Bearer $token" : "",
-      });
-
-      // Set the request body
-      request.body = json.encode(body);
-
-      // Send the request
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-
-      // Print response for debugging
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-
-      final responseData = json.decode(response.body);
-
-      if (response.statusCode == 200 && responseData['status'] == 'success') {
-        return responseData;
-      } else {
-        String errorMessage = responseData['message'] ?? 'Request failed';
-        throw Exception(errorMessage);
-      }
-    } catch (e) {
-      print('Network error: $e');
-      throw Exception('Network error: Please check your internet connection');
-    }
-  }
-
-  // get unposted data
-  Future<Map<String, dynamic>?> fetchVoucherUnPosted({
+  // Helper function for date range based reports using the enhanced postRequest
+  Future<Map<String, dynamic>> fetchDateRangeReport({
+    required String endpoint,
     required String fromDate,
     required String toDate,
-    required String voucherId,
-    required String voucherType,
+    // String? baseUrlOverride,
+    Map<String, dynamic>? additionalParams,
   }) async {
-    // Get the token from SharedPreferences
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    // Define headers
-    var headers = {
-      'Content-Type': 'application/json',
-      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
-    };
-
-    // Encode data
-    var data = {
+    final body = {
       "fromDate": fromDate,
       "toDate": toDate,
-      "voucher_id": voucherId,
-      "voucher_type": voucherType,
+      if (additionalParams != null) ...additionalParams,
     };
 
-    try {
-      // Send request
-      var response = await dio.post(
-        "${baseUrl}getVoucherUnPosted",
-        options: Options(
-          headers: headers,
-        ),
-        data: data,
-      );
-
-      // Handle response
-      if (response.statusCode == 200) {
-        print('Response data: ${response.data}');
-
-        if (response.data['status'] == 'success') {
-          print('Response data: ${response.data}');
-
-          return response.data as Map<String, dynamic>;
-        } else {
-          throw Exception(response.data['message'] ?? 'Request failed');
-        }
-      } else {
-        throw Exception('Request failed with status: ${response.statusCode}');
-      }
-    } catch (e) {
-      debugPrint("Error: $e");
-      throw Exception('Failed to fetch unposted vouchers: $e');
-    }
-  }
-
-  Future<Map<String, dynamic>?> fetchDailyActivity({
-    required String fromDate,
-    required String toDate,
-  }) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    // Define headers
-    var headers = {
-      'Content-Type': 'application/json',
-      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
-    };
-
-    // Request payload
-    var data = {
-      "fromDate": fromDate,
-      "toDate": toDate,
-    };
-
-    try {
-      // Send POST request
-      var response = await dio.post(
-        "${baseUrl2}dailyActivity",
-        options: Options(headers: headers),
-        data: data,
-      );
-
-      // Handle response
-      if (response.statusCode == 200) {
-        print(response.data);
-        return response.data as Map<String, dynamic>;
-      } else {
-        throw Exception('Request failed with status: ${response.statusCode}');
-      }
-    } catch (e) {
-      print("API Error: $e");
-      throw Exception('Failed to fetch daily activity: $e');
-    }
-  }
-
-  Future invoiceSettlementVoucher({
-    required String fromDate,
-    required String toDate,
-    required String account,
-  }) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? "";
-
-    var headers = {
-      'Content-Type': 'application/json',
-      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
-    };
-
-    var data = json.encode({
-      "fromDate": fromDate,
-      "toDate": toDate,
-      "account": account,
-    });
-
-    var dio = Dio();
-
-    try {
-      var response = await dio.post(
-        "${baseUrl2}invoiceSettlementVoucher",
-        options: Options(
-          headers: headers,
-        ),
-        data: data,
-      );
-
-      if (response.statusCode == 200) {
-        return response.data;
-      } else {
-        print('Error: ${response.statusCode} - ${response.statusMessage}');
-      }
-    } catch (e) {
-      print('Exception: $e');
-    }
-  }
-
-  // monthly sale report
-  Future<dynamic> monthlySalesReport(String fromDate, String toDate) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    // Define headers
-    var headers = {
-      'Content-Type': 'application/json',
-      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
-    };
-
-    var data = json.encode({
-      "fromDate": fromDate,
-      "toDate": toDate,
-    });
-
-    var dio = Dio();
-    var response = await dio.post(
-      "${baseUrl2}monthlySaleReport",
-      options: Options(
-        headers: headers,
-      ),
-      data: data,
+    return await postRequest(
+      endpoint: endpoint,
+      body: body,
+      // baseUrlOverride: baseUrlOverride ?? baseUrl2,
     );
-
-    if (response.statusCode == 200) {
-      print(response.data);
-      return response.data;
-    } else {
-      print(response.statusMessage);
-      return null; // Return null or handle errors appropriately
-    }
-  }
-
-//  ExpensesReport
-  Future<dynamic> Expenses_Report(String fromDate, String toDate) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    // Define headers
-    var headers = {
-      'Content-Type': 'application/json',
-      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
-    };
-
-    var data = json.encode({
-      "fromDate": fromDate,
-      "toDate": toDate,
-    });
-
-    var dio = Dio();
-    var response = await dio.post(
-      "${baseUrl2}expensesReport",
-      options: Options(
-        headers: headers,
-      ),
-      data: data,
-    );
-
-    if (response.statusCode == 200) {
-      print(response.data);
-      return response.data;
-    } else {
-      print(response.statusMessage);
-      return null; // Return null or handle errors appropriately
-    }
-  }
-
-  Future<dynamic> recoveryLists(String fromDate, String toDate) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    // Define headers
-    var headers = {
-      'Content-Type': 'application/json',
-      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
-    };
-
-    var data = json.encode({
-      "fromDate": fromDate,
-      "toDate": toDate,
-    });
-
-    var dio = Dio();
-    var response = await dio.post(
-      "${baseUrl2}recoveryLists",
-      options: Options(
-        headers: headers,
-      ),
-      data: data,
-    );
-
-    if (response.statusCode == 200) {
-      print(response.data);
-      return response.data;
-    } else {
-      print(response.statusMessage);
-      return null; // Return null or handle errors appropriately
-    }
-  }
-
-  Future<dynamic> incomesReport(String fromDate, String toDate) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    // Define headers
-    var headers = {
-      'Content-Type': 'application/json',
-      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
-    };
-
-    var data = json.encode({
-      "fromDate": fromDate,
-      "toDate": toDate,
-    });
-
-    var dio = Dio();
-    var response = await dio.post(
-      "${baseUrl2}incomesReport",
-      options: Options(
-        headers: headers,
-      ),
-      data: data,
-    );
-
-    if (response.statusCode == 200) {
-      print(response.data);
-      return response.data;
-    } else {
-      print(response.statusMessage);
-      return null; // Return null or handle errors appropriately
-    }
-  }
-  
-  Future<dynamic> allTicketVoucher({required String fromDate, required String toDate}) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    // Define headers
-    var headers = {
-      'Content-Type': 'application/json',
-      'Authorization': token.isNotEmpty ? "Bearer $token" : "",
-    };
-
-    var data = json.encode({
-      "fromDate": fromDate,
-      "toDate": toDate,
-    });
-
-    var dio = Dio();
-    var response = await dio.post(
-      "${baseUrl2}allTicketVoucher",
-      options: Options(
-        headers: headers,
-      ),
-      data: data,
-    );
-
-    if (response.statusCode == 200) {
-      print(response.data);
-      return response.data;
-    } else {
-      print(response.statusMessage);
-      return null; // Return null or handle errors appropriately
-    }
   }
 }
 
 // Custom Exception Classes
 class NetworkException implements Exception {
   final String message;
+
   NetworkException(this.message);
 
   @override
@@ -575,6 +162,7 @@ class NetworkException implements Exception {
 
 class BadRequestException implements Exception {
   final String message;
+
   BadRequestException(this.message);
 
   @override
@@ -583,6 +171,7 @@ class BadRequestException implements Exception {
 
 class UnauthorizedException implements Exception {
   final String message;
+
   UnauthorizedException(this.message);
 
   @override
@@ -591,6 +180,7 @@ class UnauthorizedException implements Exception {
 
 class ForbiddenException implements Exception {
   final String message;
+
   ForbiddenException(this.message);
 
   @override
@@ -599,6 +189,7 @@ class ForbiddenException implements Exception {
 
 class NotFoundException implements Exception {
   final String message;
+
   NotFoundException(this.message);
 
   @override
@@ -607,6 +198,7 @@ class NotFoundException implements Exception {
 
 class ServerException implements Exception {
   final String message;
+
   ServerException(this.message);
 
   @override
