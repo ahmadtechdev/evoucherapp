@@ -31,7 +31,7 @@ class IncomesReportController extends GetxController {
       // Make API request
       final response = await _apiService.fetchDateRangeReport(endpoint: "incomesReport", fromDate: fromDateStr, toDate: toDateStr);
 
-      if (response != null && response['status'] == 'success') {
+      if (response['status'] == 'success') {
         incomeData.value = response['data'];
       } else {
         errorMessage.value = 'Failed to load income data';

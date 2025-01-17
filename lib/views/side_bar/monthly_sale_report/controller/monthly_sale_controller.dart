@@ -40,7 +40,7 @@ class MonthlySalesController extends GetxController {
       final response =
           await apiService.fetchDateRangeReport(endpoint: 'monthlySaleReport', fromDate: fromDateStr, toDate: toDateStr);
 
-      if (response != null && response['status'] == 'success') {
+      if ( response['status'] == 'success') {
         // Clear existing data
         salesData.clear();
 

@@ -44,7 +44,7 @@ class DailyActivityReportController extends GetxController {
         toDate: formattedToDate,
       );
 
-      if (response != null && response['status'] == 'success') {
+      if (response['status'] == 'success') {
         // Update activities
         final List activitiesData = response['data']['activities'];
         activities.value = activitiesData

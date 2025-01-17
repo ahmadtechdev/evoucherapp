@@ -16,7 +16,6 @@ class InvoiceSettlementController extends GetxController {
     dateFrom.value = DateTime(DateTime.now().year, DateTime.now().month);
     fetchInvoices();
 
-    // Optionally, you can log or initialize other data here
   }
 
   void setAccount(String account) {
@@ -41,7 +40,7 @@ class InvoiceSettlementController extends GetxController {
           toDate: toDate,
           additionalParams: {'account': selectedAccount.value});
 
-      if (response != null && response['status'] == 'success') {
+      if (response['status'] == 'success') {
         print(response);
         var invoiceData = response['data'];
 

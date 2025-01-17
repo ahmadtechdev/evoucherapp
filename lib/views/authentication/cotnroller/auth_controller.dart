@@ -8,19 +8,19 @@ class AuthController extends GetxController {
   void setBaseUrl(String client) {
     switch (client) {
       case 'Travel':
-        baseUrl.value = "https://evoucher.pk/api-new/";
+        baseUrl.value = "https://evoucher.pk/api-test/";
         break;
       case 'Travel 1':
-        baseUrl.value = "https://api.travel1.com/";
+        baseUrl.value = "https://evoucher.pk/api-test/";
         break;
       case 'Travel 2':
-        baseUrl.value = "https://api.travel2.com/";
+        baseUrl.value = "https://evoucher.pk/api-test/";
         break;
       case 'Travel 3':
-        baseUrl.value = "https://api.travel3.com/";
+        baseUrl.value = "https://evoucher.pk/api-test/";
         break;
       case 'TOC':
-        baseUrl.value = "https://api.toc.com/";
+        baseUrl.value = "https://evoucher.pk/api-toc-test/";
         break;
       default:
         baseUrl.value = "https://api.default.com/";
@@ -29,6 +29,4 @@ class AuthController extends GetxController {
     // Update the ApiService base URL in real-time
     _apiService.updateBaseUrl(baseUrl.value);
   }
-
-
 }

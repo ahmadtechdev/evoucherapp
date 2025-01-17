@@ -32,7 +32,7 @@ class ExpenseReportController extends GetxController {
       // Make API call
       final response = await apiService.fetchDateRangeReport(endpoint: 'expensesReport',fromDate: fromDateStr, toDate: toDateStr);
 
-      if (response != null && response['status'] == 'success') {
+      if (response['status'] == 'success') {
         // Parse expense accounts
         final expenseAccounts = response['data']['expense_accounts'] as List;
         expenseItems.value = expenseAccounts.map((account) {
