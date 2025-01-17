@@ -23,7 +23,8 @@ class DayCardState extends State<DayCard> {
   @override
   Widget build(BuildContext context) {
     final summary = widget.dayData['summary'];
-    final details = widget.dayData['details'];
+    final List<Map<String, dynamic>> details =
+        List<Map<String, dynamic>>.from(widget.dayData['details']);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -63,13 +64,12 @@ class DayCardState extends State<DayCard> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+                    
                     Text(
-                      DateFormat('EEEE, dd MMM yyyy')
-                          .format(DateTime.parse(widget.dayData['date'])),
+                      widget.dayData['date'],
                       style: TextStyle(
-                        color: TColor.primary,
+                        color: TColor.primaryText,
                         fontSize: 14,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
@@ -81,14 +81,14 @@ class DayCardState extends State<DayCard> {
                     });
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
                       color: TColor.primary,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      isExpanded ? 'Hide' : 'Detail',
+                      isExpanded ? 'Hide' : 'Detail (${details.length})',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -100,80 +100,92 @@ class DayCardState extends State<DayCard> {
             ),
           ),
           if (isExpanded) ...[
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.grey.withOpacity(0.2),
-                    width: 1,
-                  ),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'V#: ${summary['vNo']}',
-                        style: TextStyle(
-                          color: TColor.primaryText,
-                          fontSize: 14,
-                        ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: details.length,
+              itemBuilder: (context, index) {
+                final detail = details[index];
+                return Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey.withOpacity(0.2),
+                        width: 1,
                       ),
-                      Text(
-                        'V.Date: ${details['vDate']}',
-                        style: TextStyle(
-                          color: TColor.primaryText,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Customer Account: ${details['cAccount']}',
-                    style: TextStyle(
-                      color: TColor.secondary,
-                      fontSize: 16,
                     ),
                   ),
-                  Text(
-                    'Supplier Account: ${details['sAccount']}',
-                    style: TextStyle(
-                      color: TColor.third,
-                      fontSize: 14,
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Detail #${index + 1}',
+                            style: TextStyle(
+                              color: TColor.secondary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'V.Date: ${detail['vDate']}',
+                            style: TextStyle(
+                              color: TColor.primaryText,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
                       Text(
-                        'Pax Name: ${details['paxName']}',
+                        'Customer Account: ${detail['cAccount']}',
                         style: TextStyle(
-                          color: TColor.primaryText,
+                          color: TColor.secondary,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        'Supplier Account: ${detail['sAccount']}',
+                        style: TextStyle(
+                          color: TColor.third,
                           fontSize: 14,
                         ),
                       ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.visibility,
-                          color: TColor.primary,
-                        ),
-                        onPressed: () {},
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Pax Name: ${detail['paxName']}',
+                            style: TextStyle(
+                              color: TColor.primaryText,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
+                      if (index < details.length - 1)
+                        Divider(
+                          color: Colors.grey.withOpacity(0.2),
+                          height: 1,
+                        ),
                     ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ],
-          _buildSummaryRow('Total Purchases:',
-              'Rs.${NumberFormat('#,###').format(summary['totalP'])}', TColor.secondaryText),
-          _buildSummaryRow('Total Sales:',
-              'Rs.${NumberFormat('#,###').format(summary['totalS'])}', TColor.secondaryText),
+          _buildSummaryRow(
+              'Total Purchases:',
+              'Rs.${NumberFormat('#,###').format(summary['totalP'])}',
+              TColor.secondaryText),
+          _buildSummaryRow(
+              'Total Sales:',
+              'Rs.${NumberFormat('#,###').format(summary['totalS'])}',
+              TColor.secondaryText),
           _buildSummaryRow(
             'Profit/Loss',
             'Rs.${NumberFormat('#,###').format(summary['pL'])}',

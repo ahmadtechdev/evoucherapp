@@ -1,5 +1,8 @@
+import 'package:evoucher/views/side_bar/daily_sales_report/controller/daily_sales_report_controller.dart';
 import 'package:evoucher/views/side_bar/daily_sales_report/day_card_widget.dart';
+import 'package:evoucher/views/side_bar/daily_sales_report/models/daily_sales_report_model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../common/color_extension.dart';
@@ -7,22 +10,6 @@ import '../../../common/drawer.dart';
 import '../../../common_widget/dart_selector2.dart';
 
 // Utility class for calculations
-class SalesReportUtils {
-  static List<Map<String, dynamic>> filterData(
-      List<Map<String, dynamic>> salesData, DateTimeRange? dateRange) {
-    if (dateRange == null) return salesData;
-    return salesData.where((entry) {
-      final entryDate = DateTime.parse(entry['date']);
-      return entryDate.isAfter(dateRange.start.subtract(const Duration(days: 1))) &&
-          entryDate.isBefore(dateRange.end.add(const Duration(days: 1)));
-    }).toList();
-  }
-
-  static int calculateTotal(List<Map<String, dynamic>> data, String key) {
-    return data.fold<int>(
-        0, (sum, entry) => sum + (entry['summary'][key] as int));
-  }
-}
 
 class DailySalesReportScreen extends StatefulWidget {
   const DailySalesReportScreen({super.key});
@@ -32,113 +19,47 @@ class DailySalesReportScreen extends StatefulWidget {
 }
 
 class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
-  final List<Map<String, dynamic>> salesData = [
-    // Sample data
-    {
-      "date": "2024-12-01",
-      "summary": {"vNo": "V123", "totalP": 1200, "totalS": 24000, "pL": 2000},
-      "details": {
-        "vDate": "2024-12-01",
-        "cAccount": "Account 1",
-        "sAccount": "Account 2",
-        "paxName": "John Doe"
-      },
-    },
-    {
-      "date": "2024-12-03",
-      "summary": {"vNo": "V124", "totalP": 8000, "totalS": 16000, "pL": 1500},
-      "details": {
-        "vDate": "2024-12-03",
-        "cAccount": "Account 3",
-        "sAccount": "Account 4",
-        "paxName": "Alice"
-      },
-    },
-    // Add more sample data as needed
-    // June 2024
-    {
-      "date": "2024-11-01",
-      "summary": {"vNo": "V201", "totalP": 1500, "totalS": 2000, "pL": 500},
-      "details": {
-        "vDate": "2024-06-01",
-        "cAccount": "Account A",
-        "sAccount": "Account B",
-        "paxName": "John Smith",
-      },
-    },
-    {
-      "date": "2024-11-04",
-      "summary": {"vNo": "V202", "totalP": 3000, "totalS": 2500, "pL": -500},
-      "details": {
-        "vDate": "2024-06-04",
-        "cAccount": "Account C",
-        "sAccount": "Account D",
-        "paxName": "Alice Johnson",
-      },
-    },
-    {
-      "date": "2024-11-08",
-      "summary": {"vNo": "V203", "totalP": 2500, "totalS": 3500, "pL": 1000},
-      "details": {
-        "vDate": "2024-06-08",
-        "cAccount": "Account E",
-        "sAccount": "Account F",
-        "paxName": "Bob Brown",
-      },
-    },
-    // Add 7 more entries for June here
-    // July 2024
-    {
-      "date": "2024-10-02",
-      "summary": {"vNo": "V204", "totalP": 4000, "totalS": 5000, "pL": 1000},
-      "details": {
-        "vDate": "2024-07-02",
-        "cAccount": "Account G",
-        "sAccount": "Account H",
-        "paxName": "Chris Evans",
-      },
-    },
-    {
-      "date": "2024-10-10",
-      "summary": {"vNo": "V205", "totalP": 2000, "totalS": 1500, "pL": -500},
-      "details": {
-        "vDate": "2024-07-10",
-        "cAccount": "Account I",
-        "sAccount": "Account J",
-        "paxName": "Diana Prince",
-      },
-    },
-    {
-      "date": "2024-10-15",
-      "summary": {"vNo": "V206", "totalP": 5000, "totalS": 7000, "pL": 2000},
-      "details": {
-        "vDate": "2024-07-15",
-        "cAccount": "Account K",
-        "sAccount": "Account L",
-        "paxName": "Edward Stone",
-      },
-    },
-  ];
+  final DailySalesReportController controller =
+      Get.put(DailySalesReportController());
+  bool isLoading = false;
+  String? error;
 
-  DateTimeRange? selectedDateRange = DateTimeRange(
-    start: DateTime.now().subtract(const Duration(days: 15)),
-    end: DateTime.now(),
-  );
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
+
+    try {
+      await controller
+          .fetchDailySalesReport(controller.selectedDateRange.value);
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = e.toString();
+        isLoading = false;
+      });
+    }
+  }
 
   void _updateDateRange({DateTime? start, DateTime? end}) {
-    setState(() {
-      selectedDateRange = DateTimeRange(
-        start: start ?? selectedDateRange!.start,
-        end: end ?? selectedDateRange!.end,
-      );
-    });
+    controller.updateDateRange(DateTimeRange(
+      start: start ?? controller.selectedDateRange.value.start,
+      end: end ?? controller.selectedDateRange.value.end,
+    ));
+    fetchData();
   }
 
   @override
   Widget build(BuildContext context) {
-    final filteredData =
-    SalesReportUtils.filterData(salesData, selectedDateRange);
-
     return Scaffold(
       backgroundColor: TColor.textField,
       appBar: AppBar(
@@ -150,28 +71,33 @@ class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
       drawer: const CustomDrawer(currentIndex: 9),
       body: Column(
         children: [
-          _DateSelectionSection(
-            selectedDateRange: selectedDateRange,
-            onDateChanged: _updateDateRange,
-          ),
+          Obx(() => _DateSelectionSection(
+                selectedDateRange: controller.selectedDateRange.value,
+                onDateChanged: _updateDateRange,
+              )),
           Expanded(
-            child: filteredData.isEmpty
-                ? const Center(
-              child: Text("No data available for the selected range."),
-            )
-                : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _SummaryCard(data: filteredData),
-                const SizedBox(height: 16),
-                ...filteredData.asMap().entries.map(
-                      (entry) => DayCard(
-                    index: entry.key,
-                    dayData: entry.value,
-                  ),
-                ),
-              ],
-            ),
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : error != null
+                    ? Center(child: Text(error!))
+                    : Obx(() => controller.salesData.isEmpty
+                        ? const Center(
+                            child: Text(
+                                "No data available for the selected range."),
+                          )
+                        : ListView(
+                            padding: const EdgeInsets.all(16),
+                            children: [
+                              _SummaryCard(salesData: controller.salesData),
+                              const SizedBox(height: 16),
+                              ...controller.salesData.asMap().entries.map(
+                                    (entry) => DayCard(
+                                      index: entry.key,
+                                      dayData: entry.value.toJson(),
+                                    ),
+                                  ),
+                            ],
+                          )),
           ),
         ],
       ),
@@ -179,18 +105,19 @@ class _DailySalesReportScreenState extends State<DailySalesReportScreen> {
   }
 }
 
-
-// Widget: Summary Card
 class _SummaryCard extends StatelessWidget {
-  final List<Map<String, dynamic>> data;
+  final RxList<SaleEntry> salesData;
 
-  const _SummaryCard({required this.data});
+  const _SummaryCard({required this.salesData});
 
   @override
   Widget build(BuildContext context) {
-    final totalPurchase = SalesReportUtils.calculateTotal(data, 'totalP');
-    final totalSales = SalesReportUtils.calculateTotal(data, 'totalS');
-    final totalProfit = SalesReportUtils.calculateTotal(data, 'pL');
+    final totalPurchase = salesData.fold<int>(
+        0, (sum, entry) => sum + (entry.summary['totalP'] as int? ?? 0));
+    final totalSales = salesData.fold<int>(
+        0, (sum, entry) => sum + (entry.summary['totalS'] as int? ?? 0));
+    final totalProfit = salesData.fold<int>(
+        0, (sum, entry) => sum + (entry.summary['pL'] as int? ?? 0));
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -203,7 +130,7 @@ class _SummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Total Entries: ${data.length}',
+            'Total Entries: ${salesData.length}',
             style: TextStyle(
               color: TColor.primaryText,
               fontSize: 18,
@@ -230,8 +157,8 @@ class _SummaryCard extends StatelessWidget {
                 valueColor: totalProfit > 0
                     ? TColor.secondary
                     : totalProfit < 0
-                    ? TColor.third
-                    : TColor.primaryText,
+                        ? TColor.third
+                        : TColor.primaryText,
               ),
             ],
           ),
@@ -241,7 +168,6 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
-// Widget: Summary Item
 class _SummaryItem extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -274,7 +200,7 @@ class _SummaryItem extends StatelessWidget {
             value,
             style: TextStyle(
               color: valueColor ?? TColor.primaryText,
-              fontSize: 16,
+              fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -284,8 +210,7 @@ class _SummaryItem extends StatelessWidget {
   }
 }
 
-
-// Widget: Date Selection Section
+/// Update the _DateSelectionSection widget
 class _DateSelectionSection extends StatelessWidget {
   final DateTimeRange? selectedDateRange;
   final Function({DateTime? start, DateTime? end}) onDateChanged;
@@ -297,6 +222,8 @@ class _DateSelectionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<DailySalesReportController>();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -338,24 +265,10 @@ class _DateSelectionSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          // ElevatedButton(
-          //   onPressed: () {},
-          //   style: ElevatedButton.styleFrom(
-          //     backgroundColor: TColor.secondary,
-          //     minimumSize: const Size(double.infinity, 45),
-          //     shape: RoundedRectangleBorder(
-          //       borderRadius: BorderRadius.circular(8),
-          //     ),
-          //   ),
-          //   child: const Text(
-          //     'Generate Report',
-          //     style: TextStyle(color: Colors.white),
-          //   ),
-          // ),
           Text(
             selectedDateRange == null
                 ? 'No date range selected'
-                : 'From ${DateFormat('E, dd MMM yyyy').format(selectedDateRange!.start)} To ${DateFormat('E, dd MMM yyyy').format(selectedDateRange!.end)}',
+                : 'From ${controller.formatDisplayDate(selectedDateRange!.start)} To ${controller.formatDisplayDate(selectedDateRange!.end)}',
             style: TextStyle(
               color: TColor.primaryText,
               fontWeight: FontWeight.w500,

@@ -1,3 +1,4 @@
+import 'package:evoucher/common_widget/date_selecter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -6,9 +7,9 @@ import '../../../common/drawer.dart';
 import '../charts_of_accounts/widgets/accounts_header_card.dart';
 import 'controller/trial_of_balance_controller.dart';
 
-
 class TrialOfBalanceScreen extends StatelessWidget {
-  final TrialOfBalanceController controller = Get.put(TrialOfBalanceController());
+  final TrialOfBalanceController controller =
+      Get.put(TrialOfBalanceController());
 
   TrialOfBalanceScreen({super.key});
 
@@ -26,48 +27,61 @@ class TrialOfBalanceScreen extends StatelessWidget {
           ),
         ),
         elevation: 0,
-
       ),
-      drawer: const CustomDrawer(currentIndex: 11,),
-      body: Obx(() {
-        return Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: controller.accountHeaders.length,
-                itemBuilder: (context, index) {
-                  final header = controller.accountHeaders[index];
-                  return AccountHeaderCard(header: header);
-                },
+      drawer: const CustomDrawer(
+        currentIndex: 11,
+      ),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: DateSelector(
+                  fontSize: 14,
+                  vpad: 20,
+                  initialDate: controller.selectedDate.value,
+                  label: "DATE:",
+                  onDateChanged: (newDate) {
+                    controller.selectedDate.value = newDate;
+                    controller.fetchTrialBalance();
+                  },
+                ),
               ),
-            ),
-            _buildSummaryCard(),
-            // Container(
-            //   padding: const EdgeInsets.all(16),
-            //   decoration: BoxDecoration(
-            //     color: TColor.primary.withOpacity(0.1),
-            //     border: Border(
-            //       top: BorderSide(color: TColor.primary.withOpacity(0.2)),
-            //     ),
-            //   ),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-            //     children: [
-            //       _buildSummaryItem('Total Debit', controller.totalDebit),
-            //       _buildSummaryItem('Total Credit', controller.totalCredit),
-            //     ],
-            //   ),
-            // ),
-          ],
-        );
-      }),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Obx(() {
+            if (controller.isLoading.value) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            return Expanded(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: controller.accountHeaders.length,
+                      itemBuilder: (context, index) {
+                        final header = controller.accountHeaders[index];
+                        return AccountHeaderCard(header: header);
+                      },
+                    ),
+                  ),
+                  _buildSummaryCard(),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
+
   Widget _buildSummaryCard() {
-    final totalDebit = controller.getDummyData()
-        .fold(0.0, (sum, header) => sum + header.totalDebit);
-    final totalCredit = controller.getDummyData()
-        .fold(0.0, (sum, header) => sum + header.totalCredit);
+    final totalDebit = controller.totalDebit;
+    final totalCredit = controller.totalCredit;
 
     return Card(
       margin: const EdgeInsets.all(16),

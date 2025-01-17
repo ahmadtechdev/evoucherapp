@@ -14,6 +14,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
+
 class DailyCashBook extends StatelessWidget {
   final DailyCashBookController controller = Get.put(DailyCashBookController());
 
@@ -23,49 +24,44 @@ class DailyCashBook extends StatelessWidget {
   Future<void> _exportToPDF(BuildContext context) async {
     final pdf = pw.Document();
     // Load the logo
-    final logoImage =
-    await rootBundle.load('assets/img/logo.png');
-    final logo =
-    pw.MemoryImage(logoImage.buffer.asUint8List());
+    final logoImage = await rootBundle.load('assets/img/logo.png');
+    final logo = pw.MemoryImage(logoImage.buffer.asUint8List());
+
     // Add logo and company name to the header
     pdf.addPage(
       pw.MultiPage(
-        header: (context) =>
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
+        header: (context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
-                pw.Row(
-                  mainAxisAlignment:
-                  pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Image(logo, width: 100, height: 100),
-                    pw.Text(
-                      'Journey Online',
-                      style: pw.TextStyle(
-                        fontSize: 24,
-                        fontWeight: pw.FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                pw.Divider(),
+                pw.Image(logo, width: 100, height: 100),
                 pw.Text(
-                  'Daily Cash Book Report',
+                  'Journey Online',
                   style: pw.TextStyle(
-                    fontSize: 18,
+                    fontSize: 24,
                     fontWeight: pw.FontWeight.bold,
                   ),
                 ),
-                pw.Text(
-                  'Date: ${controller.formatDate(
-                      controller.selectedDate.value)}',
-                  style: const pw.TextStyle(fontSize: 14),
-                ),
-                pw.SizedBox(height: 20),
               ],
             ),
-        build: (context) =>
-        [
+            pw.Divider(),
+            pw.Text(
+              'Daily Cash Book Report',
+              style: pw.TextStyle(
+                fontSize: 18,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
+            pw.Text(
+              'Date: ${controller.formatDate(controller.selectedDate.value)}',
+              style: const pw.TextStyle(fontSize: 14),
+            ),
+            pw.SizedBox(height: 20),
+          ],
+        ),
+        build: (context) => [
           pw.TableHelper.fromTextArray(
             context: context,
             data: <List<String>>[
@@ -73,19 +69,18 @@ class DailyCashBook extends StatelessWidget {
                 'V#',
                 'Date',
                 'Description',
-                'Receipt',
-                'Payment',
+                'Debit',
+                'Credit',
                 'Balance'
               ],
-              ...controller.transactions.map((transaction) =>
-              [
-                transaction.id.toString(),
-                controller.formatDate(transaction.date),
-                transaction.description,
-                'Rs ${transaction.receipt.toStringAsFixed(2)}',
-                'Rs ${transaction.payment.toStringAsFixed(2)}',
-                'Rs ${transaction.balance.toStringAsFixed(2)}',
-              ]),
+              ...controller.transactions.map((transaction) => [
+                    transaction.voucherId,
+                    controller.formatDate(transaction.date),
+                    transaction.description,
+                    'Rs ${transaction.debit.toStringAsFixed(2)}',
+                    'Rs ${transaction.credit.toStringAsFixed(2)}',
+                    transaction.balance,
+                  ]),
             ],
             headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
             cellStyle: const pw.TextStyle(),
@@ -96,14 +91,9 @@ class DailyCashBook extends StatelessWidget {
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              pw.Text(
-                  'Total Receipt: Rs ${controller.totalReceipt.toStringAsFixed(
-                      2)}'),
-              pw.Text(
-                  'Total Payment: Rs ${controller.totalPayment.toStringAsFixed(
-                      2)}'),
-              pw.Text('Closing Balance: Rs ${controller.closingBalance
-                  .toStringAsFixed(2)}'),
+              pw.Text('Total Receipt: Rs ${controller.totalReceipt.value}'),
+              pw.Text('Total Payment: Rs ${controller.totalPayment.value}'),
+              pw.Text('Closing Balance: ${controller.closingBalance.value}'),
             ],
           ),
         ],
@@ -116,6 +106,7 @@ class DailyCashBook extends StatelessWidget {
     );
   }
 
+// Excel Export Method
   Future<void> _exportToExcel(BuildContext context) async {
     // Create a new Excel file
     final excel = Excel.createExcel();
@@ -126,20 +117,21 @@ class DailyCashBook extends StatelessWidget {
       TextCellValue('V#'),
       TextCellValue('Date'),
       TextCellValue('Description'),
-      TextCellValue('Receipt'),
-      TextCellValue('Payment'),
+      TextCellValue('Debit'),
+      TextCellValue('Credit'),
       TextCellValue('Balance')
     ]);
 
     // Add transaction data
     for (var transaction in controller.transactions) {
       sheet.appendRow([
-        TextCellValue(transaction.id.toString()),
+        TextCellValue(transaction.voucherId),
         TextCellValue(controller.formatDate(transaction.date)),
         TextCellValue(transaction.description),
-        DoubleCellValue(transaction.receipt),
-        DoubleCellValue(transaction.payment),
-        DoubleCellValue(transaction.balance)
+        DoubleCellValue(transaction.debit),
+        DoubleCellValue(transaction.credit),
+        TextCellValue(transaction
+            .balance) // Using TextCellValue since balance includes "Dr/Cr"
       ]);
     }
 
@@ -147,20 +139,21 @@ class DailyCashBook extends StatelessWidget {
     sheet.appendRow([]);
     sheet.appendRow([
       TextCellValue('Total Receipt'),
-      DoubleCellValue(controller.totalReceipt)
+      TextCellValue(controller.totalReceipt.value)
     ]);
     sheet.appendRow([
       TextCellValue('Total Payment'),
-      DoubleCellValue(controller.totalPayment)
+      TextCellValue(controller.totalPayment.value)
     ]);
     sheet.appendRow([
       TextCellValue('Closing Balance'),
-      DoubleCellValue(controller.closingBalance)
+      TextCellValue(controller.closingBalance.value)
     ]);
 
     // Save the file
     String downloadsPath = '/storage/emulated/0/Download';
-    String filePath = '$downloadsPath/daily_cash_book_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+    String filePath =
+        '$downloadsPath/daily_cash_book_${DateTime.now().millisecondsSinceEpoch}.xlsx';
 
     List<int>? fileBytes = excel.save();
     if (fileBytes != null) {
@@ -183,12 +176,10 @@ class DailyCashBook extends StatelessWidget {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: TColor.white,
@@ -227,6 +218,7 @@ class DailyCashBook extends StatelessWidget {
                           label: "DATE:",
                           onDateChanged: (newDate) {
                             controller.selectedDate.value = newDate;
+                            controller.fetchDailyCashBook();
                           },
                         ),
                       ),
@@ -257,21 +249,51 @@ class DailyCashBook extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SearchTextField(hintText: "Search", onChange: (query) {
-                    // Implement search functionality
-                  }),
+                  SearchTextField(
+                      hintText: "Search",
+                      onChange: (query) {
+                        // Implement search functionality
+                      }),
                 ],
               ),
             ),
+            // Replace the transaction list builder with:
             Expanded(
               child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (controller.transactions.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.hourglass_empty,
+                          size: 50,
+                          color: TColor.secondaryText,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No Record Found',
+                          style: TextStyle(
+                            color: TColor.secondaryText,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: controller.transactions.length,
                   itemBuilder: (context, index) {
                     final transaction = controller.transactions[index];
                     return Container(
-                      margin:  const EdgeInsets.only(bottom: 12),
+                      margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
@@ -293,13 +315,14 @@ class DailyCashBook extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 6),
                                   decoration: BoxDecoration(
                                     color: TColor.primary.withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    'V# ${transaction.id}',
+                                    'V# ${transaction.voucherId}',
                                     style: TextStyle(
                                       color: TColor.primary,
                                       fontWeight: FontWeight.bold,
@@ -330,13 +353,12 @@ class DailyCashBook extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Receipt',
+                                      'Debit',
                                       style: TextStyle(
                                           color: TColor.secondaryText),
                                     ),
                                     Text(
-                                      'Rs ${transaction.receipt.toStringAsFixed(
-                                          2)}',
+                                      'Rs ${transaction.debit.toStringAsFixed(2)}',
                                       style: TextStyle(
                                         color: TColor.primaryText,
                                         fontWeight: FontWeight.bold,
@@ -348,13 +370,12 @@ class DailyCashBook extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Payment',
+                                      'Credit',
                                       style: TextStyle(
                                           color: TColor.secondaryText),
                                     ),
                                     Text(
-                                      'Rs ${transaction.payment.toStringAsFixed(
-                                          2)}',
+                                      'Rs ${transaction.credit.toStringAsFixed(2)}',
                                       style: TextStyle(
                                         color: TColor.primaryText,
                                         fontWeight: FontWeight.bold,
@@ -363,7 +384,7 @@ class DailyCashBook extends StatelessWidget {
                                   ],
                                 ),
                                 Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       'Balance',
@@ -371,8 +392,7 @@ class DailyCashBook extends StatelessWidget {
                                           color: TColor.secondaryText),
                                     ),
                                     Text(
-                                      'Rs ${transaction.balance.toStringAsFixed(
-                                          2)}',
+                                      transaction.balance,
                                       style: TextStyle(
                                         color: TColor.primaryText,
                                         fontWeight: FontWeight.bold,
@@ -390,6 +410,7 @@ class DailyCashBook extends StatelessWidget {
                 );
               }),
             ),
+
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -402,19 +423,17 @@ class DailyCashBook extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildTotalItem('Total Receipt',
-                      controller.totalReceipt.toStringAsFixed(2),
-                      TColor.secondary),
-                  _buildTotalItem('Total Payment',
-                      controller.totalPayment.toStringAsFixed(2), TColor.third),
-                  _buildTotalItem('Closing Balance',
-                      controller.closingBalance.toStringAsFixed(2),
-                      TColor.primary),
-                ],
-              ),
+              child: Obx(() => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildTotalItem('Total Receipt',
+                          controller.totalReceipt.value, TColor.secondary),
+                      _buildTotalItem('Total Payment',
+                          controller.totalPayment.value, TColor.third),
+                      _buildTotalItem('Closing Balance',
+                          controller.closingBalance.value, TColor.primary),
+                    ],
+                  )),
             ),
           ],
         ),
@@ -440,7 +459,7 @@ class DailyCashBook extends StatelessWidget {
           style: TextStyle(
             color: amountColor,
             fontWeight: FontWeight.bold,
-            fontSize: 16,
+            fontSize: 12,
           ),
         ),
       ],
