@@ -11,13 +11,10 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ApiService {
-  String baseUrl = "https://evoucher.pk/api-new/";
-  final String baseUrl2 = "https://evoucher.pk/api-test/";
+import '../views/authentication/cotnroller/auth_controller.dart';
 
-  void updateBaseUrl(String url) {
-    baseUrl = url;
-  }
+class ApiService {
+  final controller = Get.put(AuthController());
 
   var dio = Dio();
 
@@ -31,7 +28,7 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     // final url = Uri.parse((baseUrlOverride ?? baseUrl2) + endpoint);
-    final url = Uri.parse((baseUrl2) + endpoint);
+    final url = Uri.parse((controller.baseUrl.value) + endpoint);
 
     try {
       // Validate input parameters
