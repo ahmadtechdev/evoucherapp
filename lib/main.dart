@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Initialize the controller
-    // Get.put( VoucherController());
+
     Get.lazyPut(() => AccountsController(), fenix: true);
     Get.lazyPut(() => VoucherController(), fenix: true);
     Get.lazyPut(() => IncomesReportController(), fenix: true);
