@@ -1,0 +1,47 @@
+name: evoucher_new
+description: "E Voucher is a project of Journey Online, A leading Software house is based in Faisalabad Pakistan. Journey Online Team is specialized in developing Online Applications I.e. Accounting Software’s, HR Management System, Online Travel Agent Portals, Online Hotel Booking Engine, Online Pharmacies, Online Health Websites, Online Educational Websites & much more online Solutions. The Journey Online team is dedicated to quality, firm commitments and enhancing cutting edge Technology."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  get: ^4.6.6
+  dropdown_search: ^5.0.6
+  intl: ^0.19.0
+  dio: ^5.7.0
+  http: ^1.2.2
+  shared_preferences: ^2.3.3
+  image_picker: ^1.1.2
+  pdf: ^3.11.1
+  printing: ^5.13.4
+  material_design_icons_flutter: ^7.0.7296
+  url_launcher: ^6.3.1
+  excel: ^4.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/img/
+
+  fonts:
+    - family: Metropolis
+      fonts:
+        - asset: assets/font/Metropolis-Regular.otf
+        - asset: assets/font/Metropolis-Medium.otf
+          weight: 500
+        - asset: assets/font/Metropolis-SemiBold.otf
+          weight: 600
+        - asset: assets/font/Metropolis-Bold.otf
+          weight: 700
+        - asset: assets/font/Metropolis-ExtraBold.otf
+          weight: 800
