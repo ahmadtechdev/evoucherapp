@@ -20,7 +20,7 @@ class AllGrandSaleController extends GetxController {
   void onInit() {
     super.onInit();
     fetchTransactions(
-      fromDate: formatDate(DateTime.now().subtract(const Duration(days: 30))),
+      fromDate: formatDate(DateTime.now().subtract(const Duration(days: 2))),
       toDate: formatDate(DateTime.now()),
     );
   }

@@ -19,7 +19,9 @@ class _HotelSalesReportState extends State<HotelSalesReport> {
   @override
   void initState() {
     super.initState();
-    fromDate = DateTime(toDate.year, toDate.month, 1);
+    // fromDate = DateTime(toDate.year, toDate.month, 1);
+    fromDate = DateTime(toDate.year, toDate.month, toDate.day - 2);
+
   }
 
   @override

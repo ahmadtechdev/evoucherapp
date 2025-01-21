@@ -19,7 +19,8 @@ class _VisaSalesReportState extends State<VisaSalesReport> {
   @override
   void initState() {
     super.initState();
-    fromDate = DateTime(toDate.year, toDate.month, 1);
+    // fromDate = DateTime(toDate.year, toDate.month, 1);
+    fromDate = DateTime(toDate.year, toDate.month, toDate.day - 2);
   }
 
   @override
