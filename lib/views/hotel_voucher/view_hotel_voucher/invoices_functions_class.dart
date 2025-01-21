@@ -1,5 +1,8 @@
+import 'package:evoucher_new/service/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -7,57 +10,72 @@ import 'package:printing/printing.dart';
 class InvoiceGenerator {
 
 
-  Future<void> generateAndPreviewNewHotelInvoice(BuildContext context) async {
-    // Create PDF document
-    final doc = pw.Document();
+  Future<void> generateAndPreviewHotelInvoice(BuildContext context, String voucherId) async {
+    final ApiService apiService = Get.put(ApiService());
 
-    // Load logo from assets
-    final logoImage = await rootBundle.load('assets/img/logo1.png');
-    final logoImageData = logoImage.buffer.asUint8List();
+    try {
+      // Fetch invoice data from API
+      final response = await apiService.postRequest(
+        endpoint: 'getHotelVoucherInvoice',
+        body: {'voucher_id': voucherId},
+      );
 
-    // Get current date and time
-    final now = DateTime.now();
-    final formattedDateTime = '${now.toLocal()}';
+      if (response['status'] != 'success') {
+        throw 'Failed to fetch invoice data';
+      }
 
-    doc.addPage(
+      final invoiceData = response['data'];
 
-      pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(20),
-        footer: (pw.Context context) {
-          return pw.Container(
-            alignment: pw.Alignment.centerRight,
-            padding: const pw.EdgeInsets.only(top: 10),
-            child: pw.Text(
-              'Developed by Journeyonline.pk | CTC # 0310 0007901',
-              style: pw.TextStyle(fontSize: 10, fontStyle: pw.FontStyle.italic),
-            ),
-          );
-        },
-        build: (pw.Context context) => [
-           pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              // Date and time row at the top
-              pw.Container(
-                alignment: pw.Alignment.centerRight,
-                margin: const pw.EdgeInsets.only(bottom: 10),
-                child: pw.Text(
-                  'Date & Time: $formattedDateTime',
-                  style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
-                ),
+      // Create PDF document
+      final doc = pw.Document();
+
+      // Load logo from assets
+      final logoImage = await rootBundle.load('assets/img/logo1.png');
+      final logoImageData = logoImage.buffer.asUint8List();
+
+      // Get current date and time
+      final now = DateTime.now();
+      final formattedDateTime = DateFormat('dd/MM/yyyy HH:mm').format(now);
+
+      doc.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(20),
+          footer: (pw.Context context) {
+            return pw.Container(
+              alignment: pw.Alignment.centerRight,
+              padding: const pw.EdgeInsets.only(top: 10),
+              child: pw.Text(
+                'Developed by Journeyonline.pk | CTC # 0310 0007901',
+                style: pw.TextStyle(fontSize: 10, fontStyle: pw.FontStyle.italic),
               ),
-              // Header with logo and company info
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Column(
+            );
+          },
+          build: (pw.Context context) => [
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                // Date and time row at the top
+                pw.Container(
+                  alignment: pw.Alignment.centerRight,
+                  margin: const pw.EdgeInsets.only(bottom: 10),
+                  child: pw.Text(
+                    'Date & Time: $formattedDateTime',
+                    style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                  ),
+                ),
+                // Header with logo and company info
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
                         pw.Image(pw.MemoryImage(logoImageData), width: 120),
-                        // Address
-                        pw.Text('2nd Floor JOURNEY ONLINE Plaza, Al-hamra town, east canal road, Faisalabad',
-                            style: const pw.TextStyle(fontSize: 10)),
+                        pw.Text(
+                          invoiceData['company_info']['address'],
+                          style: const pw.TextStyle(fontSize: 10),
+                        ),
                         pw.RichText(
                           text: pw.TextSpan(
                             children: [
@@ -66,208 +84,225 @@ class InvoiceGenerator {
                                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
                               ),
                               pw.TextSpan(
-                                text: '03337323379',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
+                                text: invoiceData['company_info']['cell'],
+                                style: const pw.TextStyle(fontSize: 10),
                               ),
                               pw.TextSpan(
                                 text: ' - PHONE : ',
                                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
                               ),
                               pw.TextSpan(
-                                text: '03037666866',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
+                                text: invoiceData['company_info']['phone'],
+                                style: const pw.TextStyle(fontSize: 10),
                               ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      children: [
+                        pw.RichText(
+                          text: pw.TextSpan(
+                            children: [
                               pw.TextSpan(
-                                text: ' - EMAIL : ',
+                                text: 'NTN: ',
                                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
                               ),
                               pw.TextSpan(
-                                text: 'ameeramillattts@hotmail.com',
+                                text: 'HUN6678',
                                 style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
                               ),
                             ],
                           ),
                         ),
-
-                      ]
-                  ),
-
-
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.end,
-                    children: [
-                      pw.RichText(
+                        pw.RichText(
                           text: pw.TextSpan(
-                              children: [
-                                pw.TextSpan(
-                                  text: 'NTN: ',
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
-                                ),
-                                pw.TextSpan(
-                                  text: 'HUN6678',
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
-                                ),
-                              ]
-                          )
-                      ),
-                      pw.RichText(
-                          text: pw.TextSpan(
-                              children: [
-                                pw.TextSpan(
-                                  text: 'Company ID: ',
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
-                                ),
-                                pw.TextSpan(
-                                  text: 'HGDFR58',
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
-                                ),
-                              ]
-                          )
-                      ),
-
-                      pw.SizedBox(
-                          height: 8
-                      ),
-                      pw.Container(
-                        width: 120,
-                        padding: const pw.EdgeInsets.all(5),
-                        decoration: pw.BoxDecoration(
-                          border: pw.Border.all(width: 2),
-                        ),
-                        child: pw.Column(
                             children: [
-
-                              pw.Text('Invoices: 852'),
-                              pw.SizedBox(
-                                  height: 4
+                              pw.TextSpan(
+                                text: 'Company ID: ',
+                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
                               ),
-                              pw.Text('(PKR) = 14,000.00'),
-                            ]
-                        ),)
-                    ],
-                  ),
-                ],
-              ),
-              pw.Divider(thickness: 1),
+                              pw.TextSpan(
+                                text: 'HGDFR58',
+                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
+                              ),
+                            ],
+                          ),
+                        ),
+                        pw.SizedBox(height: 8),
+                        pw.Container(
+                          width: 120,
+                          padding: const pw.EdgeInsets.all(5),
+                          decoration: pw.BoxDecoration(
+                            border: pw.Border.all(width: 2),
+                          ),
+                          child: pw.Column(
+                            children: [
+                              pw.Text('Invoices: ${invoiceData['voucher_info']['voucher_id']}'),
+                              pw.SizedBox(height: 4),
+                              pw.Text('(PKR) = ${invoiceData['financial_info']['selling_price']}'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                pw.Divider(thickness: 1),
+                pw.SizedBox(height: 20),
 
-              pw.SizedBox(height: 20),
-
-              // Invoice details table
-              pw.Table(
-                columnWidths: {
-                  0: const pw.FlexColumnWidth(1),
-                  1: const pw.FlexColumnWidth(1),
-                  2: const pw.FlexColumnWidth(1),
-                  3: const pw.FlexColumnWidth(1),
-                },
-                border: pw.TableBorder.all(width: 0.5),
-                children: [
-                  _buildTableRow(
-                    ['Account Name:', 'Hotel Invoice Date #', 'Option Date', 'Confirmation'],
-                    isHeader: true,
-                    fontSize: 10,
-                  ),
-                  _buildTableRow(
-                    ['Adam', 'Thu, 31 Oct 2024', '30, Nov -0001', ''],
-                    fontSize: 10,
-                  ),
-                ],
-              ),
-              pw.SizedBox(height: 20),
-
-              // Passenger details table
-              pw.Table(
-                columnWidths: {
-                  0: const pw.FlexColumnWidth(1),
-                  1: const pw.FlexColumnWidth(1),
-                  2: const pw.FlexColumnWidth(1),
-                  3: const pw.FlexColumnWidth(1),
-                  4: const pw.FlexColumnWidth(1),
-                  5: const pw.FlexColumnWidth(2),
-                  6: const pw.FlexColumnWidth(1),
-                },
-                border: pw.TableBorder.all(width: 0.5),
-                children: [
-                  _buildTableRow(
-                    ['Pax Name', 'Hotel', 'Room Type #', 'Meal', 'Destination','CheckIn - CheckOut','Amount (PKR)'],
-                    isHeader: true,
-                    fontSize: 10,
-                  ),
-                  _buildTableRow(
-                    ['Hassan', 'ABC TEST GTEl', 'Double Room', 'None', 'Mecca- Saudia', 'Thu, 31 OCt, 2024 \n Sat, 02 Nov, 2024', '14,000.00'],
-                    fontSize: 10,
-                  ),
-                  _buildTableRow(
-                    ['', '', '','','', 'Total:', 'PKR 14,000.00'],
-                    fontSize: 10,
-                    isBold: true,
-                  ),
-                ],
-              ),
-              pw.SizedBox(height: 16),
-              // In words
-              pw.Text('IN WORDS: Fourteen Thousands PkR Only', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
-              pw.SizedBox(height: 10),
-              pw.Text('On behalf of AGENT1', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
-              pw.SizedBox(height: 10),
-
-              pw.Divider(thickness: 1),
-              // Bank details section
-              pw.Text('Bank Account Details with Account Title', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
-              pw.Table(
-                border: pw.TableBorder.all(width: 0.5),
-                columnWidths: {
-                  0: const pw.FlexColumnWidth(2),
-                  1: const pw.FlexColumnWidth(2),
-                  2: const pw.FlexColumnWidth(2),
-                  3: const pw.FlexColumnWidth(4),
-                },
-                children: [
-                  _buildTableRow(
-                    ['Acc Title', 'Bank Name', 'Account No', 'Bank Address'],
-                    isHeader: true,
-                    fontSize: 10,
-                  ),
-                  ...['Askari Bank', 'Meezan Bank', 'Alfalah Bank', 'HBL'].map((bank) {
-                    return _buildTableRow(
+                // Invoice details table
+                pw.Table(
+                  columnWidths: {
+                    0: const pw.FlexColumnWidth(1),
+                    1: const pw.FlexColumnWidth(1),
+                    2: const pw.FlexColumnWidth(1),
+                    3: const pw.FlexColumnWidth(1),
+                  },
+                  border: pw.TableBorder.all(width: 0.5),
+                  children: [
+                    _buildTableRow(
+                      ['Account Name:', 'Hotel Invoice Date #', 'Option Date', 'Confirmation'],
+                      isHeader: true,
+                      fontSize: 10,
+                    ),
+                    _buildTableRow(
                       [
-                        'JO TRAVELS',
-                        bank,
-                        bank == 'Askari Bank'
-                            ? '000123300000'
-                            : bank == 'Meezan Bank'
-                            ? '000112000108'
-                            : bank == 'Alfalah Bank'
-                            ? '000007676001'
-                            : '010101010',
-                        bank == 'Askari Bank'
-                            ? 'Satyana Road Branch, Faisalabad'
-                            : bank == 'Meezan Bank'
-                            ? 'Susan Road Branch, Faisalabad'
-                            : bank == 'Alfalah Bank'
-                            ? 'PC Branch, Faisalabad'
-                            : 'CANL ROAD BRANCH',
+                        invoiceData['account_info']['name'],
+                        invoiceData['voucher_info']['invoice_date'],
+                        '',
+                        invoiceData['voucher_info']['confirmation_number'],
                       ],
                       fontSize: 10,
-                    );
-                  }),
-                ],
-              ),
-              pw.SizedBox(height: 10),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 20),
 
-            ],
-          )
-        ],
-      ),
-    );
+                // Hotel details table
+                pw.Table(
+                  columnWidths: {
+                    0: const pw.FlexColumnWidth(1),
+                    1: const pw.FlexColumnWidth(1),
+                    2: const pw.FlexColumnWidth(1),
+                    3: const pw.FlexColumnWidth(1),
+                    4: const pw.FlexColumnWidth(1),
+                    5: const pw.FlexColumnWidth(2),
+                    6: const pw.FlexColumnWidth(1),
+                  },
+                  border: pw.TableBorder.all(width: 0.5),
+                  children: [
+                    _buildTableRow(
+                      ['Pax Name', 'Hotel', 'Room Type', 'Meal', 'Destination', 'CheckIn - CheckOut', 'Amount (PKR)'],
+                      isHeader: true,
+                      fontSize: 10,
+                    ),
+                    _buildTableRow(
+                      [
+                        invoiceData['guest_info']['lead_guest'],
+                        invoiceData['hotel_info']['name'],
+                        '${invoiceData['room_info']['type']} (${invoiceData['room_info']['number_of_rooms']} rooms)',
+                        invoiceData['room_info']['meal_plan'],
+                        invoiceData['hotel_info']['destination'],
+                        '${invoiceData['hotel_info']['checkin']}\n${invoiceData['hotel_info']['checkout']}',
+                        invoiceData['financial_info']['selling_price'],
+                      ],
+                      fontSize: 10,
+                    ),
+                    _buildTableRow(
+                      ['', '', '', '', '', 'Total:', 'PKR ${invoiceData['financial_info']['total_debit']}'],
+                      fontSize: 10,
+                      isBold: true,
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 16),
 
-    // Show print preview
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => doc.save(),
-      name: 'Invoice_950',
-    );
+                // Guest details
+                pw.Text(
+                  'Guest Details: ${invoiceData['guest_info']['adults']} Adult(s)${invoiceData['guest_info']['children'] != '0' ? ', ${invoiceData['guest_info']['children']} Child(ren)' : ''}',
+                  style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                ),
+                pw.SizedBox(height: 10),
+
+                // In words
+                pw.Text(
+                  'IN WORDS: ${_numberToWords(double.parse(invoiceData['financial_info']['total_debit']))} Only',
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'On behalf of ${invoiceData['company_info']['name']}',
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                ),
+                pw.SizedBox(height: 10),
+
+                pw.Divider(thickness: 1),
+                // Bank details section
+                pw.Text(
+                  'Bank Account Details with Account Title',
+                  style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+                ),
+                pw.Table(
+                  border: pw.TableBorder.all(width: 0.5),
+                  columnWidths: {
+                    0: const pw.FlexColumnWidth(2),
+                    1: const pw.FlexColumnWidth(2),
+                    2: const pw.FlexColumnWidth(2),
+                    3: const pw.FlexColumnWidth(4),
+                  },
+                  children: [
+                    _buildTableRow(
+                      ['Acc Title', 'Bank Name', 'Account No', 'Bank Address'],
+                      isHeader: true,
+                      fontSize: 10,
+                    ),
+                    ...['Askari Bank', 'Meezan Bank', 'Alfalah Bank', 'HBL'].map((bank) {
+                      return _buildTableRow(
+                        [
+                          'JO TRAVELS',
+                          bank,
+                          bank == 'Askari Bank'
+                              ? '000123300000'
+                              : bank == 'Meezan Bank'
+                              ? '000112000108'
+                              : bank == 'Alfalah Bank'
+                              ? '000007676001'
+                              : '010101010',
+                          bank == 'Askari Bank'
+                              ? 'Satyana Road Branch, Faisalabad'
+                              : bank == 'Meezan Bank'
+                              ? 'Susan Road Branch, Faisalabad'
+                              : bank == 'Alfalah Bank'
+                              ? 'PC Branch, Faisalabad'
+                              : 'CANL ROAD BRANCH',
+                        ],
+                        fontSize: 10,
+                      );
+                    }),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+
+      // Show print preview
+      await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async => doc.save(),
+        name: 'Hotel_Invoice_${invoiceData['voucher_info']['voucher_id']}',
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to generate invoice: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
-
   Future<void> generateAndPreviewDefiniteHotelInvoice(BuildContext context) async {
     // Create PDF document
     final doc = pw.Document();
@@ -296,7 +331,7 @@ class InvoiceGenerator {
           );
         },
         build: (pw.Context context) => [
-           pw.Column(
+          pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               // Date and time row at the top
@@ -395,28 +430,28 @@ class InvoiceGenerator {
               pw.SizedBox(height: 20),
 
               pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.RichText(
-                      text: pw.TextSpan(
-                          children: [
-                            pw.TextSpan(
-                              text: 'Account Name: | Adam',
-                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
-                            ),
-                            pw.TextSpan(
-                              text: ' | 1234567890 | test@tests.com',
-                              style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 12),
-                            ),
-                          ]
-                      )
-                  ),
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.RichText(
+                        text: pw.TextSpan(
+                            children: [
+                              pw.TextSpan(
+                                text: 'Account Name: | Adam',
+                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
+                              ),
+                              pw.TextSpan(
+                                text: ' | 1234567890 | test@tests.com',
+                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 12),
+                              ),
+                            ]
+                        )
+                    ),
 
-                  pw.Text(
-                    'Definite Invoice',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
-                  ),
-                ]
+                    pw.Text(
+                      'Definite Invoice',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                    ),
+                  ]
               ),
 
               pw.SizedBox(height: 10),
@@ -646,9 +681,9 @@ class InvoiceGenerator {
                 },
                 children: [
                   pw.TableRow(
-                      // decoration: const pw.BoxDecoration(
-                      //   color: PdfColor.fromInt(0xFF0C6B8A),
-                      // ),
+                    // decoration: const pw.BoxDecoration(
+                    //   color: PdfColor.fromInt(0xFF0C6B8A),
+                    // ),
 
                     children: [
                       _buildHeaderCell('ROOMS/BEDS'),
@@ -1008,4 +1043,125 @@ class InvoiceGenerator {
     );
   }
 
+
 }
+
+String _numberToWords(double number) {
+  List<String> units = [
+    '',
+    'One',
+    'Two',
+    'Three',
+    'Four',
+    'Five',
+    'Six',
+    'Seven',
+    'Eight',
+    'Nine',
+    'Ten',
+    'Eleven',
+    'Twelve',
+    'Thirteen',
+    'Fourteen',
+    'Fifteen',
+    'Sixteen',
+    'Seventeen',
+    'Eighteen',
+    'Nineteen'
+  ];
+  List<String> tens = [
+    '',
+    '',
+    'Twenty',
+    'Thirty',
+    'Forty',
+    'Fifty',
+    'Sixty',
+    'Seventy',
+    'Eighty',
+    'Ninety'
+  ];
+  List<String> scales = ['', 'Thousand', 'Lakh', 'Crore'];
+
+  if (number == 0) return 'Zero';
+
+  String words = '';
+  int rupees = number.toInt();
+
+  // Handle Crores (10 million)
+  if (rupees >= 10000000) {
+    int crores = rupees ~/ 10000000;
+    if (crores > 0) {
+      if (crores >= 20) {
+        words += '${tens[crores ~/ 10]} ';
+        if (crores % 10 > 0) {
+          words += '${units[crores % 10]} ';
+        }
+      } else {
+        words += '${units[crores]} ';
+      }
+      words += 'Crore ';
+    }
+    rupees %= 10000000;
+  }
+
+  // Handle Lakhs (100 thousand)
+  if (rupees >= 100000) {
+    int lakhs = rupees ~/ 100000;
+    if (lakhs > 0) {
+      if (lakhs >= 20) {
+        words += '${tens[lakhs ~/ 10]} ';
+        if (lakhs % 10 > 0) {
+          words += '${units[lakhs % 10]} ';
+        }
+      } else {
+        words += '${units[lakhs]} ';
+      }
+      words += 'Lakh ';
+    }
+    rupees %= 100000;
+  }
+
+  // Handle Thousands
+  if (rupees >= 1000) {
+    int thousands = rupees ~/ 1000;
+    if (thousands > 0) {
+      if (thousands >= 20) {
+        words += '${tens[thousands ~/ 10]} ';
+        if (thousands % 10 > 0) {
+          words += '${units[thousands % 10]} ';
+        }
+      } else {
+        words += '${units[thousands]} ';
+      }
+      words += 'Thousand ';
+    }
+    rupees %= 1000;
+  }
+
+  // Handle Hundreds
+  if (rupees >= 100) {
+    words += '${units[rupees ~/ 100]} Hundred ';
+    rupees %= 100;
+  }
+
+  // Handle remaining two digits
+  if (rupees > 0) {
+    if (words.isNotEmpty) {
+      words += 'and ';
+    }
+
+    if (rupees >= 20) {
+      words += tens[rupees ~/ 10];
+      if (rupees % 10 > 0) {
+        words += ' ${units[rupees % 10]}';
+      }
+    } else {
+      words += units[rupees];
+    }
+  }
+
+  return words.trim();
+}
+
+// Rest of the code remains the same...

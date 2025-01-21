@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -172,7 +171,7 @@ class ViewHotelVoucher extends StatelessWidget {
                         : TColor.primary),
                 const SizedBox(width: 10),
                 Text(
-                  voucher['hv_id'],
+                  'HV ${voucher['hv_id']}',
                   style: TextStyle(
                     color: voucher['needs_attention'] == true
                         ? Colors.red
@@ -232,7 +231,7 @@ class ViewHotelVoucher extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.only(top: 8),
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.red.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -246,27 +245,15 @@ class ViewHotelVoucher extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
+                Row(children: [
+                  Expanded(
                       child: _buildActionButton(
                           'New Invoice', Icons.receipt, TColor.secondary,
                           onPressed: () {
-                        invoiceGenerator
-                            .generateAndPreviewNewHotelInvoice(context);
-                      }),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildActionButton(
-                          'Hotel Invoice', Icons.receipt_long, TColor.black,
-                          onPressed: () {
-                        invoiceGenerator
-                            .generateAndPreviewDefiniteHotelInvoice(context);
-                      }),
-                    ),
-                  ],
-                ),
+                            invoiceGenerator.generateAndPreviewHotelInvoice(
+                                context, voucher['hv_id']);
+                          }))
+                ]),
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -274,18 +261,18 @@ class ViewHotelVoucher extends StatelessWidget {
                       child: _buildActionButton(
                           'Hotel Voucher', Icons.visibility, TColor.primary,
                           onPressed: () {
-                        invoiceGenerator
-                            .generateAndPreviewHotelVoucher(context);
-                      }),
+                            invoiceGenerator
+                                .generateAndPreviewHotelVoucher(context);
+                          }),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _buildActionButton(
                           'Foreign Invoice', Icons.visibility, Colors.red,
                           onPressed: () {
-                        invoiceGenerator
-                            .generateAndPreviewForeignInvoice(context);
-                      }),
+                            invoiceGenerator
+                                .generateAndPreviewForeignInvoice(context);
+                          }),
                     ),
                   ],
                 ),

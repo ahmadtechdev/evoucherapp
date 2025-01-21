@@ -35,9 +35,9 @@ class HotelVoucherController extends GetxController {
       if (response['status'] == 'success') {
         // Transform the data to match our UI structure
         final List<Map<String, dynamic>> transformedData =
-            (response['data'] as List).map((voucher) {
+        (response['data'] as List).map((voucher) {
           return {
-            'hv_id': 'HV ${voucher['voucher_id']}',
+            'hv_id': voucher['voucher_id'],
             'customer': voucher['details']['customer_account'],
             'description': voucher['details']['description'],
             'supplier': voucher['details']['supplier_account'],

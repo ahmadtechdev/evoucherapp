@@ -94,6 +94,7 @@ class _SignInState extends State<SignIn> {
             message: response['Error'] ?? "Invalid credentials",
             backgroundColor: TColor.third,
           ).show();
+          return;
         }
       }
     } catch (e) {
