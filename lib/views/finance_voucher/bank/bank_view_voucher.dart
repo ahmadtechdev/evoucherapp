@@ -73,7 +73,7 @@ class _BankViewVoucherState extends State<BankViewVoucher> {
             response['data'].map<Map<String, dynamic>>((item) {
           var master = item['master'];
           return {
-            'id': 'JV ${master['voucher_id']}',
+            'id': 'BV ${master['voucher_id']}',
             'date': DateFormat('EEE, dd MMM yyyy')
                 .format(DateTime.parse(master['voucher_data'])),
             'description': _getVoucherDescription(item['details']),

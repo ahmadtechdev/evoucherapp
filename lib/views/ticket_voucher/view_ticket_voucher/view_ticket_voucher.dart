@@ -251,7 +251,7 @@ Widget _buildVoucherCard(Map<String, dynamic> ticket, BuildContext context) {
                       onPressed: refundStatus['is_refunded'] == true
                           ? null
                           : () =>
-                          Get.to(() => const TicketRefundTicketScreen()),
+                              Get.to(() => const TicketRefundTicketScreen()),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -342,6 +342,17 @@ Future<void> generateAndPreviewInvoice(
     BuildContext context, String voucherId) async {
   final ApiService apiService = Get.put(ApiService());
 
+  // Show loading dialog
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    },
+  );
+
   try {
     // Fetch invoice data from API
     final response = await apiService.postRequest(
@@ -349,13 +360,18 @@ Future<void> generateAndPreviewInvoice(
       body: {'voucher_id': voucherId},
     );
 
+    // Close loading dialog
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
+
     if (response['status'] != 'success') {
       throw 'Failed to fetch invoice data';
     }
 
     final invoiceData = response['data'];
 
-    // Create PDF document
+    // Rest of your PDF generation code remains the same...
     final doc = pw.Document();
 
     // Load logo from assets
@@ -459,7 +475,7 @@ Future<void> generateAndPreviewInvoice(
                 border: pw.TableBorder.all(width: 0.5),
                 children: [
                   _buildTableRow(
-                    ['Invoice #', 'Account Name', 'Invoice Date', 'PKR'],
+                    ['Invoice #', 'Account Name', 'Invoice Date', 'PNR'],
                     isHeader: true,
                     fontSize: 10,
                   ),
@@ -468,7 +484,7 @@ Future<void> generateAndPreviewInvoice(
                       invoiceData['voucher_info']['voucher_id'],
                       invoiceData['account_info']['name'],
                       invoiceData['voucher_info']['invoice_date'],
-                      invoiceData['financial_info']['selling_price'],
+                      invoiceData['voucher_info']['pnr'],
                     ],
                     fontSize: 10,
                   ),
@@ -527,13 +543,13 @@ Future<void> generateAndPreviewInvoice(
               pw.Text(
                 'IN WORDS: ${_numberToWords(double.parse(invoiceData['financial_info']['total']))} Only',
                 style:
-                pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                    pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
               ),
               pw.SizedBox(height: 10),
               pw.Text(
                 'On behalf of ${invoiceData['company_info']['name']}',
                 style:
-                pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                    pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
               ),
 
               pw.SizedBox(height: 10),
@@ -543,7 +559,7 @@ Future<void> generateAndPreviewInvoice(
               pw.Text(
                 'Bank Account Details with Account Title',
                 style:
-                pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+                    pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
               ),
               pw.Table(
                 border: pw.TableBorder.all(width: 0.5),
@@ -568,17 +584,17 @@ Future<void> generateAndPreviewInvoice(
                         bank == 'Askari Bank'
                             ? '000123300000'
                             : bank == 'Meezan Bank'
-                            ? '000112000108'
-                            : bank == 'Alfalah Bank'
-                            ? '000007676001'
-                            : '010101010',
+                                ? '000112000108'
+                                : bank == 'Alfalah Bank'
+                                    ? '000007676001'
+                                    : '010101010',
                         bank == 'Askari Bank'
                             ? 'Satyana Road Branch, Faisalabad'
                             : bank == 'Meezan Bank'
-                            ? 'Susan Road Branch, Faisalabad'
-                            : bank == 'Alfalah Bank'
-                            ? 'PC Branch, Faisalabad'
-                            : 'CANL ROAD BRANCH',
+                                ? 'Susan Road Branch, Faisalabad'
+                                : bank == 'Alfalah Bank'
+                                    ? 'PC Branch, Faisalabad'
+                                    : 'CANL ROAD BRANCH',
                       ],
                       fontSize: 10,
                     );
@@ -597,11 +613,20 @@ Future<void> generateAndPreviewInvoice(
       name: 'Invoice_${invoiceData['voucher_info']['invoice_number']}',
     );
   } catch (e) {
-    Get.snackbar(
-      'Error',
-      'Failed to generate invoice: ${e.toString()}',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    // Make sure to close loading dialog if there's an error
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
+
+    // Show error message
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to generate invoice: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
 
@@ -736,7 +761,7 @@ pw.TableRow _buildTableRow(List<String> cells,
           style: pw.TextStyle(
             fontSize: fontSize,
             fontWeight:
-            isHeader || isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
+                isHeader || isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
           ),
         ),
       );

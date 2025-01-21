@@ -230,12 +230,6 @@ class ViewVisaVoucher extends StatelessWidget {
                             'Visa Status',
                             ticket['visa_status'],
                           ),
-                          const SizedBox(height: 8),
-                          _buildInfoRow(
-                            Icons.assignment_ind,
-                            'Assignment',
-                            ticket['assign_status'],
-                          ),
                         ],
                       ),
                     ),
@@ -340,12 +334,25 @@ class ViewVisaVoucher extends StatelessWidget {
 
   Future<void> generateAndPreviewInvoice(
       BuildContext context, String voucherId) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
     try {
       // Fetch invoice data from API
       final response = await Get.put(ApiService()).postRequest(
         endpoint: 'getVisaVoucherInvoice',
         body: {'voucher_id': voucherId},
       );
+
+      // Close loading dialog
+      Navigator.pop(context);
 
       if (response['status'] != 'success') {
         throw Exception('Failed to fetch invoice data');
@@ -371,7 +378,7 @@ class ViewVisaVoucher extends StatelessWidget {
               child: pw.Text(
                 'Developed by Journeyonline.pk | CTC # 0310 0007901',
                 style:
-                pw.TextStyle(fontSize: 10, fontStyle: pw.FontStyle.italic),
+                    pw.TextStyle(fontSize: 10, fontStyle: pw.FontStyle.italic),
               ),
             );
           },
@@ -547,17 +554,17 @@ class ViewVisaVoucher extends StatelessWidget {
                           bank == 'Askari Bank'
                               ? '000123300000'
                               : bank == 'Meezan Bank'
-                              ? '000112000108'
-                              : bank == 'Alfalah Bank'
-                              ? '000007676001'
-                              : '010101010',
+                                  ? '000112000108'
+                                  : bank == 'Alfalah Bank'
+                                      ? '000007676001'
+                                      : '010101010',
                           bank == 'Askari Bank'
                               ? 'Satyana Road Branch, Faisalabad'
                               : bank == 'Meezan Bank'
-                              ? 'Susan Road Branch, Faisalabad'
-                              : bank == 'Alfalah Bank'
-                              ? 'PC Branch, Faisalabad'
-                              : 'CANL ROAD BRANCH',
+                                  ? 'Susan Road Branch, Faisalabad'
+                                  : bank == 'Alfalah Bank'
+                                      ? 'PC Branch, Faisalabad'
+                                      : 'CANL ROAD BRANCH',
                         ],
                         fontSize: 10,
                       );
@@ -570,19 +577,25 @@ class ViewVisaVoucher extends StatelessWidget {
         ),
       );
 
-      // Show print preview
       await Printing.layoutPdf(
         onLayout: (PdfPageFormat format) async => doc.save(),
         name: 'Invoice_${data['voucher_info']['voucher_id']}',
       );
     } catch (e) {
+      // Make sure to close loading dialog if there's an error
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
+
       // Show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to generate invoice: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to generate invoice: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

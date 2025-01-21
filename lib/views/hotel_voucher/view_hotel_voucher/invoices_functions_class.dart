@@ -8,17 +8,30 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 class InvoiceGenerator {
-
-
-  Future<void> generateAndPreviewHotelInvoice(BuildContext context, String voucherId) async {
+  Future<void> generateAndPreviewHotelInvoice(
+      BuildContext context, String voucherId) async {
     final ApiService apiService = Get.put(ApiService());
 
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
     try {
       // Fetch invoice data from API
       final response = await apiService.postRequest(
         endpoint: 'getHotelVoucherInvoice',
         body: {'voucher_id': voucherId},
       );
+
+      // Close loading dialog
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
 
       if (response['status'] != 'success') {
         throw 'Failed to fetch invoice data';
@@ -47,7 +60,8 @@ class InvoiceGenerator {
               padding: const pw.EdgeInsets.only(top: 10),
               child: pw.Text(
                 'Developed by Journeyonline.pk | CTC # 0310 0007901',
-                style: pw.TextStyle(fontSize: 10, fontStyle: pw.FontStyle.italic),
+                style:
+                    pw.TextStyle(fontSize: 10, fontStyle: pw.FontStyle.italic),
               ),
             );
           },
@@ -61,7 +75,8 @@ class InvoiceGenerator {
                   margin: const pw.EdgeInsets.only(bottom: 10),
                   child: pw.Text(
                     'Date & Time: $formattedDateTime',
-                    style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                    style: pw.TextStyle(
+                        fontSize: 10, fontWeight: pw.FontWeight.bold),
                   ),
                 ),
                 // Header with logo and company info
@@ -81,7 +96,9 @@ class InvoiceGenerator {
                             children: [
                               pw.TextSpan(
                                 text: 'CELL : ',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                    fontSize: 10),
                               ),
                               pw.TextSpan(
                                 text: invoiceData['company_info']['cell'],
@@ -89,7 +106,9 @@ class InvoiceGenerator {
                               ),
                               pw.TextSpan(
                                 text: ' - PHONE : ',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                    fontSize: 10),
                               ),
                               pw.TextSpan(
                                 text: invoiceData['company_info']['phone'],
@@ -108,11 +127,15 @@ class InvoiceGenerator {
                             children: [
                               pw.TextSpan(
                                 text: 'NTN: ',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                    fontSize: 10),
                               ),
                               pw.TextSpan(
                                 text: 'HUN6678',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.normal,
+                                    fontSize: 10),
                               ),
                             ],
                           ),
@@ -122,11 +145,15 @@ class InvoiceGenerator {
                             children: [
                               pw.TextSpan(
                                 text: 'Company ID: ',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                    fontSize: 10),
                               ),
                               pw.TextSpan(
                                 text: 'HGDFR58',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.normal,
+                                    fontSize: 10),
                               ),
                             ],
                           ),
@@ -140,9 +167,11 @@ class InvoiceGenerator {
                           ),
                           child: pw.Column(
                             children: [
-                              pw.Text('Invoices: ${invoiceData['voucher_info']['voucher_id']}'),
+                              pw.Text(
+                                  'Invoices: ${invoiceData['voucher_info']['voucher_id']}'),
                               pw.SizedBox(height: 4),
-                              pw.Text('(PKR) = ${invoiceData['financial_info']['selling_price']}'),
+                              pw.Text(
+                                  '(PKR) = ${invoiceData['financial_info']['selling_price']}'),
                             ],
                           ),
                         ),
@@ -164,7 +193,12 @@ class InvoiceGenerator {
                   border: pw.TableBorder.all(width: 0.5),
                   children: [
                     _buildTableRow(
-                      ['Account Name:', 'Hotel Invoice Date #', 'Option Date', 'Confirmation'],
+                      [
+                        'Account Name:',
+                        'Hotel Invoice Date #',
+                        'Option Date',
+                        'Confirmation'
+                      ],
                       isHeader: true,
                       fontSize: 10,
                     ),
@@ -195,7 +229,15 @@ class InvoiceGenerator {
                   border: pw.TableBorder.all(width: 0.5),
                   children: [
                     _buildTableRow(
-                      ['Pax Name', 'Hotel', 'Room Type', 'Meal', 'Destination', 'CheckIn - CheckOut', 'Amount (PKR)'],
+                      [
+                        'Pax Name',
+                        'Hotel',
+                        'Room Type',
+                        'Meal',
+                        'Destination',
+                        'CheckIn - CheckOut',
+                        'Amount (PKR)'
+                      ],
                       isHeader: true,
                       fontSize: 10,
                     ),
@@ -212,7 +254,15 @@ class InvoiceGenerator {
                       fontSize: 10,
                     ),
                     _buildTableRow(
-                      ['', '', '', '', '', 'Total:', 'PKR ${invoiceData['financial_info']['total_debit']}'],
+                      [
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        'Total:',
+                        'PKR ${invoiceData['financial_info']['total_debit']}'
+                      ],
                       fontSize: 10,
                       isBold: true,
                     ),
@@ -223,19 +273,22 @@ class InvoiceGenerator {
                 // Guest details
                 pw.Text(
                   'Guest Details: ${invoiceData['guest_info']['adults']} Adult(s)${invoiceData['guest_info']['children'] != '0' ? ', ${invoiceData['guest_info']['children']} Child(ren)' : ''}',
-                  style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                  style: pw.TextStyle(
+                      fontSize: 10, fontWeight: pw.FontWeight.bold),
                 ),
                 pw.SizedBox(height: 10),
 
                 // In words
                 pw.Text(
                   'IN WORDS: ${_numberToWords(double.parse(invoiceData['financial_info']['total_debit']))} Only',
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                  style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold, fontSize: 10),
                 ),
                 pw.SizedBox(height: 10),
                 pw.Text(
                   'On behalf of ${invoiceData['company_info']['name']}',
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                  style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold, fontSize: 10),
                 ),
                 pw.SizedBox(height: 10),
 
@@ -243,7 +296,8 @@ class InvoiceGenerator {
                 // Bank details section
                 pw.Text(
                   'Bank Account Details with Account Title',
-                  style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+                  style: pw.TextStyle(
+                      fontSize: 12, fontWeight: pw.FontWeight.bold),
                 ),
                 pw.Table(
                   border: pw.TableBorder.all(width: 0.5),
@@ -259,7 +313,8 @@ class InvoiceGenerator {
                       isHeader: true,
                       fontSize: 10,
                     ),
-                    ...['Askari Bank', 'Meezan Bank', 'Alfalah Bank', 'HBL'].map((bank) {
+                    ...['Askari Bank', 'Meezan Bank', 'Alfalah Bank', 'HBL']
+                        .map((bank) {
                       return _buildTableRow(
                         [
                           'JO TRAVELS',
@@ -267,17 +322,17 @@ class InvoiceGenerator {
                           bank == 'Askari Bank'
                               ? '000123300000'
                               : bank == 'Meezan Bank'
-                              ? '000112000108'
-                              : bank == 'Alfalah Bank'
-                              ? '000007676001'
-                              : '010101010',
+                                  ? '000112000108'
+                                  : bank == 'Alfalah Bank'
+                                      ? '000007676001'
+                                      : '010101010',
                           bank == 'Askari Bank'
                               ? 'Satyana Road Branch, Faisalabad'
                               : bank == 'Meezan Bank'
-                              ? 'Susan Road Branch, Faisalabad'
-                              : bank == 'Alfalah Bank'
-                              ? 'PC Branch, Faisalabad'
-                              : 'CANL ROAD BRANCH',
+                                  ? 'Susan Road Branch, Faisalabad'
+                                  : bank == 'Alfalah Bank'
+                                      ? 'PC Branch, Faisalabad'
+                                      : 'CANL ROAD BRANCH',
                         ],
                         fontSize: 10,
                       );
@@ -296,14 +351,25 @@ class InvoiceGenerator {
         name: 'Hotel_Invoice_${invoiceData['voucher_info']['voucher_id']}',
       );
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to generate invoice: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Make sure to close loading dialog if there's an error
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
+
+      // Show error message
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to generate invoice: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
-  Future<void> generateAndPreviewDefiniteHotelInvoice(BuildContext context) async {
+
+  Future<void> generateAndPreviewDefiniteHotelInvoice(
+      BuildContext context) async {
     // Create PDF document
     final doc = pw.Document();
 
@@ -316,7 +382,6 @@ class InvoiceGenerator {
     final formattedDateTime = '${now.toLocal()}';
 
     doc.addPage(
-
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(20),
@@ -340,7 +405,8 @@ class InvoiceGenerator {
                 margin: const pw.EdgeInsets.only(bottom: 10),
                 child: pw.Text(
                   'Date & Time: $formattedDateTime',
-                  style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                  style: pw.TextStyle(
+                      fontSize: 10, fontWeight: pw.FontWeight.bold),
                 ),
               ),
               // Header with logo and company info
@@ -352,75 +418,81 @@ class InvoiceGenerator {
                       children: [
                         pw.Image(pw.MemoryImage(logoImageData), width: 120),
                         // Address
-                        pw.Text('2nd Floor JOURNEY ONLINE Plaza, Al-hamra town, east canal road, Faisalabad',
+                        pw.Text(
+                            '2nd Floor JOURNEY ONLINE Plaza, Al-hamra town, east canal road, Faisalabad',
                             style: const pw.TextStyle(fontSize: 10)),
                         pw.RichText(
                           text: pw.TextSpan(
                             children: [
                               pw.TextSpan(
                                 text: 'CELL : ',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                    fontSize: 10),
                               ),
                               pw.TextSpan(
                                 text: '03337323379',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.normal,
+                                    fontSize: 10),
                               ),
                               pw.TextSpan(
                                 text: ' - PHONE : ',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                    fontSize: 10),
                               ),
                               pw.TextSpan(
                                 text: '03037666866',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.normal,
+                                    fontSize: 10),
                               ),
                               pw.TextSpan(
                                 text: ' - EMAIL : ',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold,
+                                    fontSize: 10),
                               ),
                               pw.TextSpan(
                                 text: 'ameeramillattts@hotmail.com',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.normal,
+                                    fontSize: 10),
                               ),
                             ],
                           ),
                         ),
-
-                      ]
-                  ),
-
-
+                      ]),
                   pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.end,
                     children: [
                       pw.RichText(
-                          text: pw.TextSpan(
-                              children: [
-                                pw.TextSpan(
-                                  text: 'NTN: ',
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
-                                ),
-                                pw.TextSpan(
-                                  text: 'HUN6678',
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
-                                ),
-                              ]
-                          )
-                      ),
+                          text: pw.TextSpan(children: [
+                        pw.TextSpan(
+                          text: 'NTN: ',
+                          style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.bold, fontSize: 10),
+                        ),
+                        pw.TextSpan(
+                          text: 'HUN6678',
+                          style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.normal, fontSize: 10),
+                        ),
+                      ])),
                       pw.RichText(
-                          text: pw.TextSpan(
-                              children: [
-                                pw.TextSpan(
-                                  text: 'Company ID: ',
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
-                                ),
-                                pw.TextSpan(
-                                  text: 'HGDFR58',
-                                  style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 10),
-                                ),
-                              ]
-                          )
-                      ),
-
+                          text: pw.TextSpan(children: [
+                        pw.TextSpan(
+                          text: 'Company ID: ',
+                          style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.bold, fontSize: 10),
+                        ),
+                        pw.TextSpan(
+                          text: 'HGDFR58',
+                          style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.normal, fontSize: 10),
+                        ),
+                      ])),
                     ],
                   ),
                 ],
@@ -433,26 +505,24 @@ class InvoiceGenerator {
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
                     pw.RichText(
-                        text: pw.TextSpan(
-                            children: [
-                              pw.TextSpan(
-                                text: 'Account Name: | Adam',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12),
-                              ),
-                              pw.TextSpan(
-                                text: ' | 1234567890 | test@tests.com',
-                                style: pw.TextStyle(fontWeight: pw.FontWeight.normal, fontSize: 12),
-                              ),
-                            ]
-                        )
-                    ),
-
+                        text: pw.TextSpan(children: [
+                      pw.TextSpan(
+                        text: 'Account Name: | Adam',
+                        style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold, fontSize: 12),
+                      ),
+                      pw.TextSpan(
+                        text: ' | 1234567890 | test@tests.com',
+                        style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.normal, fontSize: 12),
+                      ),
+                    ])),
                     pw.Text(
                       'Definite Invoice',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
+                      style: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold, fontSize: 14),
                     ),
-                  ]
-              ),
+                  ]),
 
               pw.SizedBox(height: 10),
 
@@ -461,7 +531,6 @@ class InvoiceGenerator {
                 columnWidths: {
                   0: const pw.FlexColumnWidth(1),
                   1: const pw.FlexColumnWidth(1),
-
                 },
                 border: pw.TableBorder.all(width: 0.5),
                 children: [
@@ -471,7 +540,10 @@ class InvoiceGenerator {
                     fontSize: 10,
                   ),
                   _buildTableRow(
-                    ['Adam', 'Thu, 31 Oct 2024',],
+                    [
+                      'Adam',
+                      'Thu, 31 Oct 2024',
+                    ],
                     fontSize: 10,
                   ),
                 ],
@@ -492,16 +564,32 @@ class InvoiceGenerator {
                 border: pw.TableBorder.all(width: 0.5),
                 children: [
                   _buildTableRow(
-                    ['Pax Name', 'Hotel', 'Room Type #', 'Meal', 'Destination','CheckIn - CheckOut','Amount (PKR)'],
+                    [
+                      'Pax Name',
+                      'Hotel',
+                      'Room Type #',
+                      'Meal',
+                      'Destination',
+                      'CheckIn - CheckOut',
+                      'Amount (PKR)'
+                    ],
                     isHeader: true,
                     fontSize: 10,
                   ),
                   _buildTableRow(
-                    ['Hassan', 'ABC TEST GTEl', 'Double Room', 'None', 'Mecca- Saudia', 'Thu, 31 OCt, 2024 \n Sat, 02 Nov, 2024', '14,000.00'],
+                    [
+                      'Hassan',
+                      'ABC TEST GTEl',
+                      'Double Room',
+                      'None',
+                      'Mecca- Saudia',
+                      'Thu, 31 OCt, 2024 \n Sat, 02 Nov, 2024',
+                      '14,000.00'
+                    ],
                     fontSize: 10,
                   ),
                   _buildTableRow(
-                    ['', '', '','','', 'Total:', 'PKR 14,000.00'],
+                    ['', '', '', '', '', 'Total:', 'PKR 14,000.00'],
                     fontSize: 10,
                     isBold: true,
                   ),
@@ -509,12 +597,16 @@ class InvoiceGenerator {
               ),
               pw.SizedBox(height: 16),
               // In words
-              pw.Text('IN WORDS: Fourteen Thousands PkR Only', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+              pw.Text('IN WORDS: Fourteen Thousands PkR Only',
+                  style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold, fontSize: 10)),
               pw.SizedBox(height: 10),
 
               pw.Divider(thickness: 1),
               // Bank details section
-              pw.Text('Bank Account Details with Account Title', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
+              pw.Text('Bank Account Details with Account Title',
+                  style: pw.TextStyle(
+                      fontSize: 12, fontWeight: pw.FontWeight.bold)),
               pw.Table(
                 border: pw.TableBorder.all(width: 0.5),
                 columnWidths: {
@@ -529,7 +621,8 @@ class InvoiceGenerator {
                     isHeader: true,
                     fontSize: 10,
                   ),
-                  ...['Askari Bank', 'Meezan Bank', 'Alfalah Bank', 'HBL'].map((bank) {
+                  ...['Askari Bank', 'Meezan Bank', 'Alfalah Bank', 'HBL']
+                      .map((bank) {
                     return _buildTableRow(
                       [
                         'JO TRAVELS',
@@ -537,17 +630,17 @@ class InvoiceGenerator {
                         bank == 'Askari Bank'
                             ? '000123300000'
                             : bank == 'Meezan Bank'
-                            ? '000112000108'
-                            : bank == 'Alfalah Bank'
-                            ? '000007676001'
-                            : '010101010',
+                                ? '000112000108'
+                                : bank == 'Alfalah Bank'
+                                    ? '000007676001'
+                                    : '010101010',
                         bank == 'Askari Bank'
                             ? 'Satyana Road Branch, Faisalabad'
                             : bank == 'Meezan Bank'
-                            ? 'Susan Road Branch, Faisalabad'
-                            : bank == 'Alfalah Bank'
-                            ? 'PC Branch, Faisalabad'
-                            : 'CANL ROAD BRANCH',
+                                ? 'Susan Road Branch, Faisalabad'
+                                : bank == 'Alfalah Bank'
+                                    ? 'PC Branch, Faisalabad'
+                                    : 'CANL ROAD BRANCH',
                       ],
                       fontSize: 10,
                     );
@@ -555,7 +648,6 @@ class InvoiceGenerator {
                 ],
               ),
               pw.SizedBox(height: 10),
-
             ],
           )
         ],
@@ -593,14 +685,17 @@ class InvoiceGenerator {
                     crossAxisAlignment: pw.CrossAxisAlignment.end,
                     children: [
                       pw.Text('Hotel Booking Voucher',
-                          style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                          style: pw.TextStyle(
+                              fontSize: 16, fontWeight: pw.FontWeight.bold)),
                       pw.Text(
                         '2nd Floor JOURNEY ONLINE Plaza, Al hamra\ntown, east canal road, Faisalabad',
                         style: const pw.TextStyle(fontSize: 10),
                         textAlign: pw.TextAlign.right,
                       ),
-                      pw.Text('Cell: 03337323379', style: const pw.TextStyle(fontSize: 10)),
-                      pw.Text('Phone: 03037666866', style: const pw.TextStyle(fontSize: 10)),
+                      pw.Text('Cell: 03337323379',
+                          style: const pw.TextStyle(fontSize: 10)),
+                      pw.Text('Phone: 03037666866',
+                          style: const pw.TextStyle(fontSize: 10)),
                     ],
                   ),
                 ],
@@ -713,16 +808,27 @@ class InvoiceGenerator {
               pw.Text('Check-in/Check-out Timings & Policies',
                   style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 10),
-              pw.Bullet(text: 'The usual check-in time is 2:00/4:00 PM hours however this might vary from hotel to hotel and with different destinations.'),
-              pw.Bullet(text: 'Rooms may not be available for early check-in, unless especially required in advance. However, luggage may be deposited at the hotel reception and collected once the room is allotted.'),
-              pw.Bullet(text: 'Note that reservation may be canceled automatically after 18:00 hours if hotel is not informed about the approximate time of late arrivals.'),
-              pw.Bullet(text: 'The usual checkout time is at 12:00 hours however this might vary from hotel to hotel and with different destinations. Any late checkout may involve additional charges. Please check with the hotel reception in advance.'),
-              pw.Bullet(text: 'For any specific queries related to a particular hotel, kindly reach out to local support team for further assistance'),
+              pw.Bullet(
+                  text:
+                      'The usual check-in time is 2:00/4:00 PM hours however this might vary from hotel to hotel and with different destinations.'),
+              pw.Bullet(
+                  text:
+                      'Rooms may not be available for early check-in, unless especially required in advance. However, luggage may be deposited at the hotel reception and collected once the room is allotted.'),
+              pw.Bullet(
+                  text:
+                      'Note that reservation may be canceled automatically after 18:00 hours if hotel is not informed about the approximate time of late arrivals.'),
+              pw.Bullet(
+                  text:
+                      'The usual checkout time is at 12:00 hours however this might vary from hotel to hotel and with different destinations. Any late checkout may involve additional charges. Please check with the hotel reception in advance.'),
+              pw.Bullet(
+                  text:
+                      'For any specific queries related to a particular hotel, kindly reach out to local support team for further assistance'),
 
               pw.SizedBox(height: 20),
 
               // Booking notes
-              pw.Text('Booking Notes : Check your Reservation details carefully and inform us immediately,if you need any further clarification, please do not hesitate to contact us.',
+              pw.Text(
+                  'Booking Notes : Check your Reservation details carefully and inform us immediately,if you need any further clarification, please do not hesitate to contact us.',
                   style: const pw.TextStyle(fontSize: 10)),
             ],
           );
@@ -756,7 +862,6 @@ class InvoiceGenerator {
     );
   }
 
-
   Future<void> generateAndPreviewForeignInvoice(BuildContext context) async {
     final doc = pw.Document();
 
@@ -789,7 +894,10 @@ class InvoiceGenerator {
                       pw.RichText(
                         text: pw.TextSpan(
                           children: [
-                            pw.TextSpan(text: 'Client Name: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                            pw.TextSpan(
+                                text: 'Client Name: ',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
                             const pw.TextSpan(text: 'Adam'),
                           ],
                         ),
@@ -797,7 +905,10 @@ class InvoiceGenerator {
                       pw.RichText(
                         text: pw.TextSpan(
                           children: [
-                            pw.TextSpan(text: 'Subject: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                            pw.TextSpan(
+                                text: 'Subject: ',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
                             const pw.TextSpan(text: 'Definite Invoice'),
                           ],
                         ),
@@ -805,7 +916,10 @@ class InvoiceGenerator {
                       pw.RichText(
                         text: pw.TextSpan(
                           children: [
-                            pw.TextSpan(text: 'Confirmation#: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                            pw.TextSpan(
+                                text: 'Confirmation#: ',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
                             const pw.TextSpan(text: 'N/A'),
                           ],
                         ),
@@ -818,7 +932,10 @@ class InvoiceGenerator {
                       pw.RichText(
                         text: pw.TextSpan(
                           children: [
-                            pw.TextSpan(text: 'HV#: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                            pw.TextSpan(
+                                text: 'HV#: ',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
                             const pw.TextSpan(text: '852'),
                           ],
                         ),
@@ -826,7 +943,10 @@ class InvoiceGenerator {
                       pw.RichText(
                         text: pw.TextSpan(
                           children: [
-                            pw.TextSpan(text: 'Date: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                            pw.TextSpan(
+                                text: 'Date: ',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
                             const pw.TextSpan(text: 'Thu, 31 Oct 2024'),
                           ],
                         ),
@@ -834,7 +954,10 @@ class InvoiceGenerator {
                       pw.RichText(
                         text: pw.TextSpan(
                           children: [
-                            pw.TextSpan(text: 'Phone No: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                            pw.TextSpan(
+                                text: 'Phone No: ',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
                             const pw.TextSpan(text: '03337323379'),
                           ],
                         ),
@@ -849,8 +972,10 @@ class InvoiceGenerator {
               // Greeting text
               pw.Text('Greetings from UMER TRAVEL',
                   style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-              pw.Text('First of all we would like to thank you for your support and cooperation extended towards UMER TRAVEL and we hope that this year bring success and truthful business relationship for both our esteemed company.'),
-              pw.Text('We are please to confirm the following reservation on a UMER TRAVEL'),
+              pw.Text(
+                  'First of all we would like to thank you for your support and cooperation extended towards UMER TRAVEL and we hope that this year bring success and truthful business relationship for both our esteemed company.'),
+              pw.Text(
+                  'We are please to confirm the following reservation on a UMER TRAVEL'),
 
               pw.SizedBox(height: 20),
 
@@ -861,7 +986,10 @@ class InvoiceGenerator {
                   pw.RichText(
                     text: pw.TextSpan(
                       children: [
-                        pw.TextSpan(text: 'Guest Name: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        pw.TextSpan(
+                            text: 'Guest Name: ',
+                            style:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                         const pw.TextSpan(text: 'HASSAN'),
                       ],
                     ),
@@ -869,7 +997,10 @@ class InvoiceGenerator {
                   pw.RichText(
                     text: pw.TextSpan(
                       children: [
-                        pw.TextSpan(text: 'Option Date: ', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        pw.TextSpan(
+                            text: 'Option Date: ',
+                            style:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                         const pw.TextSpan(text: '30, Nov -0001'),
                       ],
                     ),
@@ -940,13 +1071,19 @@ class InvoiceGenerator {
 
               pw.SizedBox(height: 10),
 
-              pw.Bullet(text: 'Above rates are net and non commission-able quoted in PKR.'),
+              pw.Bullet(
+                  text:
+                      'Above rates are net and non commission-able quoted in PKR.'),
               pw.Bullet(text: 'Once you Re-Confirm this booking it will be:'),
               pw.Bullet(text: 'Non Cancellation'),
               pw.Bullet(text: 'Non Refundable'),
               pw.Bullet(text: 'Non Amendable'),
-              pw.Bullet(text: 'Check in after 16:00 hour and check out at 12:00 hour.'),
-              pw.Bullet(text: 'Triple or Quad occupancy will be through extra bed # standard room is not available.'),
+              pw.Bullet(
+                  text:
+                      'Check in after 16:00 hour and check out at 12:00 hour.'),
+              pw.Bullet(
+                  text:
+                      'Triple or Quad occupancy will be through extra bed # standard room is not available.'),
 
               pw.SizedBox(height: 20),
 
@@ -961,10 +1098,23 @@ class InvoiceGenerator {
                   2: const pw.FlexColumnWidth(2),
                 },
                 children: [
-                  _buildTableHeaderRow(['Bank name', 'Account No.', 'Bank Address']),
-                  _buildTableDataRow(['Askari Bank', '000123300000', 'Satyana Road Branch, Faisalabad']),
-                  _buildTableDataRow(['Meezan Bank', '000112000108', 'Susan Road Branch, Faisalabad']),
-                  _buildTableDataRow(['Alfalah Bank', '000007676001', 'PC Branch, Faisalabad']),
+                  _buildTableHeaderRow(
+                      ['Bank name', 'Account No.', 'Bank Address']),
+                  _buildTableDataRow([
+                    'Askari Bank',
+                    '000123300000',
+                    'Satyana Road Branch, Faisalabad'
+                  ]),
+                  _buildTableDataRow([
+                    'Meezan Bank',
+                    '000112000108',
+                    'Susan Road Branch, Faisalabad'
+                  ]),
+                  _buildTableDataRow([
+                    'Alfalah Bank',
+                    '000007676001',
+                    'PC Branch, Faisalabad'
+                  ]),
                   _buildTableDataRow(['HBL', '010101010', 'CANL ROAD BRANCH']),
                 ],
               ),
@@ -973,7 +1123,6 @@ class InvoiceGenerator {
 
               // Footer
               pw.Container(
-
                 padding: const pw.EdgeInsets.all(5),
                 child: pw.Center(
                   child: pw.Text(
@@ -1000,33 +1149,35 @@ class InvoiceGenerator {
 // Helper function to create table header rows
   pw.TableRow _buildTableHeaderRow(List<String> cells) {
     return pw.TableRow(
-
-      children: cells.map((cell) => pw.Container(
-        padding: const pw.EdgeInsets.all(5),
-        child: pw.Text(
-          cell,
-          style: pw.TextStyle(
-
-            fontWeight: pw.FontWeight.bold,
-          ),
-        ),
-      )).toList(),
+      children: cells
+          .map((cell) => pw.Container(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(
+                  cell,
+                  style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ))
+          .toList(),
     );
   }
 
 // Helper function to create table data rows
   pw.TableRow _buildTableDataRow(List<String> cells) {
     return pw.TableRow(
-      children: cells.map((cell) => pw.Container(
-        padding: const pw.EdgeInsets.all(5),
-        child: pw.Text(cell),
-      )).toList(),
+      children: cells
+          .map((cell) => pw.Container(
+                padding: const pw.EdgeInsets.all(5),
+                child: pw.Text(cell),
+              ))
+          .toList(),
     );
   }
 
-
   // Helper to build table rows
-  pw.TableRow _buildTableRow(List<String> cells, {bool isHeader = false, double fontSize = 12, bool isBold = false}) {
+  pw.TableRow _buildTableRow(List<String> cells,
+      {bool isHeader = false, double fontSize = 12, bool isBold = false}) {
     return pw.TableRow(
       children: cells.map((cell) {
         return pw.Padding(
@@ -1035,15 +1186,15 @@ class InvoiceGenerator {
             cell,
             style: pw.TextStyle(
               fontSize: fontSize,
-              fontWeight: isHeader || isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
+              fontWeight: isHeader || isBold
+                  ? pw.FontWeight.bold
+                  : pw.FontWeight.normal,
             ),
           ),
         );
       }).toList(),
     );
   }
-
-
 }
 
 String _numberToWords(double number) {

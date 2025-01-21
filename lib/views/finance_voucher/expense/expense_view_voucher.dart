@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -29,8 +28,8 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
   @override
   void initState() {
     super.initState();
-            fromDate = DateTime(DateTime.now().year, DateTime.now().month);
- // Set to 180 days before
+    fromDate = DateTime(DateTime.now().year, DateTime.now().month);
+    // Set to 180 days before
     _fetchJournalVouchers();
   }
 
@@ -74,7 +73,7 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
             response['data'].map<Map<String, dynamic>>((item) {
           var master = item['master'];
           return {
-            'id': 'JV ${master['voucher_id']}',
+            'id': 'EV ${master['voucher_id']}',
             'date': DateFormat('EEE, dd MMM yyyy')
                 .format(DateTime.parse(master['voucher_data'])),
             'description': _getVoucherDescription(item['details']),
