@@ -1,3 +1,4 @@
+import 'package:evoucher_new/views/finance_voucher/journal/view_edit_j_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -28,7 +29,7 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
   @override
   void initState() {
     super.initState();
-        fromDate = DateTime(DateTime.now().year, DateTime.now().month);
+    fromDate = DateTime(DateTime.now().year, DateTime.now().month);
 // Set to 180 days before
     _fetchJournalVouchers();
   }
@@ -55,22 +56,21 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
     });
 
     try {
-      // Format dates for API
-
       String formattedFromDate = DateFormat('yyyy-MM-dd').format(fromDate);
       String formattedToDate = DateFormat('yyyy-MM-dd').format(toDate);
 
-      final response =
-          await _apiService.postRequest(endpoint: 'getVoucherPosted', body: {
-        "fromDate": formattedFromDate,
-        "toDate": formattedToDate,
-        "voucher_id": "",
-        "voucher_type": "jv"
-      });
+      final response = await _apiService.postRequest(
+          endpoint: 'getVoucherPosted',
+          body: {
+            "fromDate": formattedFromDate,
+            "toDate": formattedToDate,
+            "voucher_id": "",
+            "voucher_type": "jv"
+          }
+      );
 
       if (response['status'] == 'success' && response['data'] != null) {
-        List<Map<String, dynamic>> voucherList =
-            response['data'].map<Map<String, dynamic>>((item) {
+        List<Map<String, dynamic>> voucherList = response['data'].map<Map<String, dynamic>>((item) {
           var master = item['master'];
           return {
             'id': 'JV ${master['voucher_id']}',
@@ -80,7 +80,7 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
             'entries': master['num_entries'],
             'addedBy': master['added_by'],
             'amount': 'PKR ${master['total_debit']}',
-            'fullDetails': item
+            'originalData': item  // Store the complete original data
           };
         }).toList();
 
@@ -102,7 +102,6 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
       });
     }
   }
-
   void handleFromDateChanged(DateTime newDate) {
     setState(() {
       fromDate = newDate;
@@ -160,12 +159,14 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
                 ),
                 VoucherHeader(
                   title: 'JOURNAL VOUCHERS LIST',
-                  selectedDate: fromDate, // For backwards compatibility
+                  selectedDate: fromDate,
+                  // For backwards compatibility
                   onFromDateChanged: handleFromDateChanged,
                   onToDateChanged: handleToDateChanged,
                   searchController: _searchController,
                   onSearchChanged: _filterVouchers,
-                  fromDate: fromDate, // Add these new parameters
+                  fromDate: fromDate,
+                  // Add these new parameters
                   toDate: toDate,
                 ),
                 if (_errorMessage.isNotEmpty)
@@ -185,9 +186,12 @@ class _JournalViewVoucherState extends State<JournalViewVoucher> {
                     vouchers: _filteredVouchers,
                     type: 'journal',
                     onVoucherTap: (voucher) {
-                      print('Voucher Details: ${voucher['fullDetails']}');
+                      Get.to(() => JournalVoucherDetail(voucherData: voucher));
+                      // Pass the complete original data
+
                     },
                   ),
+
               ],
             ),
           ),

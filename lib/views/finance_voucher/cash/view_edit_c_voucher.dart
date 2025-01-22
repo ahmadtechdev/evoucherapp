@@ -27,65 +27,75 @@ class _CashVoucherDetailState extends State<CashVoucherDetail> {
   double totalCredit = 0.0;
   late final VoucherController voucherController;
   List<Map<String, dynamic>> entries = [];
+  Map<String, dynamic> masterData = {};
 
   @override
   void initState() {
     super.initState();
+
     try {
-      // Parse date
-      String dateString = widget.voucherData['date'] as String;
-      selectedDate = DateFormat('EEE, dd MMM yyyy').parse(dateString);
+      // The data is now already in the correct format
+      masterData = widget.voucherData['master'] as Map<String, dynamic>? ?? {};
+      print(masterData);
+      final detailsData = widget.voucherData['details'] as List? ?? [];
+      print(detailsData);
+      print("i'mhere");
+      // Parse date safely
+      // String dateString = DateFormat('EEE, dd MMM yyyy')
+      //     .format(DateTime.parse(masterData['voucher_data']));
 
-      // Safely initialize entries
-      if (widget.voucherData['entries'] != null &&
-          widget.voucherData['entries'] is List &&
-          (widget.voucherData['entries'] as List).isNotEmpty) {
+      print("i'mhere 2");
+      try {
+        print(masterData['voucher_data']);
+        selectedDate = DateFormat('EEE, dd MMM yyyy').parse(masterData['voucher_data']);
+      } catch (e) {
+        print('Error parsing date: $e');
+        selectedDate = DateTime.now();
+      }
 
-        var entriesList = widget.voucherData['entries'] as List;
-        entries = entriesList.map((entry) {
-          return {
-            'account': entry['account'] ??"",
-            'description': widget.voucherData['description'] ?? '',
+      print("i'mhere");
+
+      // Map the details data to entries format
+      entries = detailsData.map((entry) {
+        return {
+          'account': entry['account_name'] ?? "",
+          'account_id': entry['account_id'] ?? "",
+          'description': entry['description'] ?? '',
+          'debit': double.tryParse(entry['debit']?.toString() ?? '0.0') ?? 0.0,
+          'credit':
+          double.tryParse(entry['credit']?.toString() ?? '0.0') ?? 0.0,
+        };
+      }).toList();
+
+
+
+      if (entries.isEmpty) {
+        entries = [
+          {
+            'account': "",
+            'account_id': "",
+            'description': '',
             'debit': 0.0,
-            'credit': _parseAmount(widget.voucherData['amount']),
-          };
-        }).toList();
-      } else {
-        // Fallback entry if no entries exist
-        entries = [{
-          'account': "",
-          'description': widget.voucherData['description'] ?? '',
-          'debit': 0.0,
-          'credit': _parseAmount(widget.voucherData['amount']),
-        }];
+            'credit': 0.0,
+          }
+        ];
       }
     } catch (e) {
       print('Error initializing data: $e');
-      // Fallback entry
-      entries = [{
-        'account': "",
-        'description': '',
-        'debit': 0.0,
-        'credit': 0.0,
-      }];
+      entries = [
+        {
+          'account': "",
+          'account_id': "",
+          'description': '',
+          'debit': 0.0,
+          'credit': 0.0,
+        }
+      ];
     }
 
-    // Use Get.find instead of Get.put to ensure the controller is already registered
     voucherController = Get.find<VoucherController>();
-
-    // Clear any existing entries when the page is first loaded
     voucherController.clearEntries();
-    for (var entryData in entries) {
-      voucherController.addEntry(EntryModel(
-        account: entryData['account'],
-        description: entryData['description'],
-        debit: entryData['debit'],
-        credit: entryData['credit'],
-      ));
-    }
-
   }
-
   double _parseAmount(dynamic amount) {
     if (amount == null) return 0.0;
     if (amount is num) return amount.toDouble();
@@ -183,6 +193,12 @@ class _CashVoucherDetailState extends State<CashVoucherDetail> {
         FocusScope.of(context).requestFocus(_mainFocusNode);
       },
       child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: TColor.primary,
+          foregroundColor: TColor.white,
+          // title: Text('Journal Voucher #${masterData['voucher_id'] ?? ''}'),
+        ),
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
@@ -190,33 +206,16 @@ class _CashVoucherDetailState extends State<CashVoucherDetail> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildHeaderButtons(),
+                  // _buildHeaderButtons(),
                   Text(
-                    'Journal Voucher #${widget.voucherData['id'] ?? ''}',
+                    'Cash Voucher #${widget.voucherData['id'] ?? ''}',
                     style: TextStyle(
                       color: TColor.primaryText,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  // Row(
-                  //   children: [
-                  //     if (!isEditMode) ...[
-                  //       IconButton(
-                  //         icon: Icon(Icons.edit, color: TColor.primary),
-                  //         onPressed: () {
-                  //           setState(() {
-                  //             isEditMode = true;
-                  //           });
-                  //         },
-                  //       ),
-                  //       IconButton(
-                  //         icon: Icon(Icons.delete, color: TColor.third),
-                  //         onPressed: _showDeleteConfirmation,
-                  //       ),
-                  //     ],
-                  //   ],
-                  // ),
+
                   const SizedBox(height: 24),
                   DateSelector(
                     fontSize: 16,
@@ -232,14 +231,12 @@ class _CashVoucherDetailState extends State<CashVoucherDetail> {
                   ),
                   const SizedBox(height: 24),
                   ReusableEntryCard(
-
                     showImageUpload: true,
                     primaryColor: TColor.primary,
                     textFieldColor: TColor.textField,
                     textColor: TColor.white,
                     placeholderColor: TColor.placeholder,
                     isViewMode: !isEditMode,
-
                     showPrintButton: !isEditMode,
                     initialData: entries,
                   ),

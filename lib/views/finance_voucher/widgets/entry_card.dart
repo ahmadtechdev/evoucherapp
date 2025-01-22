@@ -86,29 +86,49 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
   double totalCredit = 0.0;
 
   @override
-  @override
   void initState() {
     super.initState();
     accountsController = Get.find<AccountsController>();
     voucherController = Get.find<VoucherController>();
 
-    if (voucherController.entries.isNotEmpty) {
-      // If controller has existing entries, load them
-      for (var controllerEntry in voucherController.entries) {
-        var entryData = EntryCardData(
-          account: controllerEntry.account,
-          description: controllerEntry.description,
-          debit: controllerEntry.debit,
-          credit: controllerEntry.credit,
+    // Clear any existing entries in the controller
+    voucherController.clearEntries();
+
+    if (widget.initialData != null && widget.initialData!.isNotEmpty) {
+      // Load data from initialData parameter
+      for (var data in widget.initialData!) {
+        // Create EntryModel from the map data
+        var entryModel = EntryModel(
+          account: data['account_id'] ?? '',
+          description: data['description'] ?? '',
+          debit: data['debit']?.toDouble() ?? 0.0,
+          credit: data['credit']?.toDouble() ?? 0.0,
+          cheque: data['cheque'] ?? '',
         );
-        entryData.descriptionController.text = controllerEntry.description;
-        entryData.chequeController.text = controllerEntry.cheque;
-        entryData.debitController.text = controllerEntry.debit.toString();
-        entryData.creditController.text = controllerEntry.credit.toString();
+
+        // Add to controller
+        voucherController.addEntry(entryModel);
+
+        // Create EntryCardData for UI
+        var entryData = EntryCardData(
+          account: entryModel.account,
+          description: entryModel.description,
+          debit: entryModel.debit,
+          credit: entryModel.credit,
+          cheque: entryModel.cheque,
+        );
+
+        // Set the controller values
+        entryData.descriptionController.text = entryModel.description;
+        entryData.chequeController.text = entryModel.cheque;
+        entryData.debitController.text = entryModel.debit.toString();
+        entryData.creditController.text = entryModel.credit.toString();
+
+        // Add to local entries list
         entries.add(entryData);
       }
     } else {
-      _addEntry(); // Add initial empty entry if no existing data
+      _addEntry(); // Add initial empty entry if no initial data
     }
     _calculateTotals();
   }

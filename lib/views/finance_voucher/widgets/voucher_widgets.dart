@@ -22,18 +22,38 @@ class EntryVoucherCard extends StatelessWidget {
   });
 
   void _handleViewPress() {
+    // Create the properly structured data for the detail view
+    final formattedVoucherData = {
+      'master': {
+        'voucher_id': voucher['id'],
+        'voucher_data': voucher['date'],
+        'num_entries': voucher['entries'],
+        'total_debit': voucher['debit'] ?? '0.000',
+        'total_credit': voucher['credit'] ?? '0.000',
+        'added_by': voucher['addedBy']
+      },
+      'details': (voucher['originalData']['details'] as List<dynamic>? ?? []).map((entry) => {
+        'voucher_id': voucher['id'],
+        'account_id': entry['account_id'] ?? '',
+        'account_name': entry['account_name'] ?? '',
+        'description': entry['description'] ?? '',
+        'debit': entry['debit'] ?? '0.00',
+        'credit': entry['credit'] ?? '0.00'
+      }).toList()
+    };
+
     switch (type) {
       case 'journal':
-        Get.to(() => JournalVoucherDetail(voucherData: voucher));
+        Get.to(() => JournalVoucherDetail(voucherData: formattedVoucherData));
         break;
       case 'cash':
-        Get.to(() => CashVoucherDetail(voucherData: voucher));
+        Get.to(() => CashVoucherDetail(voucherData: formattedVoucherData));
         break;
       case 'expense':
-        Get.to(() => ExpenseVoucherDetail(voucherData: voucher));
+        Get.to(() => ExpenseVoucherDetail(voucherData: formattedVoucherData));
         break;
       default:
-        Get.to(() => JournalVoucherDetail(voucherData: voucher));
+        Get.to(() => JournalVoucherDetail(voucherData: formattedVoucherData));
     }
 
     // Call onVoucherTap if provided
