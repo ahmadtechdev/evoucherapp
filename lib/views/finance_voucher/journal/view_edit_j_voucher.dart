@@ -45,7 +45,8 @@ class _JournalVoucherDetailState extends State<JournalVoucherDetail> {
       print("i'mhere 2");
       try {
         print(masterData['voucher_data']);
-        selectedDate = DateFormat('EEE, dd MMM yyyy').parse(masterData['voucher_data']);
+        selectedDate =
+            DateFormat('EEE, dd MMM yyyy').parse(masterData['voucher_data']);
       } catch (e) {
         print('Error parsing date: $e');
         selectedDate = DateTime.now();
@@ -64,8 +65,6 @@ class _JournalVoucherDetailState extends State<JournalVoucherDetail> {
               double.tryParse(entry['credit']?.toString() ?? '0.0') ?? 0.0,
         };
       }).toList();
-
-
 
       if (entries.isEmpty) {
         entries = [
@@ -170,7 +169,6 @@ class _JournalVoucherDetailState extends State<JournalVoucherDetail> {
 
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(_mainFocusNode);

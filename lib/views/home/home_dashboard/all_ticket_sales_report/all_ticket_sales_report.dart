@@ -23,7 +23,6 @@ class _TransactionReportScreenState extends State<TransactionReportScreen> {
     super.initState();
     // fromDate = DateTime(toDate.year, toDate.month, 1);
     fromDate = DateTime(toDate.year, toDate.month, toDate.day - 2);
-
   }
 
   @override
@@ -287,7 +286,8 @@ class CollapsibleTransactionCard extends StatelessWidget {
                 itemBuilder: (context, detailIndex) {
                   final detail = transaction['details'][detailIndex];
                   return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: TColor.readOnlyTextField.withOpacity(0.7),
                       border: detailIndex < transaction['details'].length - 1
