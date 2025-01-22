@@ -1,6 +1,6 @@
 // voucher_widgets.dart
 
-
+import 'package:evoucher_new/views/finance_voucher/bank/view_edit_b_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../common/color_extension.dart';
@@ -32,14 +32,16 @@ class EntryVoucherCard extends StatelessWidget {
         'total_credit': voucher['credit'] ?? '0.000',
         'added_by': voucher['addedBy']
       },
-      'details': (voucher['originalData']['details'] as List<dynamic>? ?? []).map((entry) => {
-        'voucher_id': voucher['id'],
-        'account_id': entry['account_id'] ?? '',
-        'account_name': entry['account_name'] ?? '',
-        'description': entry['description'] ?? '',
-        'debit': entry['debit'] ?? '0.00',
-        'credit': entry['credit'] ?? '0.00'
-      }).toList()
+      'details': (voucher['originalData']['details'] as List<dynamic>? ?? [])
+          .map((entry) => {
+                'voucher_id': voucher['id'],
+                'account_id': entry['account_id'] ?? '',
+                'account_name': entry['account_name'] ?? '',
+                'description': entry['description'] ?? '',
+                'debit': entry['debit'] ?? '0.00',
+                'credit': entry['credit'] ?? '0.00'
+              })
+          .toList()
     };
 
     switch (type) {
@@ -51,6 +53,9 @@ class EntryVoucherCard extends StatelessWidget {
         break;
       case 'expense':
         Get.to(() => ExpenseVoucherDetail(voucherData: formattedVoucherData));
+        break;
+      case 'bank':
+        Get.to(() => BankVoucherDetail(voucherData: formattedVoucherData));
         break;
       default:
         Get.to(() => JournalVoucherDetail(voucherData: formattedVoucherData));

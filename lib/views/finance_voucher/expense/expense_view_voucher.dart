@@ -1,3 +1,4 @@
+import 'package:evoucher_new/views/finance_voucher/expense/view_edit_e_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -80,7 +81,7 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
             'entries': master['num_entries'],
             'addedBy': master['added_by'],
             'amount': 'PKR ${master['total_debit']}',
-            'fullDetails': item
+            'originalData': item
           };
         }).toList();
 
@@ -183,9 +184,11 @@ class _ExpenseViewVoucherState extends State<ExpenseViewVoucher> {
                 else
                   EntryVoucherListView(
                     vouchers: _filteredVouchers,
-                    type: 'journal',
+                    type: 'expense',
                     onVoucherTap: (voucher) {
-                      print('Voucher Details: ${voucher['fullDetails']}');
+                      Get.to(() => ExpenseVoucherDetail(voucherData: voucher));
+                      // Pass the complete original data
+
                     },
                   ),
               ],

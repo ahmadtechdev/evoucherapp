@@ -7,28 +7,25 @@ import 'package:intl/intl.dart';
 
 import '../controller/entry_controller.dart';
 
-class ExpenseVoucherDetail extends StatefulWidget {
+class BankVoucherDetail extends StatefulWidget {
   final Map<String, dynamic> voucherData;
 
-  const ExpenseVoucherDetail({
+  const BankVoucherDetail({
     super.key,
     required this.voucherData,
   });
 
   @override
-  State<ExpenseVoucherDetail> createState() => _ExpenseVoucherDetailState();
+  State<BankVoucherDetail> createState() => _BankVoucherDetailState();
 }
 
-class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
+class _BankVoucherDetailState extends State<BankVoucherDetail> {
   bool isEditMode = false;
   DateTime selectedDate = DateTime.now();
   final FocusNode _mainFocusNode = FocusNode();
-  double totalDebit = 0.0;
-  double totalCredit = 0.0;
   late final VoucherController voucherController;
   List<Map<String, dynamic>> entries = [];
   Map<String, dynamic> masterData = {};
-
 
   @override
   void initState() {
@@ -98,7 +95,6 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
     voucherController.clearEntries();
   }
 
-
   @override
   void dispose() {
     _mainFocusNode.dispose();
@@ -150,32 +146,30 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
           icon: Icon(Icons.arrow_back, color: TColor.primaryText),
           onPressed: () => Get.back(),
         ),
-
-        Row(
-          children: [
-            if (!isEditMode) ...[
-              IconButton(
-                icon: Icon(Icons.edit, color: TColor.primary),
-                onPressed: () {
-                  setState(() {
-                    isEditMode = true;
-                  });
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.delete, color: TColor.third),
-                onPressed: _showDeleteConfirmation,
-              ),
-            ],
-          ],
-        ),
+        // Row(
+        //   children: [
+        //     if (!isEditMode) ...[
+        //       IconButton(
+        //         icon: Icon(Icons.edit, color: TColor.primary),
+        //         onPressed: () {
+        //           setState(() {
+        //             isEditMode = true;
+        //           });
+        //         },
+        //       ),
+        //       IconButton(
+        //         icon: Icon(Icons.delete, color: TColor.third),
+        //         onPressed: _showDeleteConfirmation,
+        //       ),
+        //     ],
+        //   ],
+        // ),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
 
     return GestureDetector(
       onTap: () {
@@ -195,16 +189,15 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildHeaderButtons(),
+                  // _buildHeaderButtons(),
                   Text(
-                    'Expense Voucher #${masterData['id'] ?? ''}',
+                    'Bank Voucher #${masterData['voucher_id'] ?? ''}',
                     style: TextStyle(
                       color: TColor.primaryText,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 24),
                   DateSelector(
                     fontSize: 16,
@@ -219,15 +212,14 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
                     },
                   ),
                   const SizedBox(height: 24),
-                  ReusableEntryCard(
 
-                    showImageUpload: true,
+                  ReusableEntryCard(
+                    showImageUpload: false,
                     primaryColor: TColor.primary,
                     textFieldColor: TColor.textField,
                     textColor: TColor.white,
                     placeholderColor: TColor.placeholder,
                     isViewMode: !isEditMode,
-
                     showPrintButton: !isEditMode,
                     initialData: entries,
                   ),
@@ -235,7 +227,7 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
                   if (isEditMode)
                     Center(
                       child: SizedBox(
-                        width: screenWidth/1.5,
+                        width: MediaQuery.of(context).size.width / 1.5,
                         child: ElevatedButton(
                           onPressed: () {
                             setState(() {

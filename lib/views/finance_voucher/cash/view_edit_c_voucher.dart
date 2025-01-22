@@ -208,7 +208,7 @@ class _CashVoucherDetailState extends State<CashVoucherDetail> {
                 children: [
                   // _buildHeaderButtons(),
                   Text(
-                    'Cash Voucher #${widget.voucherData['id'] ?? ''}',
+                    'Cash Voucher #${masterData['id'] ?? ''}',
                     style: TextStyle(
                       color: TColor.primaryText,
                       fontSize: 18,
