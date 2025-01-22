@@ -2,55 +2,76 @@ import 'package:flutter/material.dart';
 
 class ReportsGridSection extends StatelessWidget {
   final Function(String category, String report)? onReportTap;
+
   const ReportsGridSection({super.key, this.onReportTap});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _buildReportCategory(
-          "Financial Report",
-          [
-            ReportItem("Expenses Report", Icons.receipt_long, const Color(0xff0289ee)),
-            ReportItem("Income Report", Icons.trending_up, const Color(0xff37B45D)),
-            ReportItem("Monthly Profit Loss", Icons.assessment, const Color(0xffE64A19)),
-            ReportItem("Daily Sales Report", Icons.point_of_sale, const Color(0xff0289ee)),
-            ReportItem("Roznamcha", Icons.book, const Color(0xffE0A800)),
-          ],
-        ),
-        const SizedBox(height: 16),
-        _buildReportCategory(
-          "Sales Report",
-          [
-            ReportItem("Top Customer Sales", Icons.people, const Color(0xff0289ee)),
-            ReportItem("5 Year Customer Sales", Icons.timeline, const Color(0xff37B45D)),
-            ReportItem("Top Suppliers Sales", Icons.business, const Color(0xffE64A19)),
-            ReportItem("Top Agent Sales", Icons.person_outline, const Color(0xff0289ee)),
-            ReportItem("Top Airlines Sales", Icons.flight, const Color(0xffE0A800)),
-          ],
-        ),
-        const SizedBox(height: 16),
-        _buildReportCategory(
-          "Airline Ticket Reports",
-          [
-            ReportItem("BSP Report", Icons.article, const Color(0xff0289ee)),
-            ReportItem("Airline Sale Report", Icons.flight_takeoff, const Color(0xff37B45D)),
-            ReportItem("Airline Comparison Report", Icons.compare_arrows, const Color(0xffE64A19)),
-            ReportItem("Supplier Wise Purchases", Icons.shopping_cart, const Color(0xff0289ee)),
-          ],
-        ),
-        const SizedBox(height: 16),
-        _buildReportCategory(
-          "Agency Sale Reports",
-          [
-            ReportItem("Ticket Sale Register", Icons.confirmation_number, const Color(0xff0289ee)),
-            ReportItem("Hotel Sale Register", Icons.hotel, const Color(0xff37B45D)),
-            ReportItem("Visa Sale Register", Icons.card_membership, const Color(0xffE64A19)),
-            ReportItem("Package Sale Register", Icons.card_giftcard, const Color(0xff0289ee)),
-            ReportItem("Other Services Register", Icons.miscellaneous_services, const Color(0xffE0A800)),
-          ],
-        ),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildReportCategory(
+            "Financial Report",
+            [
+              ReportItem(
+                "Expenses Report",
+                Icons.receipt_long,
+                const Color(0xff0289ee),
+                onTab: () {
+                  print("Expenses Report tapped!");
+                },
+              ),
+              ReportItem(
+                "Income Report",
+                Icons.trending_up,
+                const Color(0xff37B45D),
+                onTab: () {
+                  print("Income Report tapped!");
+                },
+              ),
+              ReportItem(
+                "Monthly Profit Loss",
+                Icons.assessment,
+                const Color(0xffE64A19),
+              ),
+              ReportItem(
+                "Daily Sales Report",
+                Icons.point_of_sale,
+                const Color(0xff0289ee),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildReportCategory(
+            "Sales Report",
+            [
+              ReportItem(
+                "Top Customer Sales",
+                Icons.people,
+                const Color(0xff0289ee),
+                onTab: () {
+                  print("Top Customer Sales tapped!");
+                },
+              ),
+              ReportItem(
+                "5 Year Customer Sales",
+                Icons.timeline,
+                const Color(0xff37B45D),
+              ),
+              ReportItem(
+                "Top Suppliers Sales",
+                Icons.business,
+                const Color(0xffE64A19),
+              ),
+              ReportItem(
+                "Top Agent Sales",
+                Icons.person_outline,
+                const Color(0xff0289ee),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -107,7 +128,11 @@ class ReportsGridSection extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          onReportTap?.call(category, report.title);
+          if (report.onTab != null) {
+            report.onTab!();
+          } else if (onReportTap != null) {
+            onReportTap!(category, report.title);
+          }
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -155,6 +180,7 @@ class ReportItem {
   final String title;
   final IconData icon;
   final Color iconColor;
+  final VoidCallback? onTab;
 
-  ReportItem(this.title, this.icon, this.iconColor);
+  ReportItem(this.title, this.icon, this.iconColor, {this.onTab});
 }
