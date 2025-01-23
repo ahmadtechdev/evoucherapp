@@ -1,4 +1,3 @@
-// customer_transaction_screen.dart
 import 'package:evoucher_new/common/color_extension.dart';
 import 'package:evoucher_new/common_widget/date_selecter.dart';
 import 'package:evoucher_new/views/home/top_report_section_views/customer_report/customer_report_controler.dart';
@@ -38,13 +37,38 @@ class CustomerTransactionScreen extends StatelessWidget {
                   initialDate: controller.selectedDate.value,
                   label: "DATE:",
                   onDateChanged: (newDate) {
-                    controller.selectedDate.value = newDate;
+                    controller.updateDate(newDate);
                   },
                 ),
               ),
             ],
           ),
-          _buildTransactionList(),
+          Obx(() {
+            if (controller.isLoading.value) {
+              // Show loading indicator
+              return const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            } else if (controller.transactions.isEmpty) {
+              // Show "No records found" message
+              return const Expanded(
+                child: Center(
+                  child: Text(
+                    "No records found",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              // Show the transaction list
+              return _buildTransactionList();
+            }
+          }),
           _buildSummary(),
         ],
       ),
@@ -53,17 +77,17 @@ class CustomerTransactionScreen extends StatelessWidget {
 
   Widget _buildTransactionList() {
     return Expanded(
-      child: Obx(() => ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: controller.transactions.length,
-            itemBuilder: (context, index) {
-              final transaction = controller.transactions[index];
-              return _TransactionCard(
-                transaction: transaction,
-                controller: controller,
-              );
-            },
-          )),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: controller.transactions.length,
+        itemBuilder: (context, index) {
+          final transaction = controller.transactions[index];
+          return _TransactionCard(
+            transaction: transaction,
+            controller: controller,
+          );
+        },
+      ),
     );
   }
 
@@ -85,7 +109,7 @@ class CustomerTransactionScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _SummaryItem(
-                label: "Total Tabit",
+                label: "Total Debit",
                 amount: controller.totalReceipt.value,
                 color: TColor.primary,
               ),
@@ -95,7 +119,7 @@ class CustomerTransactionScreen extends StatelessWidget {
                 color: TColor.secondary,
               ),
               _SummaryItem(
-                label: "Total",
+                label: "Total Balance",
                 amount: controller.closingBalance.value,
                 color: TColor.fourth,
               ),
@@ -137,7 +161,7 @@ class _TransactionCard extends StatelessWidget {
                 Text(
                   transaction.name,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: TColor.primaryText,
                   ),
@@ -219,19 +243,24 @@ class _TransactionCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _ActionButton(
-                  icon: Icons.book,
-                  label: "Ledger",
-                  color: TColor.primary,
-                  onPressed: () => controller.openLedger(transaction.id),
+                Expanded(
+                  child: _ActionButton(
+                    icon: Icons.book,
+                    label: "Ledger",
+                    color: TColor.primary,
+                    onPressed: () => controller.openLedger(transaction.id),
+                  ),
                 ),
+                SizedBox(width: 10),
                 if (transaction.contact != null)
-                  _ActionButton(
-                    icon: Icons.call,
-                    label: "WhatsApp",
-                    color: TColor.secondary,
-                    onPressed: () =>
-                        controller.openWhatsApp(transaction.contact!),
+                  Expanded(
+                    child: _ActionButton(
+                      icon: Icons.call,
+                      label: "WhatsApp",
+                      color: TColor.secondary,
+                      onPressed: () =>
+                          controller.openWhatsApp(transaction.contact!),
+                    ),
                   ),
               ],
             ),

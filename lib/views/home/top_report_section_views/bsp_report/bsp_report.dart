@@ -19,7 +19,7 @@ class TicketListingScreen extends StatelessWidget {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Ticket Listings'),
+        title: const Text('PSP Report'),
         backgroundColor: TColor.primary,
         foregroundColor: TColor.white,
         elevation: 0,
