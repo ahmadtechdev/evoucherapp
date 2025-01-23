@@ -9,6 +9,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../../../common/color_extension.dart';
 import '../../../common_widget/dart_selector2.dart';
+import '../../../common_widget/snackbar.dart';
 import 'visa_invoices_view/view/single_visa_view.dart';
 import 'visa_voucher_controller.dart';
 
@@ -192,7 +193,9 @@ class ViewVisaVoucher extends StatelessWidget {
                           ? Colors.red
                           : TColor.primary),
                   onPressed: () {
-                    Get.to(() => const SingleVisaView());
+                    // Get.to(() => const SingleVisaView());
+                    CustomSnackBar(message: "This functionality is currently under development and will be available soon.", backgroundColor: TColor.fourth).show();
+
                   },
                 ),
               ],

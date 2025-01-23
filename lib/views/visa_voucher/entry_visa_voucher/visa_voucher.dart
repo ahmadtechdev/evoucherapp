@@ -8,6 +8,7 @@ import '../../../common/accounts_dropdown.dart';
 import '../../../common/color_extension.dart';
 import '../../../common_widget/dart_selector2.dart';
 import '../../../common_widget/round_text_field.dart';
+import '../../../common_widget/snackbar.dart';
 import '../../hotel_voucher/view_hotel_voucher/view_hotel_voucher.dart';
 import 'entry_visa_voucher_controller.dart';
 
@@ -606,14 +607,8 @@ class VisaVoucher extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           // Add validation logic here
-          Get.snackbar(
-            'Success',
-            'Booking Saved Successfully',
-            backgroundColor: TColor.secondary,
-            colorText: TColor.white,
-            snackPosition: SnackPosition.TOP,
-          );
-          Get.to(() => ViewHotelVoucher());
+          CustomSnackBar(message: "Calculations are functional, but saving is not available yet.", backgroundColor: TColor.fourth).show();
+
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: TColor.primary,

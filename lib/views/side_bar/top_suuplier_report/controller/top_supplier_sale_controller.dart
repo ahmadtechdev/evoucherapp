@@ -1,32 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../common/color_extension.dart';
+import '../../../../common_widget/snackbar.dart';
 import '../../../../service/api_service.dart';
-import '../models/top_customer_sale_model.dart';
+import '../models/top_supplier_sale_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:intl/intl.dart';
 
-class CustomerReportController extends GetxController {
+class SupplierReportController extends GetxController {
   final ApiService apiService = ApiService();
 
   final selectedYear = 2024.obs;
   final searchQuery = ''.obs;
 
-  final RxList<Customer> activeCustomers = <Customer>[].obs;
-  final RxList<Customer> zeroSaleCustomers = <Customer>[].obs;
-  final RxList<Customer> filteredActiveCustomers = <Customer>[].obs;
-  final RxList<Customer> filteredZeroSaleCustomers = <Customer>[].obs;
+  final RxList<Supplier> activeSupplier = <Supplier>[].obs;
+  final RxList<Supplier> zeroSaleSupplier = <Supplier>[].obs;
+  final RxList<Supplier> filteredActiveSupplier = <Supplier>[].obs;
+  final RxList<Supplier> filteredZeroSaleSupplier = <Supplier>[].obs;
   final RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchCustomerReport();
+    fetchSupplierReport();
   }
 
-  Future<void> fetchCustomerReport() async {
+  Future<void> fetchSupplierReport() async {
     try {
       isLoading.value = true;
 
@@ -34,7 +36,7 @@ class CustomerReportController extends GetxController {
         endpoint: 'topReport',
         body: {
           'year': selectedYear.value.toString(),
-          "subhead":"customer"
+          "subhead":"supplier"
         },
       );
 
@@ -45,32 +47,27 @@ class CustomerReportController extends GetxController {
         final nonZeroSales = (data['non_zero_sales'] as List)
             .asMap()
             .entries
-            .map((entry) => Customer.fromJson(entry.value, entry.key + 1))
+            .map((entry) => Supplier.fromJson(entry.value, entry.key + 1))
             .toList();
 
         // Parse zero sales customers
         final zeroSales = (data['zero_sales'] as List)
             .asMap()
             .entries
-            .map((entry) => Customer.fromJson(
+            .map((entry) => Supplier.fromJson(
           entry.value,
           nonZeroSales.length + entry.key + 1,
         ))
             .toList();
 
-        activeCustomers.value = nonZeroSales;
-        zeroSaleCustomers.value = zeroSales;
-        filteredActiveCustomers.value = nonZeroSales;
-        filteredZeroSaleCustomers.value = zeroSales;
+        activeSupplier.value = nonZeroSales;
+        zeroSaleSupplier.value = zeroSales;
+        filteredActiveSupplier.value = nonZeroSales;
+        filteredZeroSaleSupplier.value = zeroSales;
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to fetch customer report: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+
+      CustomSnackBar(message: 'Failed to fetch Supplier report: ${e.toString()}', backgroundColor: TColor.third);
     } finally {
       isLoading.value = false;
     }
@@ -78,23 +75,23 @@ class CustomerReportController extends GetxController {
 
   void updateYear(int year) {
     selectedYear.value = year;
-    fetchCustomerReport();
+    fetchSupplierReport();
   }
 
   void updateSearch(String query) {
     searchQuery.value = query;
     if (query.isEmpty) {
-      filteredActiveCustomers.value = activeCustomers;
-      filteredZeroSaleCustomers.value = zeroSaleCustomers;
+      filteredActiveSupplier.value = activeSupplier;
+      filteredZeroSaleSupplier.value = zeroSaleSupplier;
       return;
     }
 
-    filteredActiveCustomers.value = activeCustomers
+    filteredActiveSupplier.value = activeSupplier
         .where((customer) =>
         customer.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
-    filteredZeroSaleCustomers.value = zeroSaleCustomers
+    filteredZeroSaleSupplier.value = zeroSaleSupplier
         .where((customer) =>
         customer.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
@@ -111,7 +108,7 @@ class CustomerReportController extends GetxController {
             pw.Header(
               level: 0,
               child: pw.Text(
-                'Top Customer Sale Report',
+                'Top Supplier Sale Report',
                 style: pw.TextStyle(
                   fontSize: 24,
                   fontWeight: pw.FontWeight.bold,
@@ -143,14 +140,14 @@ class CustomerReportController extends GetxController {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'Active Customers',
+          'Active Supplier',
           style: pw.TextStyle(
             fontSize: 18,
             fontWeight: pw.FontWeight.bold,
           ),
         ),
         pw.SizedBox(height: 10),
-        ...activeCustomers.map((customer) => _buildCustomerRow(customer)),
+        ...activeSupplier.map((customer) => _buildSupplierRow(customer)),
       ],
     );
   }
@@ -167,12 +164,12 @@ class CustomerReportController extends GetxController {
           ),
         ),
         pw.SizedBox(height: 10),
-        ...zeroSaleCustomers.map((customer) => _buildCustomerRow(customer)),
+        ...zeroSaleSupplier.map((supplier) => _buildSupplierRow(supplier)),
       ],
     );
   }
 
-  pw.Widget _buildCustomerRow(Customer customer) {
+  pw.Widget _buildSupplierRow(Supplier supplier) {
     final formatter = NumberFormat('#,##0.00');
 
     return pw.Container(
@@ -189,11 +186,11 @@ class CustomerReportController extends GetxController {
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
               pw.Text(
-                'Rank ${customer.rank} - ${customer.name}',
+                'Rank ${supplier.rank} - ${supplier.name}',
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
               pw.Text(
-                '${customer.percentage.toStringAsFixed(2)}%',
+                '${supplier.percentage.toStringAsFixed(2)}%',
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
             ],
@@ -202,16 +199,16 @@ class CustomerReportController extends GetxController {
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              _buildSaleItem('Ticket Sale:', customer.ticket, formatter),
-              _buildSaleItem('Hotel Sale:', customer.hotel, formatter),
+              _buildSaleItem('Ticket Sale:', supplier.ticket, formatter),
+              _buildSaleItem('Hotel Sale:', supplier.hotel, formatter),
             ],
           ),
           pw.SizedBox(height: 5),
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              _buildSaleItem('Visa Sale:', customer.visa, formatter),
-              _buildSaleItem('Transport Sale:', customer.transport, formatter),
+              _buildSaleItem('Visa Sale:', supplier.visa, formatter),
+              _buildSaleItem('Transport Sale:', supplier.transport, formatter),
             ],
           ),
           pw.Divider(),
@@ -223,7 +220,7 @@ class CustomerReportController extends GetxController {
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
               pw.Text(
-                'Rs. ${formatter.format(customer.total)}',
+                'Rs. ${formatter.format(supplier.total)}',
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
             ],

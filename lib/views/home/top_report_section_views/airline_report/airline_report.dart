@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../../side_bar/accounts/accounts_ledger/view_accounts_ledger.dart';
+
 class AirlineReport extends StatelessWidget {
   final AirlineReportController controller = Get.put(AirlineReportController());
 
-  AirlineReport({Key? key}) : super(key: key);
+  AirlineReport({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +83,7 @@ class AirlineReport extends StatelessWidget {
             itemCount: controller.transactions.length,
             itemBuilder: (context, index) {
               final ariline = controller.transactions[index];
-              return _BankCard(
+              return _AirlineCard(
                 airline: ariline,
                 controller: controller,
               );
@@ -128,11 +130,11 @@ class AirlineReport extends StatelessWidget {
   }
 }
 
-class _BankCard extends StatelessWidget {
+class _AirlineCard extends StatelessWidget {
   final ariline airline;
   final AirlineReportController controller;
 
-  const _BankCard({
+  const _AirlineCard({
     required this.airline,
     required this.controller,
   });
@@ -250,7 +252,12 @@ class _BankCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: TextButton.icon(
-                onPressed: () => controller.openLedger(airline.id),
+                onPressed: () {
+                  Get.to(() => LedgerScreen(
+                    accountId: airline.id,
+                    accountName: airline.name,
+                  ));
+                },
                 icon: Icon(Icons.book, size: 18, color: TColor.primary),
                 label: Text(
                   'View Ledger',

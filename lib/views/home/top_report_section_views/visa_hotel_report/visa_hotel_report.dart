@@ -7,10 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../../side_bar/accounts/accounts_ledger/view_accounts_ledger.dart';
+
 class VisaHotelReport extends StatelessWidget {
   final VisaHotelController controller = Get.put(VisaHotelController());
 
-  VisaHotelReport({Key? key}) : super(key: key);
+  VisaHotelReport({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -246,10 +248,15 @@ class _TransactionCard extends StatelessWidget {
                     icon: Icons.book,
                     label: "Ledger",
                     color: TColor.primary,
-                    onPressed: () => controller.openLedger(Visahotel.id),
+                    onPressed: () {
+                      Get.to(() => LedgerScreen(
+                        accountId: Visahotel.id,
+                        accountName: Visahotel.name,
+                      ));
+                    },
                   ),
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 if (Visahotel.contact != null)
                   Expanded(
                     child: _ActionButton(

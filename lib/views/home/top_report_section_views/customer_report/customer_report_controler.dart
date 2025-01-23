@@ -3,6 +3,8 @@ import 'package:evoucher_new/views/home/top_report_section_views/customer_report
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../../side_bar/accounts/accounts_ledger/view_accounts_ledger.dart';
+
 class CustomerTransactionController extends GetxController {
   final ApiService _apiService = Get.put(ApiService());
 
@@ -96,10 +98,7 @@ class CustomerTransactionController extends GetxController {
     );
   }
 
-  void openLedger(String id) {
-    // Implement ledger navigation
-    Get.toNamed('/ledger/$id');
-  }
+
 
   void openWhatsApp(String contact) {
     // Implement WhatsApp functionality

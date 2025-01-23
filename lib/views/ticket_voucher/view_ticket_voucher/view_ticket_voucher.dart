@@ -1,3 +1,4 @@
+import 'package:evoucher_new/common_widget/snackbar.dart';
 import 'package:evoucher_new/service/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -188,7 +189,8 @@ Widget _buildVoucherCard(Map<String, dynamic> ticket, BuildContext context) {
                         ? Colors.red
                         : TColor.primary),
                 onPressed: () {
-                  Get.to(() => const TicketViewSingleVoucher());
+                  // Get.to(() => const TicketViewSingleVoucher());
+                  CustomSnackBar(message: "This functionality is currently under development and will be available soon.", backgroundColor: TColor.fourth).show();
                 },
               ),
             ],
@@ -251,7 +253,8 @@ Widget _buildVoucherCard(Map<String, dynamic> ticket, BuildContext context) {
                       onPressed: refundStatus['is_refunded'] == true
                           ? null
                           : () =>
-                              Get.to(() => const TicketRefundTicketScreen()),
+                          CustomSnackBar(message: "This functionality is currently under development and will be available soon.", backgroundColor: TColor.fourth).show(),
+                              // Get.to(() => const TicketRefundTicketScreen()),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -665,7 +668,6 @@ String _numberToWords(double number) {
     'Eighty',
     'Ninety'
   ];
-  List<String> scales = ['', 'Thousand', 'Lakh', 'Crore'];
 
   if (number == 0) return 'Zero';
 

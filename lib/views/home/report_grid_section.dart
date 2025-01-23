@@ -1,4 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../side_bar/5_year_customers_sales/five_year_customers_sale.dart';
+import '../side_bar/daily_sales_report/daily_sales_report.dart';
+import '../side_bar/expense_report/expense_report.dart';
+import '../side_bar/incomes_report/income_report_view.dart';
+import '../side_bar/monthly_sale_report/monthly_sale_report.dart';
+import '../side_bar/top_agent_report/top_agent_sale.dart';
+import '../side_bar/top_customer_sale/top_customer_sale.dart';
+import '../side_bar/top_suuplier_report/top_supplier_sale.dart';
 
 class ReportsGridSection extends StatelessWidget {
   final Function(String category, String report)? onReportTap;
@@ -17,27 +27,25 @@ class ReportsGridSection extends StatelessWidget {
                 "Expenses Report",
                 Icons.receipt_long,
                 const Color(0xff0289ee),
-                onTab: () {
-                  print("Expenses Report tapped!");
-                },
+                onTap: () => Get.to(() => ExpenseComparisonReport()),
               ),
               ReportItem(
                 "Income Report",
                 Icons.trending_up,
                 const Color(0xff37B45D),
-                onTab: () {
-                  print("Income Report tapped!");
-                },
+                onTap: () => Get.to(() => const IncomesComparisonReport()),
               ),
               ReportItem(
                 "Monthly Profit Loss",
                 Icons.assessment,
                 const Color(0xffE64A19),
+                onTap: () => Get.to(() => MonthlySalesReport()),
               ),
               ReportItem(
                 "Daily Sales Report",
                 Icons.point_of_sale,
                 const Color(0xff0289ee),
+                onTap: () => Get.to(() => const DailySalesReportScreen()),
               ),
             ],
           ),
@@ -49,24 +57,25 @@ class ReportsGridSection extends StatelessWidget {
                 "Top Customer Sales",
                 Icons.people,
                 const Color(0xff0289ee),
-                onTab: () {
-                  print("Top Customer Sales tapped!");
-                },
+                onTap: () => Get.to(() => CustomerReportScreen()),
               ),
               ReportItem(
                 "5 Year Customer Sales",
                 Icons.timeline,
                 const Color(0xff37B45D),
+                onTap: () => Get.to(() => const FiveYearsCustomerSale()),
               ),
               ReportItem(
                 "Top Suppliers Sales",
                 Icons.business,
                 const Color(0xffE64A19),
+                onTap: () => Get.to(() => SupplierReportScreen()),
               ),
               ReportItem(
                 "Top Agent Sales",
                 Icons.person_outline,
                 const Color(0xff0289ee),
+                onTap: () => Get.to(() => AgentReportScreen()),
               ),
             ],
           ),
@@ -128,8 +137,8 @@ class ReportsGridSection extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          if (report.onTab != null) {
-            report.onTab!();
+          if (report.onTap != null) {
+            report.onTap!();
           } else if (onReportTap != null) {
             onReportTap!(category, report.title);
           }
@@ -180,7 +189,7 @@ class ReportItem {
   final String title;
   final IconData icon;
   final Color iconColor;
-  final VoidCallback? onTab;
+  final VoidCallback? onTap;
 
-  ReportItem(this.title, this.icon, this.iconColor, {this.onTab});
+  ReportItem(this.title, this.icon, this.iconColor, {this.onTap});
 }

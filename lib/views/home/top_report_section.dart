@@ -4,13 +4,39 @@ import 'package:evoucher_new/views/home/top_report_section_views/bank_report/ban
 import 'package:evoucher_new/views/home/top_report_section_views/bsp_report/bsp_report.dart';
 import 'package:evoucher_new/views/home/top_report_section_views/customer_report/customer_report.dart';
 import 'package:evoucher_new/views/home/top_report_section_views/visa_hotel_report/visa_hotel_report.dart';
+import 'package:evoucher_new/views/side_bar/top_agent_report/top_agent_sale.dart';
+import 'package:evoucher_new/views/side_bar/top_customer_sale/top_customer_sale.dart';
+import 'package:evoucher_new/views/side_bar/top_suuplier_report/top_supplier_sale.dart';
+import 'package:evoucher_new/views/side_bar/trial_balance/trial_balance.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../common/color_extension.dart';
+import '../../service/session_manager.dart';
+import 'top_report_section_views/details_sale_report/details_sale_report.dart';
 
-class ReportSection extends StatelessWidget {
+class ReportSection extends StatefulWidget {
   const ReportSection({super.key});
+
+  @override
+  State<ReportSection> createState() => _ReportSectionState();
+}
+
+class _ReportSectionState extends State<ReportSection> {
+  String? loginType;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _initializeLoginType();
+  }
+
+  Future<void> _initializeLoginType() async {
+    final sessionManager = Get.find<SessionManager>();
+    loginType = await sessionManager.getLoginType();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,55 +120,60 @@ class ReportSection extends StatelessWidget {
                   'TRIAL BALANCE',
                   'Report',
                   () {
-                    // Handle onTap for TRIAL BALANCE
-                    print('TRIAL BALANCE Report tapped');
+                    Get.to(() => TrialOfBalanceScreen());
                   },
                 ),
-                _dashboardItem(
-                  Icons.star,
-                  'TOP CUSTOMERS',
-                  'Report',
-                  () {
-                    // Handle onTap for TOP CUSTOMERS
-                    print('TOP CUSTOMERS Report tapped');
-                  },
-                ),
-                _dashboardItem(
-                  Icons.trending_up,
-                  'TOP SUPPLIER',
-                  'Report',
-                  () {
-                    // Handle onTap for TOP SUPPLIER
-                    print('TOP SUPPLIER Report tapped');
-                  },
-                ),
-                _dashboardItem(
-                  Icons.group,
-                  'TOP AGENTS',
-                  'Report',
-                  () {
-                    // Handle onTap for TOP AGENTS
-                    print('TOP AGENTS Report tapped');
-                  },
-                ),
+                if (loginType == 'travel') ...[
+                  _dashboardItem(
+                    Icons.star,
+                    'TOP CUSTOMERS',
+                    'Report',
+                    () {
+                      // Handle onTap for TOP CUSTOMERS
+
+                      Get.to(() => CustomerReportScreen());
+                    },
+                  ),
+                  _dashboardItem(
+                    Icons.trending_up,
+                    'TOP SUPPLIER',
+                    'Report',
+                    () {
+                      // Handle onTap for TOP SUPPLIER
+
+                      Get.to(() => SupplierReportScreen());
+                    },
+                  ),
+                  _dashboardItem(
+                    Icons.group,
+                    'TOP AGENTS',
+                    'Report',
+                    () {
+                      // Handle onTap for TOP AGENTS
+
+                      Get.to(() => AgentReportScreen());
+                    },
+                  ),
+                ],
                 _dashboardItem(
                   Icons.calendar_today,
                   'DAY WISE',
                   'Sales Report',
                   () {
-                    // Handle onTap for DAY WISE SALES
-                    print('DAY WISE Sales Report tapped');
+                    Get.to(() => DetailsSaleReport());
                   },
                 ),
-                _dashboardItem(
-                  Icons.bar_chart,
-                  'YEARLY SALES',
-                  'Report',
-                  () {
-                    // Handle onTap for YEARLY SALES
-                    print('YEARLY SALES Report tapped');
-                  },
-                ),
+                // if (loginType == 'travel') ...[
+                //   _dashboardItem(
+                //     Icons.bar_chart,
+                //     'YEARLY SALES',
+                //     'Report',
+                //     () {
+                //       // Handle onTap for YEARLY SALES
+                //       print('YEARLY SALES Report tapped');
+                //     },
+                //   ),
+                // ]
               ],
             ),
           ),

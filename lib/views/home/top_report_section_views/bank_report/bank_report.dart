@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../../side_bar/accounts/accounts_ledger/view_accounts_ledger.dart';
+
 class BanksScreen extends StatelessWidget {
   final BanksController controller = Get.put(BanksController());
 
-  BanksScreen({Key? key}) : super(key: key);
+  BanksScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -250,7 +252,12 @@ class _BankCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: TextButton.icon(
-                onPressed: () => controller.openLedger(bank.id),
+                onPressed: () {
+                  Get.to(() => LedgerScreen(
+                    accountId: bank.id,
+                    accountName: bank.name,
+                  ));
+                },
                 icon: Icon(Icons.book, size: 18, color: TColor.primary),
                 label: Text(
                   'View Ledger',

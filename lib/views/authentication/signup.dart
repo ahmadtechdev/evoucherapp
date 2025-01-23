@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/round_text_field.dart';
+import '../../common_widget/snackbar.dart';
 import 'signin.dart';
 
 
@@ -138,7 +139,8 @@ class _SignUpViewState extends State<SignUpView> {
                         RoundButton(
                             title: "Sign Up",
                             onPressed: () {
-                              // btnSignUp();
+                              CustomSnackBar(message: "Sign-up is currently unavailable on mobile. ", backgroundColor: TColor.fourth).show();
+
                             }),
                         const SizedBox(height: 16),
                         TextButton(

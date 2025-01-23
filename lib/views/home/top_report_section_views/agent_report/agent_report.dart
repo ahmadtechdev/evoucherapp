@@ -4,7 +4,6 @@ import 'package:evoucher_new/common_widget/date_selecter.dart';
 import 'package:evoucher_new/views/home/top_report_section_views/agent_report/agent_report_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 class AgentReport extends StatelessWidget {
   final AgentReportController controller = Get.put(AgentReportController());
@@ -25,66 +24,46 @@ class AgentReport extends StatelessWidget {
       body: Column(
         children: [
           _buildDateSelectionBar(),
-          _buildTransactionsList(),
+          Obx(() {
+            if (controller.isLoading.value) {
+              // Show loading indicator
+              return const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            } else if (controller.transactions.isEmpty) {
+              // Show "No records found" message
+              return const Expanded(
+                child: Center(
+                  child: Text(
+                    "No records found",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              // Show the transaction list
+              return _buildTransactionsList();
+            }
+          }),
           _buildSummaryFooter(),
         ],
       ),
     );
   }
 
-  Widget _buildDateSelectionBar() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: TColor.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: DateSelector(
-                    fontSize: 14,
-                    vpad: 14,
-                    initialDate: DateTime.now(),
-                    label: "DATE:",
-                    onDateChanged: (newDate) {},
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 16),
-          ElevatedButton.icon(
-            onPressed: controller.printTransactions,
-            icon: const Icon(Icons.print, size: 20),
-            label: const Text('Print'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: TColor.secondary,
-              foregroundColor: TColor.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // ... (keep other methods the same)
 
   Widget _buildTransactionsList() {
     return Expanded(
       child: Obx(
-        () => ListView.builder(
+            () => controller.transactions.isEmpty
+            ? Center(child: CircularProgressIndicator(color: TColor.primary))
+            : ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: controller.transactions.length,
           itemBuilder: (context, index) {
@@ -108,8 +87,7 @@ class AgentReport extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          DateFormat('MMM dd, yyyy')
-                              .format(DateTime.parse(transaction['date'])),
+                          (transaction['date']),
                           style: TextStyle(
                             color: TColor.primaryText,
                             fontWeight: FontWeight.bold,
@@ -157,10 +135,10 @@ class AgentReport extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildAmountColumn('Receipt', transaction['receipt'],
-                            TColor.secondary),
-                        _buildAmountColumn(
-                            'Payment', transaction['payment'], TColor.third),
+                        _buildAmountColumn('Credit',
+                            transaction['receipt'], TColor.secondary),
+                        _buildAmountColumn('Debit',
+                            transaction['payment'], TColor.third),
                       ],
                     ),
                   ],
@@ -175,7 +153,7 @@ class AgentReport extends StatelessWidget {
 
   Widget _buildSummaryFooter() {
     return Obx(
-      () => Container(
+          () => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: TColor.white,
@@ -190,14 +168,14 @@ class AgentReport extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
+            _buildSummaryItem('Total Credit',
+                controller.totals['totalCredit']!.value, TColor.secondary),
+            _buildSummaryItem('Total Debit',
+                controller.totals['totalDebit']!.value, TColor.third),
             _buildSummaryItem(
-                'Total Receipt', controller.totalReceipt, TColor.secondary),
-            _buildSummaryItem(
-                'Total Payment', controller.totalPayment, TColor.third),
-            _buildSummaryItem(
-                'Closing Balance',
-                controller.closingBalance,
-                controller.closingBalance >= 0
+                'Total Balance',
+                controller.totals['totalBalance']!.value,
+                controller.totals['totalBalance']!.value >= 0
                     ? TColor.secondary
                     : TColor.third),
           ],
@@ -254,5 +232,59 @@ class AgentReport extends StatelessWidget {
     );
   }
 }
+
+Widget _buildDateSelectionBar() {
+  final AgentReportController controller = Get.put(AgentReportController());
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: TColor.white,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 10,
+          offset: const Offset(0, 5),
+        ),
+      ],
+    ),
+    child: Row(
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                child: DateSelector(
+                  fontSize: 14,
+                  vpad: 14,
+                  initialDate: DateTime.now(),
+                  label: "DATE:",
+                  onDateChanged: (newDate) {
+                    controller.updateDate(newDate);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 16),
+        ElevatedButton.icon(
+          onPressed: () {},
+          icon: const Icon(Icons.print, size: 20),
+          label: const Text('Print'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: TColor.secondary,
+            foregroundColor: TColor.white,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+
 
 // bindings.dart

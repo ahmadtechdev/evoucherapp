@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../common/color_extension.dart';
 import '../../../common_widget/dart_selector2.dart';
+import '../../../common_widget/snackbar.dart';
 import 'hotel_invoices_view/view/single_hotel_view.dart';
 import 'invoices_functions_class.dart';
 import 'view_hotel_voucher_controller.dart';
@@ -192,7 +193,8 @@ class ViewHotelVoucher extends StatelessWidget {
                   icon: Icon(Icons.visibility, color: TColor.primary),
                   onPressed: () {
                     // Navigate to single hotel view
-                    Get.to(() => const SingleHotelView());
+                    // Get.to(() => const SingleHotelView());
+                    CustomSnackBar(message: "This functionality is currently under development and will be available soon.", backgroundColor: TColor.fourth).show();
                   },
                 ),
               ],
@@ -252,30 +254,39 @@ class ViewHotelVoucher extends StatelessWidget {
                           onPressed: () {
                     invoiceGenerator.generateAndPreviewHotelInvoice(
                         context, voucher['hv_id']);
-                  }))
+                  })),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildActionButton(
+                        'Foreign Invoice', Icons.visibility, Colors.red,
+                        onPressed: () {
+                          invoiceGenerator
+                              .generateAndPreviewForeignInvoice(context);
+                        }),
+                  ),
                 ]),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildActionButton(
-                          'Hotel Voucher', Icons.visibility, TColor.primary,
-                          onPressed: () {
-                        invoiceGenerator
-                            .generateAndPreviewHotelVoucher(context);
-                      }),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildActionButton(
-                          'Foreign Invoice', Icons.visibility, Colors.red,
-                          onPressed: () {
-                        invoiceGenerator
-                            .generateAndPreviewForeignInvoice(context);
-                      }),
-                    ),
-                  ],
-                ),
+                // const SizedBox(height: 8),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: _buildActionButton(
+                //           'Hotel Voucher', Icons.visibility, TColor.primary,
+                //           onPressed: () {
+                //         invoiceGenerator
+                //             .generateAndPreviewHotelVoucher(context);
+                //       }),
+                //     ),
+                //     const SizedBox(width: 12),
+                //     Expanded(
+                //       child: _buildActionButton(
+                //           'Foreign Invoice', Icons.visibility, Colors.red,
+                //           onPressed: () {
+                //         invoiceGenerator
+                //             .generateAndPreviewForeignInvoice(context);
+                //       }),
+                //     ),
+                //   ],
+                // ),
               ],
             ),
           ),

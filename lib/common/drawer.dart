@@ -14,7 +14,9 @@ import '../views/side_bar/monthly_profit_loss/monthly_profit_loss.dart';
 import '../views/side_bar/monthly_sale_report/monthly_sale_report.dart';
 import '../views/side_bar/5_year_customers_sales/five_year_customers_sale.dart';
 import '../views/side_bar/recovery_list/recovery_list.dart';
+import '../views/side_bar/top_agent_report/top_agent_sale.dart';
 import '../views/side_bar/top_customer_sale/top_customer_sale.dart';
+import '../views/side_bar/top_suuplier_report/top_supplier_sale.dart';
 import '../views/side_bar/total_monthly_expense/total_monthly_expenses.dart';
 import '../views/side_bar/total_monthly_profit_loss/total_monthly_profit_loss.dart';
 import '../views/side_bar/trial_balance/trial_balance.dart';
@@ -77,10 +79,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
   void _scrollToSelectedItem() {
     if (_selectedItemKey.currentContext != null) {
       final RenderObject? renderObject =
-          _selectedItemKey.currentContext!.findRenderObject();
+      _selectedItemKey.currentContext!.findRenderObject();
       if (renderObject != null) {
         final ScrollableState scrollableState =
-            Scrollable.of(_selectedItemKey.currentContext!);
+        Scrollable.of(_selectedItemKey.currentContext!);
         scrollableState.position.ensureVisible(
           renderObject,
           alignment: 0.5, // Center the item
@@ -158,19 +160,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Umer Liaqat Admin',
+                  'Unknown',
                   style: TextStyle(color: TColor.white, fontSize: 16),
                 ),
                 Text(
-                  'Agency ID: 157',
+                  'Agency ID: Unknown',
                   style: TextStyle(color: Colors.grey[400], fontSize: 14),
                 ),
                 Text(
-                  'Expires On: Wed 13 Aug 2025',
+                  // 'Expires On: Wed 13 Aug 2025',
+                  'Expires On: Unknown',
                   style: TextStyle(color: Colors.grey[400], fontSize: 12),
                 ),
                 Text(
-                  'Cash: 39,801.00 Cr',
+                  // 'Cash: 39,801.00 Cr',
+                  'Cash: Unknown',
                   style: TextStyle(color: Colors.grey[400], fontSize: 12),
                 ),
               ],
@@ -222,6 +226,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
     ));
 
     if (loginType == 'toc') {
+
+      items.add(_buildNavigationItem(
+        title: 'Accounts',
+        icon: Icons.person,
+        index: currentIndex++,
+        onTap: () => Get.to(() => const Accounts()),
+      ));
+
       items.addAll([
         _buildNavigationItem(
           title: 'Daily Cash Book',
@@ -230,12 +242,46 @@ class _CustomDrawerState extends State<CustomDrawer> {
           onTap: () => Get.to(() => DailyCashBook()),
         ),
         _buildNavigationItem(
+          title: 'Daily Activity Report',
+          icon: Icons.calendar_today_rounded,
+          index: currentIndex++,
+          onTap: () => Get.to(() => DailyActivityReport()),
+        ),
+        _buildNavigationItem(
           title: 'Daily Cash Activity',
           icon: Icons.analytics_rounded,
           index: currentIndex++,
           onTap: () => Get.to(() => const DailyCashActivity()),
         ),
+        _buildNavigationItem(
+          title: 'Trial Balance',
+          icon: Icons.analytics_rounded,
+          index: currentIndex++,
+          onTap: () => Get.to(() => TrialOfBalanceScreen()),
+        ),
+        _buildNavigationItem(
+          title: 'Daily Sales Report',
+          icon: Icons.analytics_rounded,
+          index: currentIndex++,
+          onTap: () => Get.to(() => const DailySalesReportScreen()),
+        ),
+        _buildNavigationItem(
+          title: 'Expenses Report',
+          icon: Icons.analytics_rounded,
+          index: currentIndex++,
+          onTap: () => Get.to(() => ExpenseComparisonReport()),
+        ),
+        _buildNavigationItem(
+          title: 'Incomes Report',
+          icon: Icons.analytics_rounded,
+          index: currentIndex++,
+          onTap: () => Get.to(() => const IncomesComparisonReport()),
+        ),
+
       ]);
+
+
+      // ************************************** Travel Started Here **************************************
     } else {
       // Accounts Section
       items.add(_buildSectionHeader(
@@ -353,6 +399,18 @@ class _CustomDrawerState extends State<CustomDrawer> {
           icon: Icons.analytics_rounded,
           index: currentIndex++,
           onTap: () => Get.to(() => const FiveYearsCustomerSale()),
+        ),
+        _buildNavigationItem(
+          title: 'Top Supplier Report',
+          icon: Icons.analytics_rounded,
+          index: currentIndex++,
+          onTap: () => Get.to(() => SupplierReportScreen()),
+        ),
+        _buildNavigationItem(
+          title: 'Top Agent Sales',
+          icon: Icons.analytics_rounded,
+          index: currentIndex++,
+          onTap: () => Get.to(() => AgentReportScreen()),
         ),
       ]);
     }

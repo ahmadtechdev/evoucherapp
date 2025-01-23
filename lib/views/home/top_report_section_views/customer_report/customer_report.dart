@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../../side_bar/accounts/accounts_ledger/view_accounts_ledger.dart';
+
 class CustomerTransactionScreen extends StatelessWidget {
   final CustomerTransactionController controller =
       Get.put(CustomerTransactionController());
 
-  CustomerTransactionScreen({Key? key}) : super(key: key);
+  CustomerTransactionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -248,10 +250,15 @@ class _TransactionCard extends StatelessWidget {
                     icon: Icons.book,
                     label: "Ledger",
                     color: TColor.primary,
-                    onPressed: () => controller.openLedger(transaction.id),
+                    onPressed: () {
+                      Get.to(() => LedgerScreen(
+                        accountId: transaction.id,
+                        accountName: transaction.name,
+                      ));
+                    },
                   ),
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 if (transaction.contact != null)
                   Expanded(
                     child: _ActionButton(

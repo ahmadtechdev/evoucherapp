@@ -61,7 +61,7 @@ class SessionManager extends GetxController {
     await prefs.setString(LOGIN_TYPE_KEY, loginType);
     updateBaseUrl(clientType);
 
-    final expiryTime = DateTime.now().add(const Duration(hours: 3)).millisecondsSinceEpoch;
+    final expiryTime = DateTime.now().add(const Duration(days: 30)).millisecondsSinceEpoch;
     await prefs.setInt(TOKEN_EXPIRY_KEY, expiryTime);
 
     _isLoggedIn.value = true;

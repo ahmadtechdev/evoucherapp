@@ -1,32 +1,34 @@
+import 'package:evoucher_new/common/color_extension.dart';
+import 'package:evoucher_new/common_widget/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../service/api_service.dart';
-import '../models/top_customer_sale_model.dart';
+import '../models/top_agent_sale_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:intl/intl.dart';
 
-class CustomerReportController extends GetxController {
+class AgentReportController extends GetxController {
   final ApiService apiService = ApiService();
 
   final selectedYear = 2024.obs;
   final searchQuery = ''.obs;
 
-  final RxList<Customer> activeCustomers = <Customer>[].obs;
-  final RxList<Customer> zeroSaleCustomers = <Customer>[].obs;
-  final RxList<Customer> filteredActiveCustomers = <Customer>[].obs;
-  final RxList<Customer> filteredZeroSaleCustomers = <Customer>[].obs;
+  final RxList<Agent> activeAgents = <Agent>[].obs;
+  final RxList<Agent> zeroSaleAgents = <Agent>[].obs;
+  final RxList<Agent> filteredActiveAgents = <Agent>[].obs;
+  final RxList<Agent> filteredZeroSaleAgents = <Agent>[].obs;
   final RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchCustomerReport();
+    fetchAgentReport();
   }
 
-  Future<void> fetchCustomerReport() async {
+  Future<void> fetchAgentReport() async {
     try {
       isLoading.value = true;
 
@@ -34,7 +36,7 @@ class CustomerReportController extends GetxController {
         endpoint: 'topReport',
         body: {
           'year': selectedYear.value.toString(),
-          "subhead":"customer"
+          "subhead":"agent"
         },
       );
 
@@ -45,32 +47,27 @@ class CustomerReportController extends GetxController {
         final nonZeroSales = (data['non_zero_sales'] as List)
             .asMap()
             .entries
-            .map((entry) => Customer.fromJson(entry.value, entry.key + 1))
+            .map((entry) => Agent.fromJson(entry.value, entry.key + 1))
             .toList();
 
         // Parse zero sales customers
         final zeroSales = (data['zero_sales'] as List)
             .asMap()
             .entries
-            .map((entry) => Customer.fromJson(
+            .map((entry) => Agent.fromJson(
           entry.value,
           nonZeroSales.length + entry.key + 1,
         ))
             .toList();
 
-        activeCustomers.value = nonZeroSales;
-        zeroSaleCustomers.value = zeroSales;
-        filteredActiveCustomers.value = nonZeroSales;
-        filteredZeroSaleCustomers.value = zeroSales;
+        activeAgents.value = nonZeroSales;
+        zeroSaleAgents.value = zeroSales;
+        filteredActiveAgents.value = nonZeroSales;
+        filteredZeroSaleAgents.value = zeroSales;
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to fetch customer report: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+
+      CustomSnackBar(message: 'Failed to fetch customer report: ${e.toString()}', backgroundColor: TColor.third);
     } finally {
       isLoading.value = false;
     }
@@ -78,23 +75,23 @@ class CustomerReportController extends GetxController {
 
   void updateYear(int year) {
     selectedYear.value = year;
-    fetchCustomerReport();
+    fetchAgentReport();
   }
 
   void updateSearch(String query) {
     searchQuery.value = query;
     if (query.isEmpty) {
-      filteredActiveCustomers.value = activeCustomers;
-      filteredZeroSaleCustomers.value = zeroSaleCustomers;
+      filteredActiveAgents.value = activeAgents;
+      filteredZeroSaleAgents.value = zeroSaleAgents;
       return;
     }
 
-    filteredActiveCustomers.value = activeCustomers
+    filteredActiveAgents.value = activeAgents
         .where((customer) =>
         customer.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
-    filteredZeroSaleCustomers.value = zeroSaleCustomers
+    filteredZeroSaleAgents.value = zeroSaleAgents
         .where((customer) =>
         customer.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
@@ -111,7 +108,7 @@ class CustomerReportController extends GetxController {
             pw.Header(
               level: 0,
               child: pw.Text(
-                'Top Customer Sale Report',
+                'Top Agent Sale Report',
                 style: pw.TextStyle(
                   fontSize: 24,
                   fontWeight: pw.FontWeight.bold,
@@ -143,14 +140,14 @@ class CustomerReportController extends GetxController {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'Active Customers',
+          'Active Agents',
           style: pw.TextStyle(
             fontSize: 18,
             fontWeight: pw.FontWeight.bold,
           ),
         ),
         pw.SizedBox(height: 10),
-        ...activeCustomers.map((customer) => _buildCustomerRow(customer)),
+        ...activeAgents.map((customer) => _buildAgentRow(customer)),
       ],
     );
   }
@@ -167,12 +164,12 @@ class CustomerReportController extends GetxController {
           ),
         ),
         pw.SizedBox(height: 10),
-        ...zeroSaleCustomers.map((customer) => _buildCustomerRow(customer)),
+        ...zeroSaleAgents.map((customer) => _buildAgentRow(customer)),
       ],
     );
   }
 
-  pw.Widget _buildCustomerRow(Customer customer) {
+  pw.Widget _buildAgentRow(Agent agent) {
     final formatter = NumberFormat('#,##0.00');
 
     return pw.Container(
@@ -189,11 +186,11 @@ class CustomerReportController extends GetxController {
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
               pw.Text(
-                'Rank ${customer.rank} - ${customer.name}',
+                'Rank ${agent.rank} - ${agent.name}',
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
               pw.Text(
-                '${customer.percentage.toStringAsFixed(2)}%',
+                '${agent.percentage.toStringAsFixed(2)}%',
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
             ],
@@ -202,16 +199,16 @@ class CustomerReportController extends GetxController {
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              _buildSaleItem('Ticket Sale:', customer.ticket, formatter),
-              _buildSaleItem('Hotel Sale:', customer.hotel, formatter),
+              _buildSaleItem('Ticket Sale:', agent.ticket, formatter),
+              _buildSaleItem('Hotel Sale:', agent.hotel, formatter),
             ],
           ),
           pw.SizedBox(height: 5),
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              _buildSaleItem('Visa Sale:', customer.visa, formatter),
-              _buildSaleItem('Transport Sale:', customer.transport, formatter),
+              _buildSaleItem('Visa Sale:', agent.visa, formatter),
+              _buildSaleItem('Transport Sale:', agent.transport, formatter),
             ],
           ),
           pw.Divider(),
@@ -223,7 +220,7 @@ class CustomerReportController extends GetxController {
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
               pw.Text(
-                'Rs. ${formatter.format(customer.total)}',
+                'Rs. ${formatter.format(agent.total)}',
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               ),
             ],

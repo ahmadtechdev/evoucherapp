@@ -1232,7 +1232,6 @@ String _numberToWords(double number) {
     'Eighty',
     'Ninety'
   ];
-  List<String> scales = ['', 'Thousand', 'Lakh', 'Crore'];
 
   if (number == 0) return 'Zero';
 
