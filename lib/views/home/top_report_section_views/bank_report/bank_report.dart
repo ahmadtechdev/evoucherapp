@@ -33,14 +33,41 @@ class BanksScreen extends StatelessWidget {
                 child: DateSelector(
                   fontSize: 14,
                   vpad: 20,
-                  initialDate: DateTime.now(),
+                  initialDate: controller.selectedDate.value,
                   label: "DATE:",
-                  onDateChanged: (newDate) {},
+                  onDateChanged: (newDate) {
+                    controller.updateDate(newDate);
+                  },
                 ),
               ),
             ],
           ),
-          _buildBanksList(),
+          Obx(() {
+            if (controller.isLoading.value) {
+              // Show loading indicator
+              return const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            } else if (controller.transactions.isEmpty) {
+              // Show "No records found" message
+              return const Expanded(
+                child: Center(
+                  child: Text(
+                    "No records found",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              // Show the transaction list
+              return _buildBanksList();
+            }
+          }),
           _buildSummary(),
         ],
       ),
@@ -51,9 +78,9 @@ class BanksScreen extends StatelessWidget {
     return Expanded(
       child: Obx(() => ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: controller.banks.length,
+            itemCount: controller.transactions.length,
             itemBuilder: (context, index) {
-              final bank = controller.banks[index];
+              final bank = controller.transactions[index];
               return _BankCard(
                 bank: bank,
                 controller: controller,
