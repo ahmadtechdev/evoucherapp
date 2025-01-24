@@ -2,6 +2,7 @@ import 'package:excel/excel.dart';
 // import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../../common/color_extension.dart';
 import '../../../common/drawer.dart';
 import '../../../common_widget/date_selecter.dart';
@@ -24,7 +25,7 @@ class DailyCashBook extends StatelessWidget {
   Future<void> _exportToPDF(BuildContext context) async {
     final pdf = pw.Document();
     // Load the logo
-    final logoImage = await rootBundle.load('assets/img/logo.png');
+    final logoImage = await rootBundle.load('assets/img/newLogo.png');
     final logo = pw.MemoryImage(logoImage.buffer.asUint8List());
 
     // Add logo and company name to the header
@@ -74,13 +75,13 @@ class DailyCashBook extends StatelessWidget {
                 'Balance'
               ],
               ...controller.transactions.map((transaction) => [
-                    transaction.voucherId,
-                    controller.formatDate(transaction.date),
-                    transaction.description,
-                    'Rs ${transaction.debit.toStringAsFixed(2)}',
-                    'Rs ${transaction.credit.toStringAsFixed(2)}',
-                    transaction.balance,
-                  ]),
+                transaction.voucherId,
+                controller.formatDate(transaction.date),
+                transaction.description,
+                'Rs ${transaction.debit.toStringAsFixed(2)}',
+                'Rs ${transaction.credit.toStringAsFixed(2)}',
+                transaction.balance,
+              ]),
             ],
             headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
             cellStyle: const pw.TextStyle(),
@@ -108,73 +109,125 @@ class DailyCashBook extends StatelessWidget {
 
 // Excel Export Method
   Future<void> _exportToExcel(BuildContext context) async {
-    // Create a new Excel file
-    final excel = Excel.createExcel();
-    final sheet = excel['Daily Cash Book'];
+    try {
+      // Request storage permissions (for Android 13+)
+      bool isPermissionGranted = await _requestStoragePermission(context);
+      if (!isPermissionGranted) {
+        return; // Exit if permission is not granted
+      }
+      // Create a new Excel file
+      final excel = Excel.createExcel();
+      final sheet = excel['Daily Cash Book'];
 
-    // Add headers
-    sheet.appendRow([
-      TextCellValue('V#'),
-      TextCellValue('Date'),
-      TextCellValue('Description'),
-      TextCellValue('Debit'),
-      TextCellValue('Credit'),
-      TextCellValue('Balance')
-    ]);
-
-    // Add transaction data
-    for (var transaction in controller.transactions) {
+      // Add headers
       sheet.appendRow([
-        TextCellValue(transaction.voucherId),
-        TextCellValue(controller.formatDate(transaction.date)),
-        TextCellValue(transaction.description),
-        DoubleCellValue(transaction.debit),
-        DoubleCellValue(transaction.credit),
-        TextCellValue(transaction
-            .balance) // Using TextCellValue since balance includes "Dr/Cr"
+        TextCellValue('V#'),
+        TextCellValue('Date'),
+        TextCellValue('Description'),
+        TextCellValue('Debit'),
+        TextCellValue('Credit'),
+        TextCellValue('Balance')
       ]);
-    }
 
-    // Add summary rows
-    sheet.appendRow([]);
-    sheet.appendRow([
-      TextCellValue('Total Receipt'),
-      TextCellValue(controller.totalReceipt.value)
-    ]);
-    sheet.appendRow([
-      TextCellValue('Total Payment'),
-      TextCellValue(controller.totalPayment.value)
-    ]);
-    sheet.appendRow([
-      TextCellValue('Closing Balance'),
-      TextCellValue(controller.closingBalance.value)
-    ]);
+      // Add transaction data
+      for (var transaction in controller.transactions) {
+        sheet.appendRow([
+          TextCellValue(transaction.voucherId),
+          TextCellValue(controller.formatDate(transaction.date)),
+          TextCellValue(transaction.description),
+          DoubleCellValue(transaction.debit),
+          DoubleCellValue(transaction.credit),
+          TextCellValue(transaction
+              .balance) // Using TextCellValue since balance includes "Dr/Cr"
+        ]);
+      }
 
-    // Save the file
-    String downloadsPath = '/storage/emulated/0/Download';
-    String filePath =
-        '$downloadsPath/daily_cash_book_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+      // Add summary rows
+      sheet.appendRow([]);
+      sheet.appendRow([
+        TextCellValue('Total Receipt'),
+        TextCellValue(controller.totalReceipt.value)
+      ]);
+      sheet.appendRow([
+        TextCellValue('Total Payment'),
+        TextCellValue(controller.totalPayment.value)
+      ]);
+      sheet.appendRow([
+        TextCellValue('Closing Balance'),
+        TextCellValue(controller.closingBalance.value)
+      ]);
 
-    List<int>? fileBytes = excel.save();
-    if (fileBytes != null) {
-      try {
+      // Save the file
+      String downloadsPath = '/storage/emulated/0/Download';
+      String filePath =
+          '$downloadsPath/daily_cash_book_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+// Save the Excel file
+      List<int>? fileBytes = excel.save();
+      if (fileBytes != null) {
         File(filePath)
           ..createSync(recursive: true)
           ..writeAsBytesSync(fileBytes);
 
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Excel file exported to $filePath')),
         );
-      } catch (e) {
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving file: ${e.toString()}')),
+          const SnackBar(content: Text('Failed to export Excel file')),
         );
       }
-    } else {
+    } catch (e) {
+      // Handle exceptions
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to export Excel file')),
+        SnackBar(content: Text('Error: ${e.toString()}')),
       );
     }
+  }
+
+  Future<bool> _requestStoragePermission(BuildContext context) async {
+    // Check current permission status for Android 13+ (use manageExternalStorage)
+    PermissionStatus status = await Permission.manageExternalStorage.status;
+
+    if (status.isGranted) {
+      // Permission is already granted
+      return true;
+    } else if (status.isDenied) {
+      // Request permission
+      PermissionStatus newStatus =
+      await Permission.manageExternalStorage.request();
+      if (newStatus.isGranted) {
+        return true;
+      } else if (newStatus.isPermanentlyDenied) {
+        // Show dialog to navigate to app settings
+        _showPermissionDialog(context);
+      }
+    }
+    return false;
+  }
+
+  void _showPermissionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Storage Permission Required'),
+        content: const Text(
+            'This app requires storage permission to export files. Please enable it in app settings.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              openAppSettings(); // Open app settings
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -424,16 +477,16 @@ class DailyCashBook extends StatelessWidget {
                 ],
               ),
               child: Obx(() => Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildTotalItem('Total Receipt',
-                          controller.totalReceipt.value, TColor.secondary),
-                      _buildTotalItem('Total Payment',
-                          controller.totalPayment.value, TColor.third),
-                      _buildTotalItem('Closing Balance',
-                          controller.closingBalance.value, TColor.primary),
-                    ],
-                  )),
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildTotalItem('Total Receipt',
+                      controller.totalReceipt.value, TColor.secondary),
+                  _buildTotalItem('Total Payment',
+                      controller.totalPayment.value, TColor.third),
+                  _buildTotalItem('Closing Balance',
+                      controller.closingBalance.value, TColor.primary),
+                ],
+              )),
             ),
           ],
         ),

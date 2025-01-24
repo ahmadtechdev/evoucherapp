@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../common/color_extension.dart';
 import '../../../common_widget/date_selecter.dart';
 import '../../../common_widget/snackbar.dart';
+import '../../../service/api_service.dart';
 import '../widgets/entry_card.dart';
 import '../controller/entry_controller.dart';
 
@@ -20,7 +21,7 @@ class CashEntryVoucher extends StatefulWidget {
 
 class _CashEntryVoucherState extends State<CashEntryVoucher> {
   DateTime selectedDate = DateTime.now();
-
+  final ApiService apiService = ApiService();
   double totalDebit = 0.0;
   double totalCredit = 0.0;
   final FocusNode _mainFocusNode = FocusNode();
@@ -33,15 +34,10 @@ class _CashEntryVoucherState extends State<CashEntryVoucher> {
     super.initState();
     // Use Get.find instead of Get.put to ensure the controller is already registered
     voucherController = Get.find<VoucherController>();
-
+    // Set voucher type to 'cash'
+    voucherController.voucherType.value = 'cash';
     // Clear any existing entries when the page is first loaded
     voucherController.clearEntries();
-  }
-
-  @override
-  void dispose() {
-    _mainFocusNode.dispose();
-    super.dispose();
   }
 
 
@@ -54,27 +50,22 @@ class _CashEntryVoucherState extends State<CashEntryVoucher> {
       ).show();
       return;
     }
-
-    // Validate total debit and credit balance
-    if (voucherController.totalDebit.value != voucherController.totalCredit.value) {
-      CustomSnackBar(
-          message: 'Total Debit and Total Credit must be equal to save',
-          backgroundColor: TColor.third
-      ).show();
-      return;
+    // For cash voucher, skip the total balance check
+    if (voucherController.voucherType.value != 'cash') {
+      // Validate total debit and credit balance for other voucher types
+      if (voucherController.totalDebit.value != voucherController.totalCredit.value) {
+        CustomSnackBar(
+            message: 'Total Debit and Total Credit must be equal to save',
+            backgroundColor: TColor.third
+        ).show();
+        return;
+      }
     }
 
     setState(() => _isSaving = true);
 
     try {
-      // API Service Implementation
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
 
-      var headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token'
-      };
 
       final payload = {
         "voucher_date": selectedDate.toIso8601String().split('T')[0],
@@ -89,52 +80,54 @@ class _CashEntryVoucherState extends State<CashEntryVoucher> {
         }).toList(),
       };
 
-      var request = http.Request('POST', Uri.parse('https://evoucher.pk/api-new/cashVoucher'));
-      request.body = json.encode(payload);
-      request.headers.addAll(headers);
-
-      http.StreamedResponse response = await request.send();
-
-      // Parse the response
-      final responseBody = await response.stream.bytesToString();
-      final responseData = json.decode(responseBody);
-
+      final response = await apiService.postRequest(
+          endpoint: 'cashVoucher',
+          body: payload
+      );
       // Check for successful response
-      if (response.statusCode == 200) {
-        // Assuming the API returns a status and message
-        if (responseData['status'] == 'success') {
-          CustomSnackBar(
-              message: responseData['message'] ?? 'Voucher saved successfully',
-              backgroundColor: TColor.secondary
-          ).show();
+      if (response['status'] == 'success') {
 
-          // Clear entries after saving
-          voucherController.clearEntries();
-
-          // Navigate back or clear the form
-          Get.back();
-        } else {
-          CustomSnackBar(
-              message: responseData['message'] ?? 'Failed to save voucher',
-              backgroundColor: TColor.third
-          ).show();
-        }
-      } else {
-        // Handle non-200 status codes
+        Get.back();
         CustomSnackBar(
-            message: 'Error: ${responseData['message'] ?? 'Server error'}',
+            message: response['message'] ?? 'Voucher saved successfully',
+            backgroundColor: TColor.secondary
+        ).show();
+
+        // Clear entries after saving
+        voucherController.clearEntries();
+
+      } else {
+        CustomSnackBar(
+            message: response['message'] ?? 'Failed to save voucher',
             backgroundColor: TColor.third
         ).show();
       }
     } catch (e) {
-      // Handle any network or parsing errors
+      // Handle specific exceptions
+      String errorMessage = 'An error occurred';
+      if (e is UnauthorizedException) {
+        errorMessage = 'Unauthorized: Please log in again';
+      } else if (e is NetworkException) {
+        errorMessage = 'Network error: ${e.message}';
+      } else if (e is ServerException) {
+        errorMessage = 'Server error: ${e.message}';
+      }
+
       CustomSnackBar(
-          message: 'Error: ${e.toString()}',
+          message: errorMessage,
           backgroundColor: TColor.third
       ).show();
     } finally {
       setState(() => _isSaving = false);
     }
+  }
+
+  @override
+  void dispose() {
+    // Reset voucher type when leaving the page
+    voucherController.voucherType.value = '';
+    _mainFocusNode.dispose();
+    super.dispose();
   }
 
 
@@ -181,6 +174,7 @@ class _CashEntryVoucherState extends State<CashEntryVoucher> {
                   textFieldColor: TColor.textField,
                   textColor: TColor.white,
                   placeholderColor: TColor.placeholder,
+                  excludeAccountIds: ['101'],
 
                 ),
                 SizedBox(height: screenHeight * 0.02), // 2% of screen height

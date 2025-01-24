@@ -194,8 +194,11 @@ class ViewVisaVoucher extends StatelessWidget {
                           : TColor.primary),
                   onPressed: () {
                     // Get.to(() => const SingleVisaView());
-                    CustomSnackBar(message: "This functionality is currently under development and will be available soon.", backgroundColor: TColor.fourth).show();
-
+                    CustomSnackBar(
+                            message:
+                                "This functionality is currently under development and will be available soon.",
+                            backgroundColor: TColor.fourth)
+                        .show();
                   },
                 ),
               ],
@@ -592,11 +595,9 @@ class ViewVisaVoucher extends StatelessWidget {
 
       // Show error message
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to generate invoice: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
+        CustomSnackBar(
+          message: "Failed to generate invoice: ${e.toString()}",
+          backgroundColor: TColor.third,
         );
       }
     }

@@ -1,5 +1,6 @@
 
 
+import 'package:evoucher_new/common_widget/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -58,6 +59,7 @@ class ReusableEntryCard extends StatefulWidget {
   final bool showAddRowButton;
   final bool showChequeField;
   final List<Map<String, dynamic>>? initialData;
+  final List<String>? excludeAccountIds;
 
   const ReusableEntryCard({
     super.key,
@@ -72,6 +74,7 @@ class ReusableEntryCard extends StatefulWidget {
     this.showAddRowButton = false,
     this.showChequeField = false,
     this.initialData,
+    this.excludeAccountIds,
   });
 
   @override
@@ -200,9 +203,10 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error picking image: $e')),
-          );
+
+          CustomSnackBar(
+            message: "Error picking image: $e"
+          ).show();
         }
       }
     }
@@ -269,16 +273,17 @@ class _ReusableEntryCardState extends State<ReusableEntryCard> {
             const SizedBox(height: 4),
             AccountDropdown(
               initialValue: entry.account,
+              excludeAccountIds: widget.excludeAccountIds, // Pass excluded account IDs
               onChanged: (value) {
                 setState(() {
                   entry.account = value ?? '';
                   voucherController.updateEntryData(
-                    index,
-                    entry.account,
-                    entry.description,
-                    entry.debit,
-                    entry.credit,
-                    entry.cheque
+                      index,
+                      entry.account,
+                      entry.description,
+                      entry.debit,
+                      entry.credit,
+                      entry.cheque
                   );
                 });
               },

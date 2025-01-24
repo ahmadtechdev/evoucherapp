@@ -70,7 +70,7 @@ class _FinanceState extends State<Finance> {
                 title: 'Unposted J Voucher',
                 icon: Icons.pending_actions_outlined,
                 color: TColor.primary,
-                badge: '0',
+                // badge: '0',
                 onTap: () {
                   // Handle Unposted J Voucher tap
                   Get.to(() => const UnPostedJVoucher());
@@ -102,7 +102,7 @@ class _FinanceState extends State<Finance> {
                 title: 'Unposted C Voucher',
                 icon: Icons.pending_actions_outlined,
                 color: TColor.secondary,
-                badge: '0',
+                // badge: '0',
                 onTap: () {
                   // Handle Unposted J Voucher tap
                   Get.to(() => const UnPostedCVoucher());
@@ -134,7 +134,7 @@ class _FinanceState extends State<Finance> {
                 title: 'Unposted E Voucher',
                 icon: Icons.pending_actions_outlined,
                 color: TColor.fourth,
-                badge: '0',
+                // badge: '0',
                 onTap: () {
                   // Handle Unposted J Voucher tap
                   Get.to(() => const UnPostedEVoucher());
@@ -166,7 +166,7 @@ class _FinanceState extends State<Finance> {
                 title: 'Unposted B Voucher',
                 icon: Icons.pending_actions_outlined,
                 color: TColor.secondaryText,
-                badge: '0',
+                // badge: '0',
                 onTap: () {
                   // Handle Unposted J Voucher tap
                   Get.to(() => const UnpostedBVoucher());

@@ -9,8 +9,10 @@ class AccountsRepository {
   AccountsRepository({required this.api});
 
   Future<List<AccountModel>> getAccounts({String? subheadName}) async {
-    final response = await api.postRequest( endpoint: 'fetchAccounts',
-        body: subheadName != null ? {"subhead_name": subheadName} : {});
+    final response = await api.postRequest(
+      endpoint: 'fetchAccounts',
+      body: subheadName != null ? {"subhead_name": subheadName} : {},
+    );
 
     if (response['status'] == 'success' && response['data'] != null) {
       return (response['data'] as List)
@@ -35,6 +37,7 @@ class AccountsController extends GetxController {
   var accounts = <AccountModel>[].obs;
   var filteredAccounts = <AccountModel>[].obs;
   var isLoading = false.obs;
+  var errorMessage = ''.obs;
 
   @override
   void onInit() {
@@ -42,17 +45,30 @@ class AccountsController extends GetxController {
     fetchAccounts();
   }
 
-  Future<void> fetchAccounts({String? subheadName}) async {
+  Future<void> fetchAccounts({String? subheadName, bool silent = false}) async {
     try {
-      isLoading.value = true;
-      final fetchedAccounts =
-          await repository.getAccounts(subheadName: subheadName);
+      // Only set loading to true if not in silent mode
+      if (!silent) {
+        isLoading.value = true;
+        errorMessage.value = ''; // Reset error message
+      }
+
+      final fetchedAccounts = await repository.getAccounts(subheadName: subheadName);
+
       accounts.assignAll(fetchedAccounts);
       filteredAccounts.assignAll(fetchedAccounts);
     } catch (error) {
-      _showErrorSnackbar('Failed to fetch accounts', error.toString());
+      // Set error message
+      errorMessage.value = error.toString();
+
+      // Show error snackbar only if not in silent mode
+      if (!silent) {
+        _showErrorSnackbar('Failed to fetch accounts', error.toString());
+      }
     } finally {
-      isLoading.value = false;
+      if (!silent) {
+        isLoading.value = false;
+      }
     }
   }
 
@@ -74,6 +90,12 @@ class AccountsController extends GetxController {
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.red,
       colorText: Colors.white,
+      duration: const Duration(seconds: 3),
     );
+  }
+
+  // Optional: Method to refresh accounts
+  Future<void> refreshAccounts({String? subheadName}) async {
+    await fetchAccounts(subheadName: subheadName, silent: true);
   }
 }

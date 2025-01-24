@@ -8,7 +8,7 @@ class CustomSnackBar {
 
   CustomSnackBar({
     required this.message,
-    required this.backgroundColor,
+    this.backgroundColor = Colors.red,
     this.duration = const Duration(seconds: 3),
   });
 

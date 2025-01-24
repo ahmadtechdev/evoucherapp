@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../common/color_extension.dart';
 import '../../../common_widget/date_selecter.dart';
 import '../../../common_widget/snackbar.dart';
+import '../../../service/api_service.dart';
 import '../controller/entry_controller.dart';
 import '../widgets/entry_card.dart';
 
@@ -21,7 +22,7 @@ class ExpenseEntryVoucher extends StatefulWidget {
 class _ExpenseEntryVoucherState extends State<ExpenseEntryVoucher> {
   DateTime selectedDate = DateTime.now();
 
-
+  final ApiService apiService = ApiService();
   double totalDebit = 0.0;
   double totalCredit = 0.0;
   final FocusNode _mainFocusNode = FocusNode();
@@ -68,14 +69,7 @@ class _ExpenseEntryVoucherState extends State<ExpenseEntryVoucher> {
     setState(() => _isSaving = true);
 
     try {
-      // API Service Implementation
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
 
-      var headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token'
-      };
 
       final payload = {
         "voucher_date": selectedDate.toIso8601String().split('T')[0],
@@ -90,54 +84,47 @@ class _ExpenseEntryVoucherState extends State<ExpenseEntryVoucher> {
         }).toList(),
       };
 
-      var request = http.Request('POST', Uri.parse('https://evoucher.pk/api-new/expenseVoucher'));
-      request.body = json.encode(payload);
-      request.headers.addAll(headers);
-
-      http.StreamedResponse response = await request.send();
-
-      // Parse the response
-      final responseBody = await response.stream.bytesToString();
-      final responseData = json.decode(responseBody);
-
+      final response = await apiService.postRequest(
+          endpoint: 'expenseVoucher',
+          body: payload
+      );
       // Check for successful response
-      if (response.statusCode == 200) {
-        // Assuming the API returns a status and message
-        if (responseData['status'] == 'success') {
-          CustomSnackBar(
-              message: responseData['message'] ?? 'Voucher saved successfully',
-              backgroundColor: TColor.secondary
-          ).show();
+      if (response['status'] == 'success') {
 
-          // Clear entries after saving
-          voucherController.clearEntries();
-
-          // Navigate back or clear the form
-         Get.back();
-        } else {
-          CustomSnackBar(
-              message: responseData['message'] ?? 'Failed to save voucher',
-              backgroundColor: TColor.third
-          ).show();
-        }
-      } else {
-        // Handle non-200 status codes
+        Get.back();
         CustomSnackBar(
-            message: 'Error: ${responseData['message'] ?? 'Server error'}',
+            message: response['message'] ?? 'Voucher saved successfully',
+            backgroundColor: TColor.secondary
+        ).show();
+
+        // Clear entries after saving
+        voucherController.clearEntries();
+
+      } else {
+        CustomSnackBar(
+            message: response['message'] ?? 'Failed to save voucher',
             backgroundColor: TColor.third
         ).show();
       }
     } catch (e) {
-      // Handle any network or parsing errors
+      // Handle specific exceptions
+      String errorMessage = 'An error occurred';
+      if (e is UnauthorizedException) {
+        errorMessage = 'Unauthorized: Please log in again';
+      } else if (e is NetworkException) {
+        errorMessage = 'Network error: ${e.message}';
+      } else if (e is ServerException) {
+        errorMessage = 'Server error: ${e.message}';
+      }
+
       CustomSnackBar(
-          message: 'Error: ${e.toString()}',
+          message: errorMessage,
           backgroundColor: TColor.third
       ).show();
     } finally {
       setState(() => _isSaving = false);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {

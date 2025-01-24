@@ -5,6 +5,7 @@ import 'package:excel/excel.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../common/color_extension.dart';
@@ -34,7 +35,7 @@ class LedgerScreen extends StatelessWidget {
 
     try {
       // Load the logo
-      final ByteData logoData = await rootBundle.load('assets/img/logo.png');
+      final ByteData logoData = await rootBundle.load('assets/img/newLogo.png');
       final Uint8List logoBytes = logoData.buffer.asUint8List();
       final logo = pw.MemoryImage(logoBytes);
 
@@ -88,14 +89,14 @@ class LedgerScreen extends StatelessWidget {
                   'Balance'
                 ],
                 ...controller.filteredVouchers.map((voucher) => [
-                      voucher.voucher,
-                      DateFormat('dd-MMM-yyyy')
-                          .format(DateTime.parse(voucher.date)),
-                      voucher.description,
-                      voucher.debit.toStringAsFixed(2),
-                      voucher.credit.toStringAsFixed(2),
-                      voucher.balance,
-                    ]),
+                  voucher.voucher,
+                  DateFormat('dd-MMM-yyyy')
+                      .format(DateTime.parse(voucher.date)),
+                  voucher.description,
+                  voucher.debit.toStringAsFixed(2),
+                  voucher.credit.toStringAsFixed(2),
+                  voucher.balance,
+                ]),
               ],
               headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               cellStyle: const pw.TextStyle(),
@@ -130,10 +131,8 @@ class LedgerScreen extends StatelessWidget {
         onLayout: (PdfPageFormat format) async => pdf.save(),
       );
     } catch (e) {
-
-      CustomSnackBar(message: 'Error generating PDF: $e', backgroundColor: TColor.third
-
-      );
+      CustomSnackBar(
+          message: 'Error generating PDF: $e', backgroundColor: TColor.third);
     }
   }
 
@@ -249,7 +248,6 @@ class LedgerScreen extends StatelessWidget {
     );
   }
 
-
   Widget _buildActionButtons(
       BuildContext context, LedgerController controller) {
     return Padding(
@@ -257,9 +255,9 @@ class LedgerScreen extends StatelessWidget {
       child: Row(
         children: [
           _buildActionButton(MdiIcons.microsoftExcel, 'Excel', TColor.primary,
-              () => _exportToExcel(context, controller.filteredVouchers)),
+                  () => _exportToExcel(context, controller.filteredVouchers)),
           _buildActionButton(MdiIcons.printer, 'Print', TColor.third,
-              () => _exportToPDF(context, controller)),
+                  () => _exportToPDF(context, controller)),
           _buildActionButton(MdiIcons.whatsapp, 'Whatsapp', TColor.secondary,
               launchWhatsappWithMobileNumber),
         ],
@@ -267,54 +265,118 @@ class LedgerScreen extends StatelessWidget {
     );
   }
 
-  void _exportToExcel(
+  Future<void> _exportToExcel(
       BuildContext context, List<LedgerVoucher> vouchers) async {
-    // Excel export logic remains the same as in the original file
-    var excel = Excel.createExcel();
-    Sheet sheet = excel['Sheet1'];
+    try {
+      // Request storage permissions (for Android 13+)
+      bool isPermissionGranted = await _requestStoragePermission(context);
+      if (!isPermissionGranted) {
+        return; // Exit if permission is not granted
+      }
 
-    sheet.appendRow([
-      TextCellValue('Voucher'),
-      TextCellValue('Date'),
-      TextCellValue('Description'),
-      TextCellValue('Debit'),
-      TextCellValue('Credit'),
-      TextCellValue('Balance'),
-    ]);
+      // Create a new Excel file
+      final excel = Excel.createExcel();
+      final sheet = excel['Sheet1'];
 
-    for (var voucher in vouchers) {
+      // Add headers
       sheet.appendRow([
-        TextCellValue(voucher.voucher),
-        TextCellValue(voucher.date),
-        TextCellValue(voucher.description),
-        DoubleCellValue(voucher.debit),
-        DoubleCellValue(voucher.credit),
-        TextCellValue(voucher.balance),
+        TextCellValue('Voucher'),
+        TextCellValue('Date'),
+        TextCellValue('Description'),
+        TextCellValue('Debit'),
+        TextCellValue('Credit'),
+        TextCellValue('Balance'),
       ]);
-    }
 
-    String downloadsPath = '/storage/emulated/0/Download';
-    String filePath = '$downloadsPath/ledger_$accountId.xlsx';
+      // Add voucher data
+      for (var voucher in vouchers) {
+        sheet.appendRow([
+          TextCellValue(voucher.voucher),
+          TextCellValue(voucher.date),
+          TextCellValue(voucher.description),
+          DoubleCellValue(voucher.debit),
+          DoubleCellValue(voucher.credit),
+          TextCellValue(voucher.balance),
+        ]);
+      }
 
-    List<int>? fileBytes = excel.save();
-    if (fileBytes != null) {
-      File(filePath)
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(fileBytes);
+      // Get the path to the app's download directory
+      String downloadsPath = '/storage/emulated/0/Download';
+      String filePath =
+          '$downloadsPath/ledger${DateTime.now().millisecondsSinceEpoch}.xlsx';
 
+      // Save the Excel file
+      List<int>? fileBytes = excel.save();
+      if (fileBytes != null) {
+        File(filePath)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(fileBytes);
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Excel file exported to $filePath')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to export Excel file')),
+        );
+      }
+    } catch (e) {
+      // Handle exceptions
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Excel file exported to $filePath')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to export Excel file')),
+        SnackBar(content: Text('Error: ${e.toString()}')),
       );
     }
   }
 
+  Future<bool> _requestStoragePermission(BuildContext context) async {
+    // Check current permission status for Android 13+ (use manageExternalStorage)
+    PermissionStatus status = await Permission.manageExternalStorage.status;
+
+    if (status.isGranted) {
+      // Permission is already granted
+      return true;
+    } else if (status.isDenied) {
+      // Request permission
+      PermissionStatus newStatus =
+      await Permission.manageExternalStorage.request();
+      if (newStatus.isGranted) {
+        return true;
+      } else if (newStatus.isPermanentlyDenied) {
+        // Show dialog to navigate to app settings
+        _showPermissionDialog(context);
+      }
+    }
+    return false;
+  }
+
+  void _showPermissionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Storage Permission Required'),
+        content: const Text(
+            'This app requires storage permission to export files. Please enable it in app settings.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              openAppSettings(); // Open app settings
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> launchWhatsappWithMobileNumber() async {
     String message = "Journey Online Message";
-    String mobileNumber = "923027253781";
+    String mobileNumber = "923100007901";
     final url = "https://wa.me/$mobileNumber?text=$message";
     if (await canLaunchUrl(Uri.parse(Uri.encodeFull(url)))) {
       await launchUrl(Uri.parse(Uri.encodeFull(url)));
@@ -385,7 +447,7 @@ class LedgerScreen extends StatelessWidget {
                       DateFormat('dd MMM yyyy')
                           .format(DateTime.parse(voucher.date)),
                       style:
-                          TextStyle(color: TColor.secondaryText, fontSize: 12),
+                      TextStyle(color: TColor.secondaryText, fontSize: 12),
                     ),
                   ],
                 ),
