@@ -21,7 +21,7 @@ class DailyActivityReport extends StatelessWidget {
   Future<void> _exportToPDF(BuildContext context) async {
     try {
       final pdf = pw.Document();
-      final logoImage = await rootBundle.load('assets/img/logo.png');
+      final logoImage = await rootBundle.load('assets/img/newLogo.png');
       final logo = pw.MemoryImage(logoImage.buffer.asUint8List());
 
       pdf.addPage(

@@ -2,6 +2,7 @@ import 'package:excel/excel.dart';
 // import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../common/color_extension.dart';
 import '../../../common/drawer.dart';
@@ -115,6 +116,15 @@ class DailyCashBook extends StatelessWidget {
       if (!isPermissionGranted) {
         return; // Exit if permission is not granted
       }
+
+      // Check if transactions are available
+      if (controller.transactions.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No data available to export')),
+        );
+        return;
+      }
+
       // Create a new Excel file
       final excel = Excel.createExcel();
       final sheet = excel['Daily Cash Book'];
@@ -131,19 +141,25 @@ class DailyCashBook extends StatelessWidget {
 
       // Add transaction data
       for (var transaction in controller.transactions) {
+        print("ahk");
+        print(transaction.voucherId);
         sheet.appendRow([
           TextCellValue(transaction.voucherId),
           TextCellValue(controller.formatDate(transaction.date)),
           TextCellValue(transaction.description),
           DoubleCellValue(transaction.debit),
           DoubleCellValue(transaction.credit),
-          TextCellValue(transaction
-              .balance) // Using TextCellValue since balance includes "Dr/Cr"
+          TextCellValue(transaction.balance)
         ]);
       }
-
+print("Ahmad");
+      print(controller.openingBalance.value);
       // Add summary rows
-      sheet.appendRow([]);
+      sheet.appendRow([]); // Empty row for separation
+      sheet.appendRow([
+        TextCellValue('Opening Balance'),
+        TextCellValue(controller.openingBalance.value)
+      ]);
       sheet.appendRow([
         TextCellValue('Total Receipt'),
         TextCellValue(controller.totalReceipt.value)
@@ -157,11 +173,12 @@ class DailyCashBook extends StatelessWidget {
         TextCellValue(controller.closingBalance.value)
       ]);
 
-      // Save the file
+      // Generate file path
       String downloadsPath = '/storage/emulated/0/Download';
-      String filePath =
-          '$downloadsPath/daily_cash_book_${DateTime.now().millisecondsSinceEpoch}.xlsx';
-// Save the Excel file
+      String formattedDate = DateFormat('yyyyMMdd').format(controller.selectedDate.value);
+      String filePath = '$downloadsPath/daily_cash_book_$formattedDate.xlsx';
+
+      // Save the Excel file
       List<int>? fileBytes = excel.save();
       if (fileBytes != null) {
         File(filePath)
@@ -170,21 +187,29 @@ class DailyCashBook extends StatelessWidget {
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Excel file exported to $filePath')),
+          SnackBar(
+            content: Text('Excel file exported to $filePath'),
+            backgroundColor: Colors.green,
+          ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to export Excel file')),
+          const SnackBar(
+            content: Text('Failed to export Excel file'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } catch (e) {
       // Handle exceptions
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
-
   Future<bool> _requestStoragePermission(BuildContext context) async {
     // Check current permission status for Android 13+ (use manageExternalStorage)
     PermissionStatus status = await Permission.manageExternalStorage.status;
