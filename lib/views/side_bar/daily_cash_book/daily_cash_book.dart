@@ -328,10 +328,11 @@ print("Ahmad");
                     ],
                   ),
                   SearchTextField(
-                      hintText: "Search",
+                      hintText: "Search by Description",
                       onChange: (query) {
-                        // Implement search functionality
-                      }),
+                        controller.updateSearchQuery(query);
+                      }
+                  ),
                 ],
               ),
             ),
@@ -342,7 +343,7 @@ print("Ahmad");
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                if (controller.transactions.isEmpty) {
+                if (controller.filteredTransactions.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -354,7 +355,9 @@ print("Ahmad");
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No Record Found',
+                          controller.searchQuery.value.isNotEmpty
+                              ? 'No matching records found'
+                              : 'No Record Found',
                           style: TextStyle(
                             color: TColor.secondaryText,
                             fontSize: 16,
@@ -367,9 +370,9 @@ print("Ahmad");
                 }
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: controller.transactions.length,
+                  itemCount: controller.filteredTransactions.length,
                   itemBuilder: (context, index) {
-                    final transaction = controller.transactions[index];
+                    final transaction = controller.filteredTransactions[index];
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(

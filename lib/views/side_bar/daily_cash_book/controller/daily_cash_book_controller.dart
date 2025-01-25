@@ -4,25 +4,59 @@ import 'package:intl/intl.dart';
 import '../../../../service/api_service.dart';
 import '../models/daily_cash_book_model.dart';
 
-// daily_cash_book_controller.dart
 class DailyCashBookController extends GetxController {
   final ApiService _apiService = Get.put(ApiService());
   var selectedDate = DateTime.now().obs;
   var transactions = <DailyCashBookModel>[].obs;
+  var filteredTransactions = <DailyCashBookModel>[].obs;
   var isLoading = false.obs;
   var openingBalance = ''.obs;
   var totalReceipt = ''.obs;
   var totalPayment = ''.obs;
   var closingBalance = ''.obs;
+  var searchQuery = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchDailyCashBook();
+
+    // Listen to search query changes
+    ever(searchQuery, (_) => _filterTransactions());
   }
 
   String formatDate(DateTime date) {
     return DateFormat('dd MMM yyyy').format(date);
+  }
+
+  void _filterTransactions() {
+    if (searchQuery.value.isEmpty) {
+      filteredTransactions.value = transactions.value;
+    } else {
+      filteredTransactions.value = transactions.value.where((transaction) {
+        return transaction.description
+            .toLowerCase()
+            .contains(searchQuery.value.toLowerCase());
+      }).toList();
+    }
+
+    // Update summary values based on filtered transactions
+    _updateSummaryValues();
+  }
+
+  void _updateSummaryValues() {
+    // Recalculate summary values based on filtered transactions
+    double totalRcpt = filteredTransactions.fold(0, (sum, transaction) => sum + transaction.credit);
+    double totalPymt = filteredTransactions.fold(0, (sum, transaction) => sum + transaction.debit);
+
+    totalReceipt.value = totalRcpt.toStringAsFixed(2);
+    totalPayment.value = totalPymt.toStringAsFixed(2);
+    // You might want to adjust closing balance calculation based on your business logic
+    closingBalance.value = (totalRcpt - totalPymt).toStringAsFixed(2);
+  }
+
+  void updateSearchQuery(String query) {
+    searchQuery.value = query;
   }
 
   Future<void> fetchDailyCashBook() async {
@@ -45,6 +79,9 @@ class DailyCashBookController extends GetxController {
         transactions.value = data
             .map((item) => DailyCashBookModel.fromJson(item))
             .toList();
+
+        // Initialize filtered transactions with all transactions
+        filteredTransactions.value = transactions.value;
       }
     } catch (e) {
       Get.snackbar(
@@ -61,5 +98,6 @@ class DailyCashBookController extends GetxController {
   void onDateChanged(DateTime newDate) {
     selectedDate.value = newDate;
     fetchDailyCashBook();
+    searchQuery.value = ''; // Reset search query
   }
 }
