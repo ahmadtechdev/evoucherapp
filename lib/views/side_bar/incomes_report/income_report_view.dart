@@ -27,6 +27,33 @@ class IncomesComparisonReport extends GetView<IncomesReportController> {
           _buildDateSelectors(),
           Expanded(
             child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (controller.incomeData.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.hourglass_empty,
+                        size: 50,
+                        color: TColor.secondaryText,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No Record Found',
+                        style: TextStyle(
+                          color: TColor.secondaryText,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
               final months = controller.getMonthsBetween();
               return ListView.builder(
                 padding: const EdgeInsets.all(16),
@@ -61,35 +88,35 @@ class IncomesComparisonReport extends GetView<IncomesReportController> {
             children: [
               Expanded(
                 child: Obx(() => DateSelector2(
-                      label: 'From Month',
-                      fontSize: 12,
-                      initialDate: controller.fromDate.value,
-                      selectMonthOnly: true,
-                      onDateChanged: controller.updateFromDate,
-                    )),
+                  label: 'From Month',
+                  fontSize: 12,
+                  initialDate: controller.fromDate.value,
+                  selectMonthOnly: true,
+                  onDateChanged: controller.updateFromDate,
+                )),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Obx(() => DateSelector2(
-                      label: 'To Month',
-                      fontSize: 12,
-                      initialDate: controller.toDate.value,
-                      selectMonthOnly: true,
-                      onDateChanged: controller.updateToDate,
-                    )),
+                  label: 'To Month',
+                  fontSize: 12,
+                  initialDate: controller.toDate.value,
+                  selectMonthOnly: true,
+                  onDateChanged: controller.updateToDate,
+                )),
               ),
             ],
           ),
           const SizedBox(height: 16),
           Obx(() => Text(
-                controller.errorMessage.isNotEmpty
-                    ? controller.errorMessage.value
-                    : 'From ${DateFormat('MMM yyyy').format(controller.fromDate.value)} To ${DateFormat('MMM yyyy').format(controller.toDate.value)}',
-                style: TextStyle(
-                  color: TColor.primaryText,
-                  fontWeight: FontWeight.w500,
-                ),
-              )),
+            controller.errorMessage.isNotEmpty
+                ? controller.errorMessage.value
+                : 'From ${DateFormat('MMM yyyy').format(controller.fromDate.value)} To ${DateFormat('MMM yyyy').format(controller.toDate.value)}',
+            style: TextStyle(
+              color: TColor.primaryText,
+              fontWeight: FontWeight.w500,
+            ),
+          )),
         ],
       ),
     );
@@ -128,7 +155,7 @@ class IncomesComparisonReport extends GetView<IncomesReportController> {
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 childAspectRatio:
-                    0.9, // Changed from 1.2 to 1.0 for more height
+                0.9, // Changed from 1.2 to 1.0 for more height
                 crossAxisSpacing: 12, // Increased spacing
                 mainAxisSpacing: 12,
               ),

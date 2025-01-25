@@ -23,12 +23,12 @@ class AccountTypeExpansionTile extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(
-              icon: Icon(Icons.add, color: TColor.primary),
-              onPressed: () {
-                // Add your onPressed functionality here
-              },
-            ),
+            // IconButton(
+            //   icon: Icon(Icons.add, color: TColor.primary),
+            //   onPressed: () {
+            //     // Add your onPressed functionality here
+            //   },
+            // ),
             // This is the default expansion arrow icon
             const RotationTransition(
               turns: AlwaysStoppedAnimation(0.0),
@@ -44,14 +44,13 @@ class AccountTypeExpansionTile extends StatelessWidget {
             fontSize: 15,
           ),
         ),
-
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
-              children: accountType.accounts.map((account) =>
-                  AccountCard(account: account)
-              ).toList(),
+              children: accountType.accounts
+                  .map((account) => AccountCard(account: account))
+                  .toList(),
             ),
           ),
         ],

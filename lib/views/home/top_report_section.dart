@@ -4,6 +4,7 @@ import 'package:evoucher_new/views/home/top_report_section_views/bank_report/ban
 import 'package:evoucher_new/views/home/top_report_section_views/bsp_report/bsp_report.dart';
 import 'package:evoucher_new/views/home/top_report_section_views/customer_report/customer_report.dart';
 import 'package:evoucher_new/views/home/top_report_section_views/visa_hotel_report/visa_hotel_report.dart';
+import 'package:evoucher_new/views/side_bar/accounts/accounts/accounts.dart';
 import 'package:evoucher_new/views/side_bar/top_agent_report/top_agent_sale.dart';
 import 'package:evoucher_new/views/side_bar/top_customer_sale/top_customer_sale.dart';
 import 'package:evoucher_new/views/side_bar/top_suuplier_report/top_supplier_sale.dart';
@@ -61,6 +62,15 @@ class _ReportSectionState extends State<ReportSection> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
+                _dashboardItem(
+                  Icons.person,
+                  'Ledger',
+                  'Report',
+                      () {
+                    Get.to(() => const Accounts());
+                    // Handle onTap for CUSTOMERS
+                  },
+                ),
                 _dashboardItem(
                   Icons.people,
                   'CUSTOMERS',

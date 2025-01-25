@@ -29,19 +29,56 @@ class DailyCashActivity extends StatelessWidget {
         title: const Text('Daily Cash Activity'),
       ),
       drawer: const CustomDrawer(currentIndex: 5),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDateSelector(controller, context),
-            _buildDateDisplay(controller),
-            _buildSummaryGrid(),
-            Obx(() => _buildSection('Cash Received', TColor.secondary,
-                controller.receivedTransactions)),
-            Obx(() => _buildSection(
-                'Cash Paid', TColor.third, controller.paidTransactions)),
-          ],
-        ),
+      body: Column(
+        children: [
+          _buildDateSelector(controller, context),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () => controller.loadTransactions(),
+              child: SingleChildScrollView(
+                child: Obx(() {
+                  // Show loading indicator while fetching data
+                  if (controller.isLoading.value) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 50),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              color: TColor.primary,
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              'Loading Transactions...',
+                              style: TextStyle(
+                                color: TColor.primaryText,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  // Show transactions when data is loaded
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDateDisplay(controller),
+                      _buildSummaryGrid(),
+                      Obx(() => _buildSection('Cash Received', TColor.secondary,
+                          controller.receivedTransactions)),
+                      Obx(() => _buildSection('Cash Paid', TColor.third,
+                          controller.paidTransactions)),
+                    ],
+                  );
+                }),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

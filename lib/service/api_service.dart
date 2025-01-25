@@ -18,7 +18,7 @@ class ApiService extends GetxController {
   Future<Map<String, dynamic>> postRequest({
     required String endpoint,
     required Map<String, dynamic> body,
-    Duration timeout = const Duration(seconds: 90),
+    Duration timeout = const Duration(seconds: 300),
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';

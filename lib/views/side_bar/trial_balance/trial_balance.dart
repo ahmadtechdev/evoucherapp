@@ -95,7 +95,7 @@ class TrialOfBalanceScreen extends StatelessWidget {
               'Total Debit',
               totalDebit.toStringAsFixed(2),
               Icons.arrow_upward,
-              TColor.third,
+              TColor.secondary,
             ),
             Container(
               height: 40,
@@ -106,7 +106,7 @@ class TrialOfBalanceScreen extends StatelessWidget {
               'Total Credit',
               totalCredit.toStringAsFixed(2),
               Icons.arrow_downward,
-              TColor.fourth,
+              TColor.third,
             ),
           ],
         ),

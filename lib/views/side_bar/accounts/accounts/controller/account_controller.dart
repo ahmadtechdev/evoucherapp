@@ -54,8 +54,10 @@ class AccountsController extends GetxController {
       }
 
       final fetchedAccounts = await repository.getAccounts(subheadName: subheadName);
+      final nonDrCrdAccounts = fetchedAccounts.where((account) => account.debit != '0' || account.credit != '0').toList();
 
-      accounts.assignAll(fetchedAccounts);
+
+      accounts.assignAll(nonDrCrdAccounts);
       filteredAccounts.assignAll(fetchedAccounts);
     } catch (error) {
       // Set error message

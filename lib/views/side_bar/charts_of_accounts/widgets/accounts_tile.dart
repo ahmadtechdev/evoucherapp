@@ -103,7 +103,7 @@ class AccountCard extends StatelessWidget {
                       Text(
                         'Dr: ${account.openingDebit.toStringAsFixed(2)}',
                         style: TextStyle(
-                          color: TColor.third,
+                          color: TColor.secondary,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
@@ -123,7 +123,7 @@ class AccountCard extends StatelessWidget {
                       Text(
                         'Cr: ${account.openingCredit.toStringAsFixed(2)}',
                         style: TextStyle(
-                          color: TColor.fourth,
+                          color: TColor.third,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),

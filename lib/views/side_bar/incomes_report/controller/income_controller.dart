@@ -1,11 +1,11 @@
-// controllers/incomes_report_controller.dart
+
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../service/api_service.dart';
 
 class IncomesReportController extends GetxController {
-  final ApiService _apiService = Get.put(ApiService());
+  final ApiService _apiService = ApiService();
   final Rx<DateTime> fromDate = DateTime.now().obs;
   final Rx<DateTime> toDate = DateTime.now().obs;
 
@@ -29,8 +29,18 @@ class IncomesReportController extends GetxController {
       String fromDateStr = DateFormat('yyyy-MM-dd').format(fromDate.value);
       String toDateStr = DateFormat('yyyy-MM-dd').format(toDate.value);
 
-      // Make API request
-      final response = await _apiService.fetchDateRangeReport(endpoint: "incomesReport", fromDate: fromDateStr, toDate: toDateStr);
+      // Prepare the request body
+      final requestBody = {
+        "fromDate": fromDateStr,
+        "toDate": toDateStr,
+        // Add any additional parameters if required by your API
+      };
+
+      // Make API request using postRequest
+      final response = await _apiService.postRequest(
+        endpoint: "incomesReport",
+        body: requestBody,
+      );
 
       if (response['status'] == 'success') {
         incomeData.value = response['data'];

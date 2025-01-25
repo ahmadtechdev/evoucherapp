@@ -40,7 +40,7 @@ class TotalSection extends StatelessWidget {
               Text(
                 totalDebit.toStringAsFixed(2),
                 style: TextStyle(
-                  color: TColor.third,
+                  color: TColor.secondary,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -60,7 +60,7 @@ class TotalSection extends StatelessWidget {
               Text(
                 totalCredit.toStringAsFixed(2),
                 style: TextStyle(
-                  color: TColor.fourth,
+                  color: TColor.third,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),

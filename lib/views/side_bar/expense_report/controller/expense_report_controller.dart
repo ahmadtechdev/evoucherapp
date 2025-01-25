@@ -1,3 +1,4 @@
+
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../../../../service/api_service.dart';
@@ -9,7 +10,7 @@ class ExpenseReportController extends GetxController {
   final toDate = DateTime(2024, 12).obs;
   final expenseItems = <ExpenseItemModel>[].obs;
   final isLoading = true.obs;
-  final apiService = ApiService();
+  final ApiService apiService = ApiService();
   final monthlyTotals = <Map<String, dynamic>>[].obs;
 
   @override
@@ -29,8 +30,18 @@ class ExpenseReportController extends GetxController {
       String fromDateStr = DateFormat('yyyy-MM-dd').format(fromDate.value);
       String toDateStr = DateFormat('yyyy-MM-dd').format(toDate.value);
 
-      // Make API call
-      final response = await apiService.fetchDateRangeReport(endpoint: 'expensesReport',fromDate: fromDateStr, toDate: toDateStr);
+      // Prepare the request body
+      final requestBody = {
+        "fromDate": fromDateStr,
+        "toDate": toDateStr,
+        // Add any additional parameters if required by your API
+      };
+
+      // Make API call using postRequest
+      final response = await apiService.postRequest(
+        endpoint: 'expensesReport',
+        body: requestBody,
+      );
 
       if (response['status'] == 'success') {
         // Parse expense accounts
@@ -48,16 +59,14 @@ class ExpenseReportController extends GetxController {
         // Parse monthly totals
         monthlyTotals.value = (response['data']['monthly_totals'] as List)
             .map((e) => {
-                  'month': e['month'],
-                  'total': e['total'],
-                  'formatted_total': e['formatted_total']
-                })
+          'month': e['month'],
+          'total': e['total'],
+          'formatted_total': e['formatted_total']
+        })
             .toList();
-
-        // Set grand total
       }
     } catch (e) {
-      print('Error fetching expense data: $e');
+      print('Error fetching expense  $e');
       Get.snackbar(
         'Error',
         'Failed to load expense data. Please try again.',
@@ -94,18 +103,8 @@ class ExpenseReportController extends GetxController {
 
   String getMonthName(int month) {
     const monthNames = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
     ];
     return monthNames[month - 1];
   }
