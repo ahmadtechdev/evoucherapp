@@ -67,15 +67,20 @@ class RecoveryListController extends GetxController {
   }
 
   void addRecoveryItem(RecoveryListModel item) {
-    recoveryList.add(item);
+    // recoveryList.add(item);
+    CustomSnackBar(message: "Currently this feature unavailable on mobile. ", backgroundColor: TColor.fourth).show();
   }
 
   void updateRecoveryItem(int index, RecoveryListModel item) {
-    recoveryList[index] = item;
+    // recoveryList[index] = item;
+    CustomSnackBar(message: "Currently this feature unavailable on mobile. ", backgroundColor: TColor.fourth).show();
+
   }
 
   void deleteRecoveryItem(int index) {
-    recoveryList.removeAt(index);
+    // recoveryList.removeAt(index);
+    CustomSnackBar(message: "currently this feature unavailable on mobile. ", backgroundColor: TColor.fourth).show();
+
   }
 
   Future<void> exportToPDF(BuildContext context) async {
@@ -84,7 +89,7 @@ class RecoveryListController extends GetxController {
     final pdf = pw.Document();
 
     // Load the logo
-    final logoImage = await rootBundle.load('assets/img/logo.png');
+    final logoImage = await rootBundle.load('assets/img/newLogo.png');
     final logo = pw.MemoryImage(logoImage.buffer.asUint8List());
 
     pdf.addPage(

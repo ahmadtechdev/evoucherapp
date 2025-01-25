@@ -175,16 +175,16 @@ class DailyActivityReport extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      ElevatedButton(
-                        onPressed: () => controller.fetchDailyActivity(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: TColor.primary,
-                          foregroundColor: TColor.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12),
-                        ),
-                        child: const Text('Submit'),
-                      ),
+                      // ElevatedButton(
+                      //   onPressed: () => controller.fetchDailyActivity(),
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: TColor.primary,
+                      //     foregroundColor: TColor.white,
+                      //     padding: const EdgeInsets.symmetric(
+                      //         horizontal: 24, vertical: 12),
+                      //   ),
+                      //   child: const Text('Submit'),
+                      // ),
                       ElevatedButton.icon(
                         onPressed: () => _exportToPDF(context),
                         icon: const Icon(Icons.print),

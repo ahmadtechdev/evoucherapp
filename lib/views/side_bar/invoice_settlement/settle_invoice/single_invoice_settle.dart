@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../../common/color_extension.dart';
 import '../../../../common_widget/round_text_field.dart';
+import '../../../../common_widget/snackbar.dart';
 import 'controller/settle_invoice_controller.dart';
 
 class SingleInvoiceSettlementPage extends StatelessWidget {
@@ -421,6 +422,8 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   // Handle settlement logic
+                  CustomSnackBar(message: "Settle feature currently unavailable on mobile. ", backgroundColor: TColor.fourth).show();
+
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: TColor.secondary,

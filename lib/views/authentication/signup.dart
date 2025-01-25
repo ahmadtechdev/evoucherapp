@@ -139,7 +139,7 @@ class _SignUpViewState extends State<SignUpView> {
                         RoundButton(
                             title: "Sign Up",
                             onPressed: () {
-                              CustomSnackBar(message: "Sign-up is currently unavailable on mobile. ", backgroundColor: TColor.fourth).show();
+                              CustomSnackBar(message: "Sign-up feature currently unavailable on mobile. ", backgroundColor: TColor.fourth).show();
 
                             }),
                         const SizedBox(height: 16),

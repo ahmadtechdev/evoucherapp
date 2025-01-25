@@ -373,18 +373,18 @@ class _CustomDrawerState extends State<CustomDrawer> {
           index: currentIndex++,
           onTap: () => Get.to(() => MonthlyProfitLoss()),
         ),
-        _buildNavigationItem(
-          title: 'Total Monthly Profit Loss',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => TotalMonthlyProfitLoss()),
-        ),
-        _buildNavigationItem(
-          title: 'Total Expenses Report',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => TotalMonthlyExpenses()),
-        ),
+        // _buildNavigationItem(
+        //   title: 'Total Monthly Profit Loss',
+        //   icon: Icons.analytics_rounded,
+        //   index: currentIndex++,
+        //   onTap: () => Get.to(() => TotalMonthlyProfitLoss()),
+        // ),
+        // _buildNavigationItem(
+        //   title: 'Total Expenses Report',
+        //   icon: Icons.analytics_rounded,
+        //   index: currentIndex++,
+        //   onTap: () => Get.to(() => TotalMonthlyExpenses()),
+        // ),
       ]);
 
       items.addAll([

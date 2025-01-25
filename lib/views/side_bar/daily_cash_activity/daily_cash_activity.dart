@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 import '../../../common/color_extension.dart';
 import '../../../common/drawer.dart';
@@ -14,7 +18,7 @@ class DailyCashActivity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DailyCashActivityController controller =
-        Get.put(DailyCashActivityController());
+    Get.put(DailyCashActivityController());
 
     return Scaffold(
       backgroundColor: TColor.white,
@@ -36,7 +40,6 @@ class DailyCashActivity extends StatelessWidget {
                 controller.receivedTransactions)),
             Obx(() => _buildSection(
                 'Cash Paid', TColor.third, controller.paidTransactions)),
-            // _buildTotalSummary(controller),
           ],
         ),
       ),
@@ -67,7 +70,7 @@ class DailyCashActivity extends StatelessWidget {
             ),
           ),
           ElevatedButton.icon(
-            onPressed: () => controller.printReport(),
+            onPressed: () => _exportToPDF(context),
             icon: const Icon(Icons.print, color: Colors.white),
             label: const Text('Print Report',
                 style: TextStyle(color: Colors.white)),
@@ -80,6 +83,121 @@ class DailyCashActivity extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _exportToPDF(BuildContext context) async {
+    final DailyCashActivityController controller = Get.find();
+    final pdf = pw.Document();
+
+    // Load the logo
+    final logoImage = await rootBundle.load('assets/img/newLogo.png');
+    final logo = pw.MemoryImage(logoImage.buffer.asUint8List());
+
+    pdf.addPage(
+      pw.MultiPage(
+        header: (context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Image(logo, width: 100, height: 100),
+                pw.Text(
+                  'Journey Online',
+                  style: pw.TextStyle(
+                    fontSize: 24,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            pw.Divider(),
+            pw.Text(
+              'Daily Cash Book Report',
+              style: pw.TextStyle(
+                fontSize: 18,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
+            pw.Text(
+              'Date: ${DateFormat('E, dd MMM yyyy').format(controller.selectedDate.value)}',
+              style: const pw.TextStyle(fontSize: 14),
+            ),
+            pw.SizedBox(height: 20),
+          ],
+        ),
+        build: (context) => [
+          // Cash Received Section
+          pw.Text(
+            'Cash Received',
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+          pw.TableHelper.fromTextArray(
+            context: context,
+            data: <List<String>>[
+              <String>['V#', 'Account', 'Description', 'Amount'],
+              ...controller.receivedTransactions.map((transaction) => [
+                transaction.vNumber,
+                transaction.account,
+                transaction.description,
+                'Rs. ${transaction.amount}',
+              ]),
+            ],
+            headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+            headerAlignment: pw.Alignment.centerLeft,
+            cellAlignment: pw.Alignment.centerLeft,
+          ),
+          pw.SizedBox(height: 20),
+
+          // Cash Paid Section
+          pw.Text(
+            'Cash Paid',
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+          pw.TableHelper.fromTextArray(
+            context: context,
+            data: <List<String>>[
+              <String>['V#', 'Account', 'Description', 'Amount'],
+              ...controller.paidTransactions.map((transaction) => [
+                transaction.vNumber,
+                transaction.account,
+                transaction.description,
+                'Rs. ${transaction.amount}',
+              ]),
+            ],
+            headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+            headerAlignment: pw.Alignment.centerLeft,
+            cellAlignment: pw.Alignment.centerLeft,
+          ),
+          pw.SizedBox(height: 20),
+
+          // Summary
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+            children: [
+              pw.Text('Opening Balance: ${controller.openingBalance.value}'),
+              pw.Text(
+                  'Total Cash Received: Rs. ${controller.totalReceivedAmount.value}'),
+              pw.Text(
+                  'Total Cash Paid: Rs. ${controller.totalPaidAmount.value}'),
+              pw.Text(
+                  'Closing Balance: ${controller.closingBalanceAmount.value}'),
+            ],
+          ),
+        ],
+      ),
+    );
+
+    // Save and print the PDF
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
     );
   }
 
@@ -98,40 +216,40 @@ class DailyCashActivity extends StatelessWidget {
 
   Widget _buildSummaryGrid() {
     final DailyCashActivityController controller =
-        Get.put(DailyCashActivityController());
+    Get.put(DailyCashActivityController());
     return Obx(() => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.5,
-            children: [
-              _buildSummaryCard(
-                  'Opening Balance',
-                  controller.openingBalance.value,
-                  TColor.primary,
-                  Icons.account_balance),
-              _buildSummaryCard(
-                  'Total Cash Received',
-                  'Rs. ${controller.totalReceivedAmount.value}',
-                  TColor.secondary,
-                  Icons.arrow_downward),
-              _buildSummaryCard(
-                  'Total Cash Paid',
-                  'Rs. ${controller.totalPaidAmount.value}',
-                  TColor.third,
-                  Icons.arrow_upward),
-              _buildSummaryCard(
-                  'Closing Balance',
-                  controller.closingBalanceAmount.value,
-                  TColor.fourth,
-                  Icons.account_balance_wallet),
-            ],
-          ),
-        ));
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 1.5,
+        children: [
+          _buildSummaryCard(
+              'Opening Balance',
+              controller.openingBalance.value,
+              TColor.primary,
+              Icons.account_balance),
+          _buildSummaryCard(
+              'Total Cash Received',
+              'Rs. ${controller.totalReceivedAmount.value}',
+              TColor.secondary,
+              Icons.arrow_downward),
+          _buildSummaryCard(
+              'Total Cash Paid',
+              'Rs. ${controller.totalPaidAmount.value}',
+              TColor.third,
+              Icons.arrow_upward),
+          _buildSummaryCard(
+              'Closing Balance',
+              controller.closingBalanceAmount.value,
+              TColor.fourth,
+              Icons.account_balance_wallet),
+        ],
+      ),
+    ));
   }
 
   Widget _buildSummaryCard(
@@ -239,7 +357,7 @@ class DailyCashActivity extends StatelessWidget {
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -297,54 +415,6 @@ class DailyCashActivity extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-// Widget _buildTotalSummary(DailyCashActivityController controller) {
-  //   return Container(
-  //     margin: const EdgeInsets.all(16),
-  //     padding: const EdgeInsets.all(16),
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(12),
-  //       boxShadow: [
-  //         BoxShadow(
-  //           color: Colors.black.withOpacity(0.1),
-  //           blurRadius: 8,
-  //           offset: const Offset(0, 2),
-  //         ),
-  //       ],
-  //     ),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-  //       children: [
-  //         _buildTotalItem('Total Received', '${controller.totalReceived}', TColor.secondary),
-  //         _buildTotalItem('Total Paid', '${controller.totalPaid}', TColor.third),
-  //         _buildTotalItem('Closing Balance', '${controller.closingBalance}', TColor.fourth),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  Widget _buildTotalItem(String label, String value, Color color) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: TColor.secondaryText,
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            color: color,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
     );
   }
 }

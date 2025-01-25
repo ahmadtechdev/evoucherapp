@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -5,6 +6,7 @@ import '../../common/color_extension.dart';
 import '../../common/drawer.dart';
 import '../../common_widget/bottom_navigation.dart';
 import 'entry_hotel_voucher/entry_hotel_voucher.dart';
+import 'hotel_sale_register/hotel_sale_register.dart';
 import 'view_hotel_voucher/view_hotel_voucher.dart';
 
 class Hotel extends StatefulWidget {
@@ -49,40 +51,48 @@ class _HotelState extends State<Hotel> {
         ),
       ),
       drawer: const CustomDrawer(currentIndex: 0),
-      body: Container(
-        width: media.width,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              TColor.white,
-              TColor.primary.withOpacity(0.05),
+      body: SingleChildScrollView(
+        child: Container(
+          width: media.width,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                TColor.white,
+                TColor.primary.withOpacity(0.05),
+              ],
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 30),
+              _buildVoucherOptions([
+                VoucherOption(
+                  title: 'Entry Hotel Voucher',
+                  subtitle: 'Create a new hotel voucher entry',
+                  icon: Icons.add_circle_outline,
+                  color: TColor.primary,
+                  onTap: () => Get.to(() => const EntryHotelVoucher()),
+                ),
+                VoucherOption(
+                  title: 'View Hotel Voucher',
+                  subtitle: 'Check existing voucher details',
+                  icon: Icons.visibility_outlined,
+                  color: TColor.primary,
+                  onTap: () => Get.to(() => ViewHotelVoucher()),
+                ),
+                VoucherOption(
+                  title: 'Hotel Register View',
+                  subtitle: 'Register view details',
+                  icon: Icons.app_registration,
+                  color: TColor.primary,
+                  onTap: () => Get.to(() => HotelSaleRegisterScreen()),
+                ),
+              ]),
             ],
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // _buildSectionTitle('Journal Voucher'),
-            const SizedBox(height: 30),
-            _buildVoucherOptions([
-              VoucherOption(
-                title: 'Entry Hotel Voucher',
-                subtitle: 'Create a new hotel voucher entry',
-                icon: Icons.add_circle_outline,
-                color: TColor.primary,
-                onTap: () => Get.to(() => const EntryHotelVoucher()),
-              ),
-              VoucherOption(
-                title: 'View Hotel Voucher',
-                subtitle: 'Check existing voucher details',
-                icon: Icons.visibility_outlined,
-                color: TColor.primary,
-                onTap: () => Get.to(() => ViewHotelVoucher()),
-              ),
-            ]),
-          ],
         ),
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(
@@ -90,8 +100,6 @@ class _HotelState extends State<Hotel> {
       ),
     );
   }
-
-
 
   Widget _buildVoucherOptions(List<VoucherOption> options) {
     return Padding(
