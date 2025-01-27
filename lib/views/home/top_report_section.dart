@@ -64,7 +64,7 @@ class _ReportSectionState extends State<ReportSection> {
               children: [
                 _dashboardItem(
                   Icons.person,
-                  'Ledger',
+                  'LEDGER',
                   'Report',
                       () {
                     Get.to(() => const Accounts());

@@ -1,10 +1,15 @@
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../common/color_extension.dart';
 import '../../common/drawer.dart';
 import '../../common_widget/bottom_navigation.dart';
+
 import 'entry_ticket_voucher/entry_ticket_voucher.dart';
+
+import 'ticket_sale_register/ticket_sale_register.dart';
+
 import 'view_ticket_voucher/view_ticket_voucher.dart';
 
 class Ticket extends StatefulWidget {
@@ -32,7 +37,7 @@ class _TicketState extends State<Ticket> {
         ),
         centerTitle: true,
         backgroundColor: TColor.white,
-        elevation: 2,
+        elevation: 0,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(4.0),
           child: Container(
@@ -49,40 +54,48 @@ class _TicketState extends State<Ticket> {
         ),
       ),
       drawer: const CustomDrawer(currentIndex: 0),
-      body: Container(
-        width: media.width,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              TColor.white,
-              TColor.primary.withOpacity(0.05),
+      body: SingleChildScrollView(
+        child: Container(
+          width: media.width,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                TColor.white,
+                TColor.primary.withOpacity(0.05),
+              ],
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 30),
+              _buildVoucherOptions([
+                VoucherOption(
+                  title: 'Entry Ticket Voucher',
+                  subtitle: 'Create a new ticket voucher entry',
+                  icon: Icons.add_circle_outline,
+                  color: TColor.primary,
+                  onTap: () => Get.to(() => const EntryTicketVoucher()),
+                ),
+                VoucherOption(
+                  title: 'View Ticket Voucher',
+                  subtitle: 'Check existing voucher details',
+                  icon: Icons.visibility_outlined,
+                  color: TColor.primary,
+                  onTap: () => Get.to(() => ViewTicketVoucher()),
+                ),
+                VoucherOption(
+                  title: 'Ticket Sale Register',
+                  subtitle: 'Register view details',
+                  icon: Icons.app_registration,
+                  color: TColor.primary,
+                  onTap: () => Get.to(() =>TicketSaleRegisterScreen()),
+                ),
+              ]),
             ],
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // _buildSectionTitle('Journal Voucher'),
-            const SizedBox(height: 30),
-            _buildVoucherOptions([
-              VoucherOption(
-                title: 'Entry Ticket Voucher',
-                subtitle: 'Create a new ticket voucher entry',
-                icon: Icons.add_circle_outline,
-                color: TColor.primary,
-                onTap: () => Get.to(() => const EntryTicketVoucher()),
-              ),
-              VoucherOption(
-                title: 'View Ticket Voucher',
-                subtitle: 'Check existing voucher details',
-                icon: Icons.visibility_outlined,
-                color: TColor.primary,
-                onTap: () => Get.to(() => ViewTicketVoucher()),
-              ),
-            ]),
-          ],
         ),
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(
@@ -90,8 +103,6 @@ class _TicketState extends State<Ticket> {
       ),
     );
   }
-
-
 
   Widget _buildVoucherOptions(List<VoucherOption> options) {
     return Padding(

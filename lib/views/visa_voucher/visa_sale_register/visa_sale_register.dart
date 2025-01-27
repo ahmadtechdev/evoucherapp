@@ -4,22 +4,22 @@ import 'package:intl/intl.dart';
 
 import '../../../common/color_extension.dart';
 import '../../../common_widget/dart_selector2.dart';
-import 'hotel_sale_register_controller.dart';
+import 'visa_sale_register_controller.dart';
 
-class HotelSaleRegisterScreen extends StatelessWidget {
-  HotelSaleRegisterScreen({super.key}) {
-    Get.put(HotelSaleRegisterController());
+class VisaSaleRegisterScreen extends StatelessWidget {
+  VisaSaleRegisterScreen({super.key}) {
+    Get.put(VisaSaleRegisterController());
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(HotelSaleRegisterController());
+    final controller = Get.put(VisaSaleRegisterController());
 
     return Scaffold(
       backgroundColor: TColor.textField,
       appBar: AppBar(
         title: Text(
-          'Hotel Sale Register',
+          'Visa Sale Register',
           style: TextStyle(color: TColor.white),
         ),
         backgroundColor: TColor.primary,
@@ -31,7 +31,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Date Range Selector with enhanced shadow
+          // Date Range Selector
           Container(
             decoration: BoxDecoration(
               color: TColor.white,
@@ -48,28 +48,28 @@ class HotelSaleRegisterScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: Obx(() => DateSelector2(
-                        fontSize: 14,
-                        initialDate: controller.fromDate.value,
-                        onDateChanged: (DateTime date) {
-                          controller.fromDate.value = date;
-                        },
-                        label: 'From Date',
-                      )),
+                    fontSize: 14,
+                    initialDate: controller.fromDate.value,
+                    onDateChanged: (DateTime date) {
+                      controller.fromDate.value = date;
+                    },
+                    label: 'From Date',
+                  )),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Obx(() => DateSelector2(
-                        fontSize: 14,
-                        initialDate: controller.toDate.value,
-                        onDateChanged: (DateTime date) {
-                          controller.toDate.value = date;
-                        },
-                        label: 'To Date',
-                      )),
+                    fontSize: 14,
+                    initialDate: controller.toDate.value,
+                    onDateChanged: (DateTime date) {
+                      controller.toDate.value = date;
+                    },
+                    label: 'To Date',
+                  )),
                 ),
                 // IconButton(
                 //   icon: Icon(Icons.refresh, color: TColor.primary),
-                //   onPressed: () => controller.fetchHotelSaleRegisterData(),
+                //   onPressed: () => controller.fetchVisaSaleRegisterData(),
                 // ),
               ],
             ),
@@ -94,22 +94,20 @@ class HotelSaleRegisterScreen extends StatelessWidget {
               );
             }
 
-            // Booking List with enhanced scrolling
             return Expanded(
               child: Obx(() => controller.dailyRecords.isEmpty
                   ? Center(
-                      child: Text(
-                      'No records found',
-                      style: TextStyle(color: TColor.secondaryText),
-                    ))
+                  child: Text(
+                    'No records found',
+                    style: TextStyle(color: TColor.secondaryText),
+                  ))
                   : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: controller.dailyRecords.length,
-                      itemBuilder: (context, index) {
-                        return _buildDailyBookingSection(
-                            controller.dailyRecords[index]);
-                      },
-                    )),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: controller.dailyRecords.length,
+                itemBuilder: (context, index) {
+                  return _buildDailySection(controller.dailyRecords[index]);
+                },
+              )),
             );
           }),
         ],
@@ -118,22 +116,21 @@ class HotelSaleRegisterScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDailyBookingSection(dynamic dailyData) {
-    if (dailyData == null || dailyData['tickets'] == null) {
+  Widget _buildDailySection(dynamic dailyData) {
+    if (dailyData == null || dailyData['entries'] == null) {
       return const SizedBox.shrink();
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Enhanced Date Header
+        // Date Header
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: TColor.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -151,19 +148,18 @@ class HotelSaleRegisterScreen extends StatelessWidget {
           ),
         ),
 
-        // Enhanced Daily Summary Card
+        // Daily Summary Card
         _buildDailySummaryCard(dailyData['totals'] ?? {}),
 
-        // Booking Cards
-        ...?dailyData['tickets']
-            ?.map<Widget>((booking) => _buildBookingCard(booking)),
+        // Visa Entry Cards
+        ...?dailyData['entries']?.map<Widget>((entry) => _buildVisaCard(entry)),
 
         const SizedBox(height: 16),
       ],
     );
   }
 
-  Widget _buildBookingCard(dynamic booking) {
+  Widget _buildVisaCard(dynamic entry) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -180,7 +176,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Enhanced Header
+          // Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
@@ -194,7 +190,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    '${booking['voucher_number'] ?? 'N/A'}',
+                    entry['v_number'] ?? 'N/A',
                     style: TextStyle(
                       color: TColor.primary,
                       fontSize: 16,
@@ -203,7 +199,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  booking['conf_number'] ?? 'N/A',
+                  entry['visa_number'] ?? 'N/A',
                   style: TextStyle(
                     color: TColor.secondaryText,
                     fontSize: 14,
@@ -213,45 +209,29 @@ class HotelSaleRegisterScreen extends StatelessWidget {
             ),
           ),
 
-          // Booking Details with improved layout
+          // Visa Details
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildResponsiveDetailRow(
-                    'Voucher ID', booking['voucher_id'] ?? 'N/A'),
-                _buildResponsiveDetailRow(
-                    'Pax Name', booking['pax_name'] ?? 'N/A'),
-                _buildResponsiveDetailRow(
-                    'Customer Account', booking['customer_account'] ?? 'N/A',
-                    isWrappable: true),
-                _buildResponsiveDetailRow(
-                    'Check In', booking['check_in'] ?? 'N/A'),
-                _buildResponsiveDetailRow(
-                    'Check Out', booking['check_out'] ?? 'N/A'),
-                _buildResponsiveDetailRow('Sector', booking['sector'] ?? 'N/A'),
-                _buildResponsiveDetailRow(
-                    'Supplier Account', booking['supplier_account'] ?? 'N/A',
-                    isWrappable: true),
+                _buildDetailRow('Account', entry['account'] ?? 'N/A', isWrappable: true),
+                _buildDetailRow('Visa Type', entry['visa_type'] ?? 'N/A'),
+                _buildDetailRow('Country', entry['country'] ?? 'N/A'),
+                _buildDetailRow('Supplier', entry['supplier'] ?? 'N/A', isWrappable: true),
 
                 const Divider(height: 24),
 
-                // Enhanced Financial Details
-                _buildFinancialRow(
-                    'Buying',
-                    'Rs. ${NumberFormat('#,##0.00').format(double.tryParse(booking['buying_amount']?.toString() ?? '0') ?? 0)}',
+                // Financial Details
+                _buildFinancialRow('Buying',
+                    'Rs. ${NumberFormat('#,##0.00').format(entry['buying'] ?? 0)}',
                     TColor.third),
-                _buildFinancialRow(
-                    'Selling',
-                    'Rs. ${NumberFormat('#,##0.00').format(double.tryParse(booking['selling_amount']?.toString() ?? '0') ?? 0)}',
+                _buildFinancialRow('Selling',
+                    'Rs. ${NumberFormat('#,##0.00').format(entry['selling'] ?? 0)}',
                     TColor.secondary),
-
-                if (booking['profit_loss'] != null)
-                  _buildFinancialRow(
-                      '${booking['profit_loss']['type']?.toUpperCase() ?? 'Profit'}',
-                      'Rs. ${NumberFormat('#,##0.00').format(double.tryParse(booking['profit_loss']['amount']?.toString() ?? '0') ?? 0)}',
-                      TColor.primary),
+                _buildFinancialRow('Profit',
+                    'Rs. ${NumberFormat('#,##0.00').format(entry['profit_loss'] ?? 0)}',
+                    TColor.primary),
               ],
             ),
           ),
@@ -260,58 +240,57 @@ class HotelSaleRegisterScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildResponsiveDetailRow(String label, String value,
-      {bool isWrappable = false}) {
+  Widget _buildDetailRow(String label, String value, {bool isWrappable = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: isWrappable
           ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: TColor.secondaryText,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: TextStyle(
-                    color: TColor.primaryText,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            )
-          : Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      color: TColor.secondaryText,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      color: TColor.primaryText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.right,
-                  ),
-                ),
-              ],
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: TColor.secondaryText,
+              fontSize: 14,
             ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              color: TColor.primaryText,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      )
+          : Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              label,
+              style: TextStyle(
+                color: TColor.secondaryText,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              value,
+              style: TextStyle(
+                color: TColor.primaryText,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -362,16 +341,13 @@ class HotelSaleRegisterScreen extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _buildSummaryItem(
-                'Rows', totals['total_rows'].toString(), TColor.primary),
+            _buildSummaryItem('Count', totals['count'].toString(), TColor.primary),
             const SizedBox(width: 16),
-            _buildSummaryItem(
-                'Buying', totals['total_buying'], TColor.secondary),
+            _buildSummaryItem('Buying', totals['buying'], TColor.secondary),
             const SizedBox(width: 16),
-            _buildSummaryItem('Selling', totals['total_selling'], TColor.third),
+            _buildSummaryItem('Selling', totals['selling'], TColor.third),
             const SizedBox(width: 16),
-            _buildSummaryItem(
-                'Profit', totals['total_profit_loss'], TColor.fourth),
+            _buildSummaryItem('Profit', totals['profit'], TColor.fourth),
           ],
         ),
       ),
@@ -380,33 +356,34 @@ class HotelSaleRegisterScreen extends StatelessWidget {
 
   Widget _buildSummaryItem(String label, String value, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    decoration: BoxDecoration(
+    color: color.withOpacity(0.1),
+    borderRadius: BorderRadius.circular(12),
+    border: Border.all(color: color.withOpacity(0.2)),
+    ),
+    child: Column(
+    children: [
+    Text(
+    label,
+    style: TextStyle(
+    color: TColor.secondaryText,
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    ),
+    ),
+    const SizedBox(height: 4),
+    Text(
+
+      value,
+      style: TextStyle(
+        color: color,
+        fontSize: 15,
+        fontWeight: FontWeight.bold,
       ),
-      child: Column(
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: TColor.secondaryText,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              color: color,
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
+    ),
+    ],
+    ),
     );
   }
 
@@ -414,13 +391,13 @@ class HotelSaleRegisterScreen extends StatelessWidget {
     return FloatingActionButton.extended(
       onPressed: _showTotalSummaryBottomSheet,
       backgroundColor: TColor.primary,
-      icon:  Icon(Icons.summarize, color: TColor.white),
-      label: Text('', style: TextStyle(color: TColor.white),),
+      icon: Icon(Icons.summarize, color: TColor.white),
+      label: Text('Summary', style: TextStyle(color: TColor.white)),
     );
   }
 
   void _showTotalSummaryBottomSheet() {
-    final controller = Get.find<HotelSaleRegisterController>();
+    final controller = Get.find<VisaSaleRegisterController>();
 
     Get.bottomSheet(
       Container(
@@ -456,29 +433,6 @@ class HotelSaleRegisterScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            // const SizedBox(height: 20),
-            // Obx(() {
-            //   final totals = controller.totalSummary.value;
-            //   return SingleChildScrollView(
-            //     scrollDirection: Axis.horizontal,
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-            //       children: [
-            //         _buildSummaryStatItem('Total Rows',
-            //             totals['total_rows'].toString(), TColor.primary),
-            //         const SizedBox(width: 16),
-            //         _buildSummaryStatItem('Total Buying',
-            //             totals['total_buying'], TColor.secondary),
-            //         const SizedBox(width: 16),
-            //         _buildSummaryStatItem(
-            //             'Total Selling', totals['total_selling'], TColor.third),
-            //         const SizedBox(width: 16),
-            //         _buildSummaryStatItem('Total Profit',
-            //             totals['total_profit_loss'], TColor.fourth),
-            //       ],
-            //     ),
-            //   );
-            // }),
             const SizedBox(height: 20),
             Obx(() {
               final totals = controller.totalSummary.value;
@@ -487,17 +441,17 @@ class HotelSaleRegisterScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildSummaryStatItem('Total Rows',
-                        totals['total_rows'].toString(), TColor.primary),
+                    _buildSummaryStatItem('Total Entries',
+                        totals['total_count'].toString(), TColor.primary),
                     const SizedBox(width: 16),
                     _buildSummaryStatItem('Total Buying',
-                        totals['total_buying'], TColor.secondary),
+                        'Rs. ${totals['total_buying']}', TColor.secondary),
                     const SizedBox(width: 16),
-                    _buildSummaryStatItem(
-                        'Total Selling', totals['total_selling'], TColor.third),
+                    _buildSummaryStatItem('Total Selling',
+                        'Rs. ${totals['total_selling']}', TColor.third),
                     const SizedBox(width: 16),
                     _buildSummaryStatItem('Total Profit',
-                        totals['total_profit_loss'], TColor.fourth),
+                        'Rs. ${totals['total_profit']}', TColor.fourth),
                   ],
                 ),
               );
@@ -515,7 +469,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
   Widget _buildSummaryStatItem(String label, String value, Color color) {
     // Format the value if it's a number
     String displayValue = value;
-    if (value != "0") {
+    if (!value.startsWith('Rs.') && value != "0") {
       try {
         final numValue = double.tryParse(value.replaceAll(',', ''));
         if (numValue != null) {

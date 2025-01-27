@@ -84,7 +84,7 @@ class _HotelState extends State<Hotel> {
                   onTap: () => Get.to(() => ViewHotelVoucher()),
                 ),
                 VoucherOption(
-                  title: 'Hotel Register View',
+                  title: 'Hotel Sale Register',
                   subtitle: 'Register view details',
                   icon: Icons.app_registration,
                   color: TColor.primary,

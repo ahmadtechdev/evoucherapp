@@ -1,4 +1,5 @@
 import 'package:evoucher_new/views/authentication/cotnroller/auth_controller.dart';
+import 'package:evoucher_new/views/hotel_voucher/hotel_sale_register/hotel_sale_register_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
     Get.lazyPut(() => IncomesReportController(), fenix: true);
     Get.lazyPut(() => EntryHotelController(), fenix: true);
     Get.lazyPut(() => AuthController(), fenix: true);
+    Get.lazyPut(() => HotelSaleRegisterController(), fenix: true);
 
     return GetMaterialApp(
       title: 'Flutter dome',

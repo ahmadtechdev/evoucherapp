@@ -1,11 +1,14 @@
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../common/color_extension.dart';
 import '../../common/drawer.dart';
 import '../../common_widget/bottom_navigation.dart';
+
 import 'entry_visa_voucher/visa_voucher.dart';
 import 'view_visa_voucher/view_visa_voucher.dart';
+import 'visa_sale_register/visa_sale_register.dart';
 
 class Visa extends StatefulWidget {
   const Visa({super.key});
@@ -23,7 +26,7 @@ class _VisaState extends State<Visa> {
       backgroundColor: TColor.white,
       appBar: AppBar(
         title: Text(
-          'Visa Vouchers',
+          'Hotel Vouchers',
           style: TextStyle(
             color: TColor.primaryText,
             fontSize: 24,
@@ -49,40 +52,49 @@ class _VisaState extends State<Visa> {
         ),
       ),
       drawer: const CustomDrawer(currentIndex: 0),
-      body: Container(
-        width: media.width,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              TColor.white,
-              TColor.primary.withOpacity(0.05),
+      body: SingleChildScrollView(
+        child: Container(
+          width: media.width,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                TColor.white,
+                TColor.primary.withOpacity(0.05),
+              ],
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 30),
+              _buildVoucherOptions([
+
+                VoucherOption(
+                  title: 'Entry Visa Voucher',
+                  subtitle: 'Create a new visa voucher entry',
+                  icon: Icons.add_circle_outline,
+                  color: TColor.primary,
+                  onTap: () => Get.to(() => const VisaVoucher()),
+                ),
+                VoucherOption(
+                  title: 'View Visa Voucher',
+                  subtitle: 'Check existing voucher details',
+                  icon: Icons.visibility_outlined,
+                  color: TColor.primary,
+                  onTap: () => Get.to(() => ViewVisaVoucher()),
+                ),
+                VoucherOption(
+                  title: 'Visa Sale Register',
+                  subtitle: 'Register view details',
+                  icon: Icons.app_registration,
+                  color: TColor.primary,
+                  onTap: () => Get.to(() =>VisaSaleRegisterScreen()),
+                ),
+              ]),
             ],
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // _buildSectionTitle('Journal Voucher'),
-            const SizedBox(height: 30),
-            _buildVoucherOptions([
-              VoucherOption(
-                title: 'Entry Visa Voucher',
-                subtitle: 'Create a new visa voucher entry',
-                icon: Icons.add_circle_outline,
-                color: TColor.primary,
-                onTap: () => Get.to(() => const VisaVoucher()),
-              ),
-              VoucherOption(
-                title: 'View Visa Voucher',
-                subtitle: 'Check existing voucher details',
-                icon: Icons.visibility_outlined,
-                color: TColor.primary,
-                onTap: () => Get.to(() => ViewVisaVoucher()),
-              ),
-            ]),
-          ],
         ),
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(

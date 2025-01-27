@@ -4,22 +4,22 @@ import 'package:intl/intl.dart';
 
 import '../../../common/color_extension.dart';
 import '../../../common_widget/dart_selector2.dart';
-import 'hotel_sale_register_controller.dart';
+import 'ticket_sale_register_controller.dart';
 
-class HotelSaleRegisterScreen extends StatelessWidget {
-  HotelSaleRegisterScreen({super.key}) {
-    Get.put(HotelSaleRegisterController());
+class TicketSaleRegisterScreen extends StatelessWidget {
+  TicketSaleRegisterScreen({super.key}) {
+    Get.put(TicketSaleRegisterController());
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(HotelSaleRegisterController());
+    final controller = Get.put(TicketSaleRegisterController());
 
     return Scaffold(
       backgroundColor: TColor.textField,
       appBar: AppBar(
         title: Text(
-          'Hotel Sale Register',
+          'Ticket Sale Register',
           style: TextStyle(color: TColor.white),
         ),
         backgroundColor: TColor.primary,
@@ -31,7 +31,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Date Range Selector with enhanced shadow
+          // Date Range Selector
           Container(
             decoration: BoxDecoration(
               color: TColor.white,
@@ -69,7 +69,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
                 ),
                 // IconButton(
                 //   icon: Icon(Icons.refresh, color: TColor.primary),
-                //   onPressed: () => controller.fetchHotelSaleRegisterData(),
+                //   onPressed: () => controller.fetchTicketSaleRegisterData(),
                 // ),
               ],
             ),
@@ -94,7 +94,6 @@ class HotelSaleRegisterScreen extends StatelessWidget {
               );
             }
 
-            // Booking List with enhanced scrolling
             return Expanded(
               child: Obx(() => controller.dailyRecords.isEmpty
                   ? Center(
@@ -106,7 +105,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       itemCount: controller.dailyRecords.length,
                       itemBuilder: (context, index) {
-                        return _buildDailyBookingSection(
+                        return _buildDailyTicketSection(
                             controller.dailyRecords[index]);
                       },
                     )),
@@ -118,7 +117,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDailyBookingSection(dynamic dailyData) {
+  Widget _buildDailyTicketSection(dynamic dailyData) {
     if (dailyData == null || dailyData['tickets'] == null) {
       return const SizedBox.shrink();
     }
@@ -126,7 +125,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Enhanced Date Header
+        // Date Header
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Row(
@@ -151,19 +150,19 @@ class HotelSaleRegisterScreen extends StatelessWidget {
           ),
         ),
 
-        // Enhanced Daily Summary Card
+        // Daily Summary Card
         _buildDailySummaryCard(dailyData['totals'] ?? {}),
 
-        // Booking Cards
+        // Ticket Cards
         ...?dailyData['tickets']
-            ?.map<Widget>((booking) => _buildBookingCard(booking)),
+            ?.map<Widget>((ticket) => _buildTicketCard(ticket)),
 
         const SizedBox(height: 16),
       ],
     );
   }
 
-  Widget _buildBookingCard(dynamic booking) {
+  Widget _buildTicketCard(dynamic ticket) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -180,7 +179,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Enhanced Header
+          // Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
@@ -194,7 +193,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    '${booking['voucher_number'] ?? 'N/A'}',
+                    '${ticket['voucher_number'] ?? 'N/A'}',
                     style: TextStyle(
                       color: TColor.primary,
                       fontSize: 16,
@@ -203,7 +202,7 @@ class HotelSaleRegisterScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  booking['conf_number'] ?? 'N/A',
+                  ticket['pnr'] ?? 'N/A',
                   style: TextStyle(
                     color: TColor.secondaryText,
                     fontSize: 14,
@@ -213,44 +212,42 @@ class HotelSaleRegisterScreen extends StatelessWidget {
             ),
           ),
 
-          // Booking Details with improved layout
+          // Ticket Details
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildResponsiveDetailRow(
-                    'Voucher ID', booking['voucher_id'] ?? 'N/A'),
+                    'Voucher ID', ticket['voucher_id'] ?? 'N/A'),
                 _buildResponsiveDetailRow(
-                    'Pax Name', booking['pax_name'] ?? 'N/A'),
+                    'Pax Name', ticket['pax_name'] ?? 'N/A'),
                 _buildResponsiveDetailRow(
-                    'Customer Account', booking['customer_account'] ?? 'N/A',
+                    'Ticket Number', ticket['ticket_number'] ?? 'N/A'),
+                _buildResponsiveDetailRow(
+                    'Customer Account', ticket['customer_account'] ?? 'N/A',
                     isWrappable: true),
                 _buildResponsiveDetailRow(
-                    'Check In', booking['check_in'] ?? 'N/A'),
+                    'Airline', ticket['airline'] ?? 'N/A'),
+                _buildResponsiveDetailRow('Sector', ticket['sector'] ?? 'N/A'),
                 _buildResponsiveDetailRow(
-                    'Check Out', booking['check_out'] ?? 'N/A'),
-                _buildResponsiveDetailRow('Sector', booking['sector'] ?? 'N/A'),
-                _buildResponsiveDetailRow(
-                    'Supplier Account', booking['supplier_account'] ?? 'N/A',
+                    'Supplier Account', ticket['supplier_account'] ?? 'N/A',
                     isWrappable: true),
 
                 const Divider(height: 24),
 
-                // Enhanced Financial Details
-                _buildFinancialRow(
-                    'Buying',
-                    'Rs. ${NumberFormat('#,##0.00').format(double.tryParse(booking['buying_amount']?.toString() ?? '0') ?? 0)}',
-                    TColor.third),
+                // Financial Details
+                _buildFinancialRow('Buying',
+                    'Rs. ${ticket['buying_amount'] ?? '0.00'}', TColor.third),
                 _buildFinancialRow(
                     'Selling',
-                    'Rs. ${NumberFormat('#,##0.00').format(double.tryParse(booking['selling_amount']?.toString() ?? '0') ?? 0)}',
+                    'Rs. ${ticket['selling_amount'] ?? '0.00'}',
                     TColor.secondary),
 
-                if (booking['profit_loss'] != null)
+                if (ticket['profit_loss'] != null)
                   _buildFinancialRow(
-                      '${booking['profit_loss']['type']?.toUpperCase() ?? 'Profit'}',
-                      'Rs. ${NumberFormat('#,##0.00').format(double.tryParse(booking['profit_loss']['amount']?.toString() ?? '0') ?? 0)}',
+                      '${ticket['profit_loss']['type']?.toUpperCase() ?? 'Profit'}',
+                      'Rs. ${ticket['profit_loss']['amount'] ?? '0.00'}',
                       TColor.primary),
               ],
             ),
@@ -414,13 +411,13 @@ class HotelSaleRegisterScreen extends StatelessWidget {
     return FloatingActionButton.extended(
       onPressed: _showTotalSummaryBottomSheet,
       backgroundColor: TColor.primary,
-      icon:  Icon(Icons.summarize, color: TColor.white),
-      label: Text('', style: TextStyle(color: TColor.white),),
+      icon: Icon(Icons.summarize, color: TColor.white),
+      label: Text('', style: TextStyle(color: TColor.white)),
     );
   }
 
   void _showTotalSummaryBottomSheet() {
-    final controller = Get.find<HotelSaleRegisterController>();
+    final controller = Get.find<TicketSaleRegisterController>();
 
     Get.bottomSheet(
       Container(
@@ -456,29 +453,6 @@ class HotelSaleRegisterScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            // const SizedBox(height: 20),
-            // Obx(() {
-            //   final totals = controller.totalSummary.value;
-            //   return SingleChildScrollView(
-            //     scrollDirection: Axis.horizontal,
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-            //       children: [
-            //         _buildSummaryStatItem('Total Rows',
-            //             totals['total_rows'].toString(), TColor.primary),
-            //         const SizedBox(width: 16),
-            //         _buildSummaryStatItem('Total Buying',
-            //             totals['total_buying'], TColor.secondary),
-            //         const SizedBox(width: 16),
-            //         _buildSummaryStatItem(
-            //             'Total Selling', totals['total_selling'], TColor.third),
-            //         const SizedBox(width: 16),
-            //         _buildSummaryStatItem('Total Profit',
-            //             totals['total_profit_loss'], TColor.fourth),
-            //       ],
-            //     ),
-            //   );
-            // }),
             const SizedBox(height: 20),
             Obx(() {
               final totals = controller.totalSummary.value;
