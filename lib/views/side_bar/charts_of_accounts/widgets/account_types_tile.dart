@@ -20,7 +20,7 @@ class AccountTypeExpansionTile extends StatelessWidget {
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         leading: Icon(MdiIcons.shieldCrownOutline, color: TColor.primary),
-        trailing: Row(
+        trailing: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             // IconButton(
@@ -30,7 +30,7 @@ class AccountTypeExpansionTile extends StatelessWidget {
             //   },
             // ),
             // This is the default expansion arrow icon
-            const RotationTransition(
+            RotationTransition(
               turns: AlwaysStoppedAnimation(0.0),
               child: Icon(Icons.expand_more),
             ),

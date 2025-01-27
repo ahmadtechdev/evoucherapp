@@ -3,6 +3,8 @@ import 'package:evoucher_new/views/home/top_report_section_views/bank_report/mod
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../service/session_manager.dart';
+
 class BanksController extends GetxController {
   final ApiService _apiService = Get.put(ApiService());
 
@@ -12,13 +14,23 @@ class BanksController extends GetxController {
   var totalPayment = 0.0.obs;
   var closingBalance = 0.0.obs;
   var isLoading = false.obs;
+  String? loginType;
+  String subhead="Banks";
 
   final currencyFormatter = NumberFormat("#,##0.00", "en_US");
 
   @override
   void onInit() {
     super.onInit();
+    _initializeLoginType();
     loadTransactions();
+
+  }
+
+  Future<void> _initializeLoginType() async {
+    final sessionManager = Get.find<SessionManager>();
+    loginType = await sessionManager.getLoginType();
+
   }
 
   void loadTransactions() async {
@@ -28,10 +40,16 @@ class BanksController extends GetxController {
 
       // Format date to match API requirement
       String formattedDate = DateFormat('yyyy-M-d').format(selectedDate.value);
+      if(loginType=="toc"){
+        subhead = "Travelocity Bank Accounts";
+      }else{
+        subhead = "Banks";
+      }
 
       final response = await _apiService.postRequest(
           endpoint: 'accReports',
-          body: {"date": formattedDate, "subhead": "Banks"});
+
+          body: {"date": formattedDate, "subhead":subhead});
 
       // Clear existing transactions
       transactions.clear();

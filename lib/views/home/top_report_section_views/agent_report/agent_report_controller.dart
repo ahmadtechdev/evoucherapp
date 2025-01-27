@@ -58,7 +58,7 @@ class AgentReportController extends GetxController {
             response['data']['totals']['total_balance'].replaceAll(',', ''));
       }
     } catch (e) {
-      print('Error fetching transactions: $e');
+      // print('Error fetching transactions: $e');
       // Handle error - perhaps show a snackbar or toast
     } finally {
       // Set loading to false
@@ -67,10 +67,10 @@ class AgentReportController extends GetxController {
   }
 
   // Helper method to parse amount strings with commas
-  double _parseAmount(String? amount) {
-    if (amount == null || amount.isEmpty) return 0.0;
-    return double.parse(amount.replaceAll(',', ''));
-  }
+  // double _parseAmount(String? amount) {
+  //   if (amount == null || amount.isEmpty) return 0.0;
+  //   return double.parse(amount.replaceAll(',', ''));
+  // }
 
   void updateDate(DateTime date) {
     selectedDate.value = date;

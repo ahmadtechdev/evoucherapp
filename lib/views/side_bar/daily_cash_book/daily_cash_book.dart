@@ -8,6 +8,7 @@ import '../../../common/color_extension.dart';
 import '../../../common/drawer.dart';
 import '../../../common_widget/date_selecter.dart';
 import '../../../common_widget/round_text_field.dart';
+import '../../../common_widget/snackbar.dart';
 import 'controller/daily_cash_book_controller.dart';
 
 // Import required packages
@@ -119,9 +120,7 @@ class DailyCashBook extends StatelessWidget {
 
       // Check if transactions are available
       if (controller.transactions.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No data available to export')),
-        );
+            CustomSnackBar(message:'No data available to export').show();
         return;
       }
 
@@ -141,8 +140,7 @@ class DailyCashBook extends StatelessWidget {
 
       // Add transaction data
       for (var transaction in controller.transactions) {
-        print("ahk");
-        print(transaction.voucherId);
+
         sheet.appendRow([
           TextCellValue(transaction.voucherId),
           TextCellValue(controller.formatDate(transaction.date)),
@@ -152,8 +150,7 @@ class DailyCashBook extends StatelessWidget {
           TextCellValue(transaction.balance)
         ]);
       }
-print("Ahmad");
-      print(controller.openingBalance.value);
+
       // Add summary rows
       sheet.appendRow([]); // Empty row for separation
       sheet.appendRow([
@@ -186,28 +183,18 @@ print("Ahmad");
           ..writeAsBytesSync(fileBytes);
 
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Excel file exported to $filePath'),
-            backgroundColor: Colors.green,
-          ),
-        );
+
+        CustomSnackBar(message: "Excel file exported to $filePath", backgroundColor: TColor.secondary).show();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to export Excel file'),
-            backgroundColor: Colors.red,
-          ),
-        );
+
+        CustomSnackBar(message: "Failed to export Excel file", backgroundColor: TColor.third).show();
+
       }
     } catch (e) {
       // Handle exceptions
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
+
+      CustomSnackBar(message: "Error: ${e.toString()}", backgroundColor: TColor.third).show();
+
     }
   }
   Future<bool> _requestStoragePermission(BuildContext context) async {
@@ -225,6 +212,7 @@ print("Ahmad");
         return true;
       } else if (newStatus.isPermanentlyDenied) {
         // Show dialog to navigate to app settings
+        // ignore: use_build_context_synchronously
         _showPermissionDialog(context);
       }
     }

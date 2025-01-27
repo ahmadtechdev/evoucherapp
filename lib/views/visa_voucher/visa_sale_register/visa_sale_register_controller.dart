@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -46,6 +46,7 @@ class VisaSaleRegisterController extends GetxController {
 
       if (response['status'] == 'success') {
         dailyRecords.value = response['data']['daily_records'] ?? [];
+        // ignore: invalid_use_of_protected_member
         _calculateTotalSummary(dailyRecords.value);
       } else {
         errorMessage.value = 'Failed to fetch data';

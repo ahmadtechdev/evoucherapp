@@ -17,8 +17,6 @@ import '../views/side_bar/recovery_list/recovery_list.dart';
 import '../views/side_bar/top_agent_report/top_agent_sale.dart';
 import '../views/side_bar/top_customer_sale/top_customer_sale.dart';
 import '../views/side_bar/top_suuplier_report/top_supplier_sale.dart';
-import '../views/side_bar/total_monthly_expense/total_monthly_expenses.dart';
-import '../views/side_bar/total_monthly_profit_loss/total_monthly_profit_loss.dart';
 import '../views/side_bar/trial_balance/trial_balance.dart';
 import 'color_extension.dart';
 
@@ -134,7 +132,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   Widget _buildHeader(BuildContext context) {
     return SizedBox(
-      height: 180,
+      height: 120,
       child: DrawerHeader(
         decoration: const BoxDecoration(color: Colors.black87),
         child: Column(
@@ -156,30 +154,30 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ),
               ],
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Unknown',
-                  style: TextStyle(color: TColor.white, fontSize: 16),
-                ),
-                Text(
-                  'Agency ID: Unknown',
-                  style: TextStyle(color: Colors.grey[400], fontSize: 14),
-                ),
-                Text(
-                  // 'Expires On: Wed 13 Aug 2025',
-                  'Expires On: Unknown',
-                  style: TextStyle(color: Colors.grey[400], fontSize: 12),
-                ),
-                Text(
-                  // 'Cash: 39,801.00 Cr',
-                  'Cash: Unknown',
-                  style: TextStyle(color: Colors.grey[400], fontSize: 12),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
+            // Column(
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: [
+            //     Text(
+            //       'Unknown',
+            //       style: TextStyle(color: TColor.white, fontSize: 16),
+            //     ),
+            //     Text(
+            //       'Agency ID: Unknown',
+            //       style: TextStyle(color: Colors.grey[400], fontSize: 14),
+            //     ),
+            //     Text(
+            //       // 'Expires On: Wed 13 Aug 2025',
+            //       'Expires On: Unknown',
+            //       style: TextStyle(color: Colors.grey[400], fontSize: 12),
+            //     ),
+            //     Text(
+            //       // 'Cash: 39,801.00 Cr',
+            //       'Cash: Unknown',
+            //       style: TextStyle(color: Colors.grey[400], fontSize: 12),
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 10),
           ],
         ),
       ),

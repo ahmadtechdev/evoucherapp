@@ -37,24 +37,17 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
     try {
       // The data is now already in the correct format
       masterData = widget.voucherData['master'] as Map<String, dynamic>? ?? {};
-      print(masterData);
-      final detailsData = widget.voucherData['details'] as List? ?? [];
-      print(detailsData);
-      print("i'mhere");
-      // Parse date safely
-      // String dateString = DateFormat('EEE, dd MMM yyyy')
-      //     .format(DateTime.parse(masterData['voucher_data']));
 
-      print("i'mhere 2");
+      final detailsData = widget.voucherData['details'] as List? ?? [];
+
       try {
-        print(masterData['voucher_data']);
+
         selectedDate = DateFormat('EEE, dd MMM yyyy').parse(masterData['voucher_data']);
       } catch (e) {
-        print('Error parsing date: $e');
+
         selectedDate = DateTime.now();
       }
 
-      print("i'mhere");
 
       // Map the details data to entries format
       entries = detailsData.map((entry) {
@@ -82,7 +75,7 @@ class _ExpenseVoucherDetailState extends State<ExpenseVoucherDetail> {
         ];
       }
     } catch (e) {
-      print('Error initializing data: $e');
+      // print('Error initializing data: $e');
       entries = [
         {
           'account': "",

@@ -7,7 +7,7 @@ class AirlineReportController extends GetxController {
   final ApiService _apiService = Get.put(ApiService());
 
   var selectedDate = DateTime.now().obs;
-  var transactions = <ariline>[].obs;
+  var transactions = <AirLine>[].obs;
   var totalReceipt = 0.0.obs;
   var totalPayment = 0.0.obs;
   var closingBalance = 0.0.obs;
@@ -42,7 +42,7 @@ class AirlineReportController extends GetxController {
         // Transform API data to CustomerTransaction
         transactions.value =
             (response['data']['customers'] as List).map((customer) {
-          return ariline(
+          return AirLine(
               id: customer['account_id'],
               name: customer['account_name'],
               closingDr: _parseAmount(customer['debit']),

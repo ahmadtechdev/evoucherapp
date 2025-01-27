@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 class AgentReport extends StatelessWidget {
   final AgentReportController controller = Get.put(AgentReportController());
 
-  AgentReport({Key? key}) : super(key: key);
+  AgentReport({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -266,20 +266,20 @@ Widget _buildDateSelectionBar() {
             ],
           ),
         ),
-        const SizedBox(width: 16),
-        ElevatedButton.icon(
-          onPressed: () {},
-          icon: const Icon(Icons.print, size: 20),
-          label: const Text('Print'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: TColor.secondary,
-            foregroundColor: TColor.white,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
+        // const SizedBox(width: 16),
+        // ElevatedButton.icon(
+        //   onPressed: () {},
+        //   icon: const Icon(Icons.print, size: 20),
+        //   label: const Text('Print'),
+        //   style: ElevatedButton.styleFrom(
+        //     backgroundColor: TColor.secondary,
+        //     foregroundColor: TColor.white,
+        //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        //     shape: RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.circular(8),
+        //     ),
+        //   ),
+        // ),
       ],
     ),
   );

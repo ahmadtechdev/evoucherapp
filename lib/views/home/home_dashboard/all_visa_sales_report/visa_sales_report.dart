@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../../common/color_extension.dart';
 import '../../../../common_widget/dart_selector2.dart';
 import 'all_visa_sale_controller.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class VisaSalesReport extends StatefulWidget {
   const VisaSalesReport({super.key});
@@ -21,6 +25,226 @@ class _VisaSalesReportState extends State<VisaSalesReport> {
     super.initState();
     // fromDate = DateTime(toDate.year, toDate.month, 1);
     fromDate = DateTime(toDate.year, toDate.month, toDate.day - 2);
+  }
+
+  Future<void> _generateAndPrintPDF() async {
+    try {
+      final pdf = pw.Document();
+
+      // Load the logo
+      final ByteData logoData = await rootBundle.load('assets/img/newLogo.png');
+      final Uint8List logoBytes = logoData.buffer.asUint8List();
+      final logo = pw.MemoryImage(logoBytes);
+
+      // Get data from controller
+      final transactions = controller.transactions;
+      final grandTotals = controller.grandTotals;
+
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(40),
+          header: (context) => pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Image(logo, width: 60, height: 60),
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.end,
+                children: [
+                  pw.Text(
+                    'Hotel Sales Report',
+                    style: pw.TextStyle(
+                      fontSize: 20,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  pw.SizedBox(height: 5),
+                  pw.Text(
+                    'From: ${fromDate.toString().split(' ')[0]}',
+                    style: const pw.TextStyle(fontSize: 12),
+                  ),
+                  pw.Text(
+                    'To: ${toDate.toString().split(' ')[0]}',
+                    style: const pw.TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          footer: (context) => pw.Container(
+            alignment: pw.Alignment.centerRight,
+            margin: const pw.EdgeInsets.only(top: 10),
+            child: pw.Text(
+              'Page ${context.pageNumber} of ${context.pagesCount}',
+              style: const pw.TextStyle(fontSize: 10),
+            ),
+          ),
+          build: (context) => [
+            pw.SizedBox(height: 20),
+
+            // Daily Records
+            ...transactions.map((transaction) => pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  transaction['date'],
+                  style: pw.TextStyle(
+                    fontSize: 14,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 5),
+                pw.Table(
+                  border: pw.TableBorder.all(
+                    color: PdfColors.grey400,
+                    width: 0.5,
+                  ),
+                  children: [
+                    // Table Header
+                    pw.TableRow(
+                      decoration: const pw.BoxDecoration(
+                        color: PdfColors.grey200,
+                      ),
+                      children: [
+                        _buildTableCell('Total Purchase', isHeader: true),
+                        _buildTableCell('Total Sale', isHeader: true),
+                        _buildTableCell('Total P/L', isHeader: true),
+                      ],
+                    ),
+                    // Data Row
+                    pw.TableRow(
+                      children: [
+                        _buildTableCell(
+                          'Rs ${transaction['purchase'].toStringAsFixed(2)}',
+                        ),
+                        _buildTableCell(
+                          'Rs ${transaction['sale'].toStringAsFixed(2)}',
+                        ),
+                        _buildTableCell(
+                          'Rs ${transaction['profit'].toStringAsFixed(2)}',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                // Detailed entries with page breaks if needed
+                ...transaction['details'].map((detail) => pw.Container(
+                  margin: const pw.EdgeInsets.only(top: 5),
+                  padding: const pw.EdgeInsets.all(8),
+                  decoration: pw.BoxDecoration(
+                    color: PdfColors.grey100,
+                    border: pw.Border.all(color: PdfColors.grey400),
+                  ),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text(
+                        'Voucher: ${detail['voucherNo']}',
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
+                      pw.Text(
+                        'Customer: ${detail['customerAccount']}',
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
+                      pw.Text(
+                        'Supplier: ${detail['supplierAccount']}',
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
+                      pw.Text(
+                        'Pax Name: ${detail['paxName']}',
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
+                      pw.Row(
+                        mainAxisAlignment:
+                        pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            'P: Rs ${detail['pAmount']}',
+                            style: const pw.TextStyle(fontSize: 10),
+                          ),
+                          pw.Text(
+                            'S: Rs ${detail['sAmount']}',
+                            style: const pw.TextStyle(fontSize: 10),
+                          ),
+                          pw.Text(
+                            'P/L: Rs ${detail['pnl']}',
+                            style: const pw.TextStyle(fontSize: 10),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )),
+                pw.SizedBox(height: 10),
+              ],
+            )),
+
+            // Grand Totals at the end
+            pw.Container(
+              padding: const pw.EdgeInsets.all(10),
+              decoration: pw.BoxDecoration(
+                color: PdfColors.grey100,
+                border: pw.Border.all(color: PdfColors.grey400),
+              ),
+              child: pw.Table(
+                children: [
+                  pw.TableRow(
+                    decoration: const pw.BoxDecoration(
+                      color: PdfColors.grey200,
+                    ),
+                    children: [
+                      _buildTableCell('Total Purchases', isHeader: true),
+                      _buildTableCell('Total Sales', isHeader: true),
+                      _buildTableCell('Total P/L', isHeader: true),
+                    ],
+                  ),
+                  pw.TableRow(
+                    children: [
+                      _buildTableCell(
+                        'Rs ${controller.parseAmount(grandTotals['total_purchases'] ?? '0.00').toStringAsFixed(2)}',
+                      ),
+                      _buildTableCell(
+                        'Rs ${controller.parseAmount(grandTotals['total_sales'] ?? '0.00').toStringAsFixed(2)}',
+                      ),
+                      _buildTableCell(
+                        'Rs ${controller.parseAmount(grandTotals['total_profit_loss'] ?? '0.00').toStringAsFixed(2)}',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
+      await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async => pdf.save(),
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to generate PDF: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  pw.Widget _buildTableCell(String text, {bool isHeader = false}) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(8),
+      alignment: pw.Alignment.center,
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(
+          fontSize: 12,
+          fontWeight: isHeader ? pw.FontWeight.bold : null,
+        ),
+      ),
+    );
   }
 
   @override
@@ -57,7 +281,7 @@ class _VisaSalesReportState extends State<VisaSalesReport> {
                         child: _buildDateSelector(
                           'From Date',
                           fromDate,
-                          (date) => setState(() => fromDate = date),
+                              (date) => setState(() => fromDate = date),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -65,7 +289,7 @@ class _VisaSalesReportState extends State<VisaSalesReport> {
                         child: _buildDateSelector(
                           'To Date',
                           toDate,
-                          (date) => setState(() => toDate = date),
+                              (date) => setState(() => toDate = date),
                         ),
                       ),
                     ],
@@ -74,7 +298,9 @@ class _VisaSalesReportState extends State<VisaSalesReport> {
                   Row(
                     children: [
                       ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          _generateAndPrintPDF();
+                        },
                         icon: const Icon(Icons.print, size: 20),
                         label: const Text('Print Report'),
                         style: ElevatedButton.styleFrom(
@@ -94,29 +320,29 @@ class _VisaSalesReportState extends State<VisaSalesReport> {
             ),
             Expanded(
               child: Obx(
-                () => controller.isLoading.value
+                    () => controller.isLoading.value
                     ? const Center(child: CircularProgressIndicator())
                     : controller.transactions.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "No records in this range",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          )
-                        : ListView.builder(
-                            padding: const EdgeInsets.all(16),
-                            itemCount: controller.transactions.length,
-                            itemBuilder: (context, index) {
-                              return CollapsibleTransactionCard(
-                                transaction: controller.transactions[index],
-                                index: index,
-                                controller: controller,
-                              );
-                            },
-                          ),
+                    ? const Center(
+                  child: Text(
+                    "No records in this range",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                )
+                    : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: controller.transactions.length,
+                  itemBuilder: (context, index) {
+                    return CollapsibleTransactionCard(
+                      transaction: controller.transactions[index],
+                      index: index,
+                      controller: controller,
+                    );
+                  },
+                ),
               ),
             ),
             _buildTotalSection(),
@@ -144,31 +370,31 @@ class _VisaSalesReportState extends State<VisaSalesReport> {
         label: label);
   }
 
-  Widget _buildTransactionInfo(String label, double amount, Color color) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: TColor.secondaryText,
-              fontSize: 12,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Rs ${amount.toStringAsFixed(2)}',
-            style: TextStyle(
-              color: color,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildTransactionInfo(String label, double amount, Color color) {
+  //   return Expanded(
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(
+  //           label,
+  //           style: TextStyle(
+  //             color: TColor.secondaryText,
+  //             fontSize: 12,
+  //           ),
+  //         ),
+  //         const SizedBox(height: 4),
+  //         Text(
+  //           'Rs ${amount.toStringAsFixed(2)}',
+  //           style: TextStyle(
+  //             color: color,
+  //             fontSize: 16,
+  //             fontWeight: FontWeight.bold,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildTotalSection() {
     return Obx(() {
@@ -194,8 +420,8 @@ class _VisaSalesReportState extends State<VisaSalesReport> {
             ),
             _buildTotalItem(
               'Total Sales',
-              controller.parseAmount(
-                  controller.grandTotals['total_sales'] ?? '0.00'),
+              controller
+                  .parseAmount(controller.grandTotals['total_sales'] ?? '0.00'),
               TColor.secondary,
             ),
             _buildTotalItem(
@@ -279,16 +505,17 @@ class CollapsibleTransactionCard extends StatelessWidget {
                 itemBuilder: (context, detailIndex) {
                   final detail = transaction['details'][detailIndex];
                   return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    margin:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: TColor.readOnlyTextField.withOpacity(0.7),
                       border: detailIndex < transaction['details'].length - 1
                           ? Border(
-                              bottom: BorderSide(
-                                color: TColor.primary.withOpacity(0.1),
-                                width: 1,
-                              ),
-                            )
+                        bottom: BorderSide(
+                          color: TColor.primary.withOpacity(0.1),
+                          width: 1,
+                        ),
+                      )
                           : null,
                     ),
                     child: Padding(

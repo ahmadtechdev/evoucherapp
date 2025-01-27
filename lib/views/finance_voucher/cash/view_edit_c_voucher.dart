@@ -36,24 +36,17 @@ class _CashVoucherDetailState extends State<CashVoucherDetail> {
     try {
       // The data is now already in the correct format
       masterData = widget.voucherData['master'] as Map<String, dynamic>? ?? {};
-      print(masterData);
-      final detailsData = widget.voucherData['details'] as List? ?? [];
-      print(detailsData);
-      print("i'mhere");
-      // Parse date safely
-      // String dateString = DateFormat('EEE, dd MMM yyyy')
-      //     .format(DateTime.parse(masterData['voucher_data']));
 
-      print("i'mhere 2");
+      final detailsData = widget.voucherData['details'] as List? ?? [];
+
       try {
-        print(masterData['voucher_data']);
+
         selectedDate = DateFormat('EEE, dd MMM yyyy').parse(masterData['voucher_data']);
       } catch (e) {
-        print('Error parsing date: $e');
+
         selectedDate = DateTime.now();
       }
 
-      print("i'mhere");
 
       // Map the details data to entries format
       entries = detailsData.map((entry) {
@@ -81,7 +74,7 @@ class _CashVoucherDetailState extends State<CashVoucherDetail> {
         ];
       }
     } catch (e) {
-      print('Error initializing data: $e');
+      // print('Error initializing data: $e');
       entries = [
         {
           'account': "",
@@ -96,19 +89,19 @@ class _CashVoucherDetailState extends State<CashVoucherDetail> {
     voucherController = Get.find<VoucherController>();
     voucherController.clearEntries();
   }
-  double _parseAmount(dynamic amount) {
-    if (amount == null) return 0.0;
-    if (amount is num) return amount.toDouble();
-    if (amount is String) {
-      try {
-        return double.parse(amount.replaceAll('PKR ', '').replaceAll(',', ''));
-      } catch (e) {
-        print('Error parsing amount: $e');
-        return 0.0;
-      }
-    }
-    return 0.0;
-  }
+  // double _parseAmount(dynamic amount) {
+  //   if (amount == null) return 0.0;
+  //   if (amount is num) return amount.toDouble();
+  //   if (amount is String) {
+  //     try {
+  //       return double.parse(amount.replaceAll('PKR ', '').replaceAll(',', ''));
+  //     } catch (e) {
+  //       print('Error parsing amount: $e');
+  //       return 0.0;
+  //     }
+  //   }
+  //   return 0.0;
+  // }
 
   @override
   void dispose() {
@@ -116,73 +109,73 @@ class _CashVoucherDetailState extends State<CashVoucherDetail> {
     super.dispose();
   }
 
-  void _showDeleteConfirmation() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Delete Voucher',
-            style: TextStyle(color: TColor.primaryText),
-          ),
-          content: Text(
-            'Do you really want to delete this voucher?',
-            style: TextStyle(color: TColor.secondaryText),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'No',
-                style: TextStyle(color: TColor.primary),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Get.back();
-              },
-              child: Text(
-                'Yes',
-                style: TextStyle(color: TColor.third),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // void _showDeleteConfirmation() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text(
+  //           'Delete Voucher',
+  //           style: TextStyle(color: TColor.primaryText),
+  //         ),
+  //         content: Text(
+  //           'Do you really want to delete this voucher?',
+  //           style: TextStyle(color: TColor.secondaryText),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.pop(context),
+  //             child: Text(
+  //               'No',
+  //               style: TextStyle(color: TColor.primary),
+  //             ),
+  //           ),
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.pop(context);
+  //               Get.back();
+  //             },
+  //             child: Text(
+  //               'Yes',
+  //               style: TextStyle(color: TColor.third),
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
-  Widget _buildHeaderButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        IconButton(
-          icon: Icon(Icons.arrow_back, color: TColor.primaryText),
-          onPressed: () => Get.back(),
-        ),
-
-        Row(
-          children: [
-            if (!isEditMode) ...[
-              IconButton(
-                icon: Icon(Icons.edit, color: TColor.primary),
-                onPressed: () {
-                  setState(() {
-                    isEditMode = true;
-                  });
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.delete, color: TColor.third),
-                onPressed: _showDeleteConfirmation,
-              ),
-            ],
-          ],
-        ),
-      ],
-    );
-  }
+  // Widget _buildHeaderButtons() {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //     children: [
+  //       IconButton(
+  //         icon: Icon(Icons.arrow_back, color: TColor.primaryText),
+  //         onPressed: () => Get.back(),
+  //       ),
+  //
+  //       Row(
+  //         children: [
+  //           if (!isEditMode) ...[
+  //             IconButton(
+  //               icon: Icon(Icons.edit, color: TColor.primary),
+  //               onPressed: () {
+  //                 setState(() {
+  //                   isEditMode = true;
+  //                 });
+  //               },
+  //             ),
+  //             IconButton(
+  //               icon: Icon(Icons.delete, color: TColor.third),
+  //               onPressed: _showDeleteConfirmation,
+  //             ),
+  //           ],
+  //         ],
+  //       ),
+  //     ],
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

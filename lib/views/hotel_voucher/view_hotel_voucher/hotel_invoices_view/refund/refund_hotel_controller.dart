@@ -63,9 +63,9 @@ class RefundHotelController extends GetxController {
   // Process refund
   void processRefund() {
     // Implement refund logic here
-    print('Processing refund...');
-    print('Refund Date: ${refundDate.value}');
-    print('Cancellation Date: ${cancellationDate.value}');
-    print('Remarks: ${remarks.value}');
+    // print('Processing refund...');
+    // print('Refund Date: ${refundDate.value}');
+    // print('Cancellation Date: ${cancellationDate.value}');
+    // print('Remarks: ${remarks.value}');
   }
 }

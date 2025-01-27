@@ -23,19 +23,19 @@ class DashboardController extends GetxController {
       dashboardData.value = DashboardData.fromJson(response);
     } on NetworkException catch (e) {
       error.value = e.toString();
-      print('Network error: ${e.message}');
+      // print('Network error: ${e.message}');
     } on UnauthorizedException catch (e) {
       error.value = e.toString();
-      print('Authorization error: ${e.message}');
+      // print('Authorization error: ${e.message}');
     } on BadRequestException catch (e) {
       error.value = e.toString();
-      print('Bad request error: ${e.message}');
+      // print('Bad request error: ${e.message}');
     } on ServerException catch (e) {
       error.value = e.toString();
-      print('Server error: ${e.message}');
+      // print('Server error: ${e.message}');
     } catch (e) {
       error.value = 'An unexpected error occurred';
-      print('Unexpected error: $e');
+      // print('Unexpected error: $e');
     } finally {
       isLoading.value = false;
     }

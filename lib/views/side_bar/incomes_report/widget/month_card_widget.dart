@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import '../../../../common/color_extension.dart';
 import '../controller/income_controller.dart';
 import 'income_card_widget.dart';
-import 'total_item_widget.dart';
+
 
 class MonthCardWidget extends GetView<IncomesReportController> {
   final DateTime month;
@@ -102,50 +102,50 @@ class MonthCardWidget extends GetView<IncomesReportController> {
 }
 
 // Update in IncomesComparisonReport class
-Widget _buildTotalSummaryCard() {
-  return Obx(() {
-    final totals = IncomesReportController().getTotalSummary();
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: TColor.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: TColor.primary.withOpacity(0.2), width: 2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Total Incomes Summary',
-            style: TextStyle(
-              color: TColor.primaryText,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: totals.entries.map((entry) {
-              return Expanded(
-                child: TotalItemWidget(
-                  label: entry.key,
-                  total: entry.value,
-                  icon: getIconForIncomeType(entry.key),
-                  amount: '',
-                ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
-    );
-  });
-}
+// Widget _buildTotalSummaryCard() {
+//   return Obx(() {
+//     final totals = IncomesReportController().getTotalSummary();
+//
+//     return Container(
+//       margin: const EdgeInsets.only(bottom: 16),
+//       padding: const EdgeInsets.all(16),
+//       decoration: BoxDecoration(
+//         color: TColor.white,
+//         borderRadius: BorderRadius.circular(12),
+//         border: Border.all(color: TColor.primary.withOpacity(0.2), width: 2),
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Text(
+//             'Total Incomes Summary',
+//             style: TextStyle(
+//               color: TColor.primaryText,
+//               fontSize: 18,
+//               fontWeight: FontWeight.bold,
+//             ),
+//           ),
+//           const SizedBox(height: 16),
+//           Wrap(
+//             spacing: 16,
+//             runSpacing: 16,
+//             children: totals.entries.map((entry) {
+//               return Expanded(
+//                 child: TotalItemWidget(
+//                   label: entry.key,
+//                   total: entry.value,
+//                   icon: getIconForIncomeType(entry.key),
+//                   amount: '',
+//                 ),
+//               );
+//             }).toList(),
+//           ),
+//           const SizedBox(height: 16),
+//         ],
+//       ),
+//     );
+//   });
+// }
 
 IconData getIconForIncomeType(String type) {
   switch (type) {

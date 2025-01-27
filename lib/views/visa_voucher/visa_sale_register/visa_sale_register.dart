@@ -52,6 +52,7 @@ class VisaSaleRegisterScreen extends StatelessWidget {
                     initialDate: controller.fromDate.value,
                     onDateChanged: (DateTime date) {
                       controller.fromDate.value = date;
+                      controller.fetchVisaSaleRegisterData();
                     },
                     label: 'From Date',
                   )),
@@ -63,6 +64,7 @@ class VisaSaleRegisterScreen extends StatelessWidget {
                     initialDate: controller.toDate.value,
                     onDateChanged: (DateTime date) {
                       controller.toDate.value = date;
+                      controller.fetchVisaSaleRegisterData();
                     },
                     label: 'To Date',
                   )),
@@ -215,6 +217,7 @@ class VisaSaleRegisterScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _buildDetailRow('Customer', entry['customer'] ?? 'N/A', isWrappable: true),
                 _buildDetailRow('Account', entry['account'] ?? 'N/A', isWrappable: true),
                 _buildDetailRow('Visa Type', entry['visa_type'] ?? 'N/A'),
                 _buildDetailRow('Country', entry['country'] ?? 'N/A'),

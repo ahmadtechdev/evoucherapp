@@ -1,11 +1,11 @@
-class ariline {
+class AirLine {
   final String id;
   final String name;
   final String? accountNumber;
   final double closingDr;
   final double closingCr;
 
-  ariline({
+  AirLine({
     required this.id,
     required this.name,
     this.accountNumber,

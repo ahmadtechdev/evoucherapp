@@ -45,21 +45,21 @@ class AccountDropdown extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.error_outline,
                 color: Colors.red,
                 size: 50,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                 'Error: ${accountsController.errorMessage}',
-                style: TextStyle(color: Colors.red),
+                style: const TextStyle(color: Colors.red),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () => accountsController.fetchAccounts(subheadName: subHeadName),
-                child: Text('Retry'),
+                child: const Text('Retry'),
               ),
             ],
           ),
@@ -88,20 +88,20 @@ class AccountDropdown extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.account_balance_wallet_outlined,
                 color: Colors.grey,
                 size: 50,
               ),
-              SizedBox(height: 10),
-              Text(
+              const SizedBox(height: 10),
+              const Text(
                 'No accounts available',
                 style: TextStyle(color: Colors.grey),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () => accountsController.fetchAccounts(subheadName: subHeadName),
-                child: Text('Refresh'),
+                child: const Text('Refresh'),
               ),
             ],
           ),

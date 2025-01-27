@@ -29,8 +29,13 @@ class MonthlySalesReport extends StatelessWidget {
         children: [
           _buildDateFilterSection(),
           Expanded(
-            child: _buildSalesList(),
-          ),
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return _buildSalesList();
+              }),
+            ),
         ],
       ),
     );

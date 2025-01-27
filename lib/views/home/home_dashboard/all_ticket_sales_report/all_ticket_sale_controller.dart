@@ -32,7 +32,7 @@ class TransactionController extends GetxController {
       String cleanAmount = amount.replaceAll(',', '').trim();
       return double.parse(cleanAmount);
     } catch (e) {
-      print('Error parsing amount: $amount');
+      // print('Error parsing amount: $amount');
       return 0.0;
     }
   }
@@ -83,7 +83,7 @@ class TransactionController extends GetxController {
         expandedStates.value = List.generate(transactions.length, (_) => false);
       }
     } catch (e) {
-      print('Error fetching transactions: $e');
+      // print('Error fetching transactions: $e');
     } finally {
       isLoading.value = false;
     }

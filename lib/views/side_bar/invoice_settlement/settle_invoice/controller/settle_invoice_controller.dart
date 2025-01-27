@@ -58,7 +58,7 @@ class SettleInvoiceController extends GetxController {
     } else {
       selectedInvoices.add(invoice);
     }
-    print(selectedInvoices);
+
   }
 
   void setSettledAmount(Map<String, dynamic> invoice, String value) {

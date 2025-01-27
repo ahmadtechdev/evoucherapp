@@ -100,7 +100,7 @@ class TrialOfBalanceController extends GetxController {
         accountHeaders.value = headers;
       }
     } catch (e) {
-      print('Error fetching trial balance: $e');
+      // print('Error fetching trial balance: $e');
     } finally {
       isLoading(false);
     }

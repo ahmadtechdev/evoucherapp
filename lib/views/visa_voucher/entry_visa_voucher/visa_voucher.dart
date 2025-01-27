@@ -9,7 +9,7 @@ import '../../../common/color_extension.dart';
 import '../../../common_widget/dart_selector2.dart';
 import '../../../common_widget/round_text_field.dart';
 import '../../../common_widget/snackbar.dart';
-import '../../hotel_voucher/view_hotel_voucher/view_hotel_voucher.dart';
+
 import 'entry_visa_voucher_controller.dart';
 
 class VisaVoucher extends StatelessWidget {
@@ -523,72 +523,72 @@ class VisaVoucher extends StatelessWidget {
     );
   }
 
-  Widget _buildCounterField({
-    required String title,
-    required RxInt count,
-    required VoidCallback onIncrement,
-    required VoidCallback onDecrement,
-    IconData? icon,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      decoration: BoxDecoration(
-        color: TColor.textField,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        children: [
-          if (icon != null) Icon(icon, color: TColor.secondaryText, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                color: TColor.primaryText,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: TColor.white,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: TColor.primary.withOpacity(0.3)),
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.remove, color: TColor.primary),
-                  onPressed: onDecrement,
-                  padding: const EdgeInsets.all(8),
-                  constraints: const BoxConstraints(),
-                ),
-                SizedBox(
-                  width: 40,
-                  child: Center(
-                    child: Text(
-                      '${count.value}',
-                      style: TextStyle(
-                        color: TColor.primaryText,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.add, color: TColor.primary),
-                  onPressed: onIncrement,
-                  padding: const EdgeInsets.all(8),
-                  constraints: const BoxConstraints(),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildCounterField({
+  //   required String title,
+  //   required RxInt count,
+  //   required VoidCallback onIncrement,
+  //   required VoidCallback onDecrement,
+  //   IconData? icon,
+  // }) {
+  //   return Container(
+  //     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+  //     decoration: BoxDecoration(
+  //       color: TColor.textField,
+  //       borderRadius: BorderRadius.circular(15),
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         if (icon != null) Icon(icon, color: TColor.secondaryText, size: 20),
+  //         const SizedBox(width: 10),
+  //         Expanded(
+  //           child: Text(
+  //             title,
+  //             style: TextStyle(
+  //               color: TColor.primaryText,
+  //               fontSize: 16,
+  //             ),
+  //           ),
+  //         ),
+  //         Container(
+  //           decoration: BoxDecoration(
+  //             color: TColor.white,
+  //             borderRadius: BorderRadius.circular(10),
+  //             border: Border.all(color: TColor.primary.withOpacity(0.3)),
+  //           ),
+  //           child: Row(
+  //             children: [
+  //               IconButton(
+  //                 icon: Icon(Icons.remove, color: TColor.primary),
+  //                 onPressed: onDecrement,
+  //                 padding: const EdgeInsets.all(8),
+  //                 constraints: const BoxConstraints(),
+  //               ),
+  //               SizedBox(
+  //                 width: 40,
+  //                 child: Center(
+  //                   child: Text(
+  //                     '${count.value}',
+  //                     style: TextStyle(
+  //                       color: TColor.primaryText,
+  //                       fontSize: 16,
+  //                       fontWeight: FontWeight.bold,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //               IconButton(
+  //                 icon: Icon(Icons.add, color: TColor.primary),
+  //                 onPressed: onIncrement,
+  //                 padding: const EdgeInsets.all(8),
+  //                 constraints: const BoxConstraints(),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildBottomButton(VisaVoucherControler controller) {
     return Container(

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../common/color_extension.dart';
 import '../../../common_widget/dart_selector2.dart';
 import '../../../common_widget/snackbar.dart';
-import 'hotel_invoices_view/view/single_hotel_view.dart';
+
 import 'invoices_functions_class.dart';
 import 'view_hotel_voucher_controller.dart';
 

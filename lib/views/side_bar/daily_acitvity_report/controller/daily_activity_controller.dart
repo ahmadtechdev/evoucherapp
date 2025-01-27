@@ -36,10 +36,7 @@ class DailyActivityReportController extends GetxController {
       String formattedFromDate = formatDateForApi(fromDate.value);
       String formattedToDate = formatDateForApi(toDate.value);
 
-      print('From Date: $formattedFromDate');
-      print('To Date: $formattedToDate');
-
-      final response = await _apiService.fetchDateRangeReport(
+         final response = await _apiService.fetchDateRangeReport(
         endpoint: "dailyActivity",
         fromDate: formattedFromDate,
         toDate: formattedToDate,

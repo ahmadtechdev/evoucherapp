@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 class TicketListingScreen extends StatelessWidget {
   final BspReportController controller = Get.put(BspReportController());
 
-  TicketListingScreen({Key? key}) : super(key: key);
+  TicketListingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

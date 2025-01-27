@@ -2,13 +2,13 @@ import 'package:evoucher_new/common/color_extension.dart';
 import 'package:flutter/material.dart';
 
 class AirlineWiseSaleReport extends StatefulWidget {
-  const AirlineWiseSaleReport({Key? key}) : super(key: key);
+  const AirlineWiseSaleReport({super.key});
 
   @override
-  _AirlineWiseSaleReportState createState() => _AirlineWiseSaleReportState();
+  AirlineWiseSaleReportState createState() => AirlineWiseSaleReportState();
 }
 
-class _AirlineWiseSaleReportState extends State<AirlineWiseSaleReport> {
+class AirlineWiseSaleReportState extends State<AirlineWiseSaleReport> {
   final List<Map<String, dynamic>> data = [
     {
       'Date': 'Wed, 13 Nov 2024',

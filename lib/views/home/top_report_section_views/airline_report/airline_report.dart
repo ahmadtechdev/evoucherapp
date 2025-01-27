@@ -131,7 +131,7 @@ class AirlineReport extends StatelessWidget {
 }
 
 class _AirlineCard extends StatelessWidget {
-  final ariline airline;
+  final AirLine airline;
   final AirlineReportController controller;
 
   const _AirlineCard({

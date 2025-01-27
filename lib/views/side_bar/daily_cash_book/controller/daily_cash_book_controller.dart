@@ -31,8 +31,10 @@ class DailyCashBookController extends GetxController {
 
   void _filterTransactions() {
     if (searchQuery.value.isEmpty) {
+      // ignore: invalid_use_of_protected_member
       filteredTransactions.value = transactions.value;
     } else {
+      // ignore: invalid_use_of_protected_member
       filteredTransactions.value = transactions.value.where((transaction) {
         return transaction.description
             .toLowerCase()
@@ -81,6 +83,7 @@ class DailyCashBookController extends GetxController {
             .toList();
 
         // Initialize filtered transactions with all transactions
+        // ignore: invalid_use_of_protected_member
         filteredTransactions.value = transactions.value;
       }
     } catch (e) {

@@ -76,7 +76,7 @@ class BspReportController extends GetxController {
       }
     } catch (e) {
       errorMessage.value = 'An error occurred: ${e.toString()}';
-      print('Error in fetchTickets: ${e.toString()}'); // Added for debugging
+      // print('Error in fetchTickets: ${e.toString()}'); // Added for debugging
     } finally {
       isLoading.value = false;
     }

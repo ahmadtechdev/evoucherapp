@@ -313,33 +313,33 @@ Widget _buildInfoRow(String label, String value) {
   );
 }
 
-Widget _buildDateField(String label, String value) {
-  return Container(
-    padding: const EdgeInsets.all(8),
-    decoration: BoxDecoration(
-      color: TColor.textField,
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: TColor.secondaryText,
-            fontSize: 12,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            color: TColor.primaryText,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    ),
-  );
-}
+// Widget _buildDateField(String label, String value) {
+//   return Container(
+//     padding: const EdgeInsets.all(8),
+//     decoration: BoxDecoration(
+//       color: TColor.textField,
+//       borderRadius: BorderRadius.circular(8),
+//     ),
+//     child: Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         Text(
+//           label,
+//           style: TextStyle(
+//             color: TColor.secondaryText,
+//             fontSize: 12,
+//           ),
+//         ),
+//         const SizedBox(height: 4),
+//         Text(
+//           value,
+//           style: TextStyle(
+//             color: TColor.primaryText,
+//             fontSize: 14,
+//             fontWeight: FontWeight.w500,
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }

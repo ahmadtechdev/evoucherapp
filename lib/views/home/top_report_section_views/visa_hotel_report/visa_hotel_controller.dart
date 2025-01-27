@@ -7,7 +7,7 @@ class VisaHotelController extends GetxController {
   final ApiService _apiService = Get.put(ApiService());
 
   var selectedDate = DateTime.now().obs;
-  var transactions = <visahotel>[].obs;
+  var transactions = <VisaHotel>[].obs;
   var totalReceipt = 0.0.obs;
   var totalPayment = 0.0.obs;
   var closingBalance = 0.0.obs;
@@ -42,7 +42,7 @@ class VisaHotelController extends GetxController {
         // Transform API data to CustomerTransaction
         transactions.value =
             (response['data']['customers'] as List).map((customer) {
-          return visahotel(
+          return VisaHotel(
               id: customer['account_id'],
               name: customer['account_name'],
               closingDr: _parseAmount(customer['debit']),

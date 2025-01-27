@@ -1,9 +1,8 @@
-import 'dart:convert';
+
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 import '../../../common/color_extension.dart';
 import '../../../common_widget/date_selecter.dart';
@@ -171,7 +170,7 @@ class _ExpenseEntryVoucherState extends State<ExpenseEntryVoucher> {
                   placeholderColor: TColor.placeholder,
                   onTotalChanged: (totalDebit, totalCredit) {
                     // Optional: Handle total changes in parent widget
-                    print('Total Debit: \$totalDebit, Total Credit: \$totalCredit');
+                    // print('Total Debit: \$totalDebit, Total Credit: \$totalCredit');
                   },
                 ),
                 SizedBox(height: screenHeight * 0.02), // 2% of screen height

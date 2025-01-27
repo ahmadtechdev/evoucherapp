@@ -41,7 +41,7 @@ class _HomeState extends State<Home> {
         ],
       ),
       drawer: const CustomDrawer(currentIndex: 0),
-      body: const SingleChildScrollView(
+      body:  const SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(

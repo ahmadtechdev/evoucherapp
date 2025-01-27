@@ -170,7 +170,7 @@ class _ReportSectionState extends State<ReportSection> {
                   'DAY WISE',
                   'Sales Report',
                   () {
-                    Get.to(() => DetailsSaleReport());
+                    Get.to(() => const DetailsSaleReport());
                   },
                 ),
                 // if (loginType == 'travel') ...[

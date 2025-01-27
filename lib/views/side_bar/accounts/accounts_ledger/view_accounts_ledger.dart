@@ -313,19 +313,17 @@ class LedgerScreen extends StatelessWidget {
           ..writeAsBytesSync(fileBytes);
 
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Excel file exported to $filePath')),
-        );
+
+        CustomSnackBar(message: 'Excel file exported to $filePath', backgroundColor: TColor.secondary).show();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to export Excel file')),
-        );
+
+        CustomSnackBar(message: 'Failed to export Excel file', backgroundColor: TColor.third).show();
       }
     } catch (e) {
       // Handle exceptions
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+
+      CustomSnackBar(message: 'Error: ${e.toString()}', backgroundColor: TColor.third).show();
+
     }
   }
 
@@ -344,6 +342,7 @@ class LedgerScreen extends StatelessWidget {
         return true;
       } else if (newStatus.isPermanentlyDenied) {
         // Show dialog to navigate to app settings
+        // ignore: use_build_context_synchronously
         _showPermissionDialog(context);
       }
     }

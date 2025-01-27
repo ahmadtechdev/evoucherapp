@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../service/session_manager.dart';
 import '../side_bar/5_year_customers_sales/five_year_customers_sale.dart';
 import '../side_bar/daily_sales_report/daily_sales_report.dart';
 import '../side_bar/expense_report/expense_report.dart';
@@ -10,10 +11,31 @@ import '../side_bar/top_agent_report/top_agent_sale.dart';
 import '../side_bar/top_customer_sale/top_customer_sale.dart';
 import '../side_bar/top_suuplier_report/top_supplier_sale.dart';
 
-class ReportsGridSection extends StatelessWidget {
+class ReportsGridSection extends StatefulWidget {
   final Function(String category, String report)? onReportTap;
 
   const ReportsGridSection({super.key, this.onReportTap});
+
+  @override
+  State<ReportsGridSection> createState() => _ReportsGridSectionState();
+}
+
+class _ReportsGridSectionState extends State<ReportsGridSection> {
+  String? loginType;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _initializeLoginType();
+
+  }
+
+  Future<void> _initializeLoginType() async {
+    final sessionManager = Get.find<SessionManager>();
+    loginType = await sessionManager.getLoginType();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,36 +71,39 @@ class ReportsGridSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          _buildReportCategory(
-            "Sales Report",
-            [
-              ReportItem(
-                "Top Customer Sales",
-                Icons.people,
-                const Color(0xff0289ee),
-                onTap: () => Get.to(() => CustomerReportScreen()),
-              ),
-              ReportItem(
-                "5 Year Customer Sales",
-                Icons.timeline,
-                const Color(0xff37B45D),
-                onTap: () => Get.to(() => const FiveYearsCustomerSale()),
-              ),
-              ReportItem(
-                "Top Suppliers Sales",
-                Icons.business,
-                const Color(0xffE64A19),
-                onTap: () => Get.to(() => SupplierReportScreen()),
-              ),
-              ReportItem(
-                "Top Agent Sales",
-                Icons.person_outline,
-                const Color(0xff0289ee),
-                onTap: () => Get.to(() => AgentReportScreen()),
-              ),
-            ],
-          ),
+          if(loginType != "toc")...[
+            const SizedBox(height: 16),
+            _buildReportCategory(
+              "Sales Report",
+              [
+                ReportItem(
+                  "Top Customer Sales",
+                  Icons.people,
+                  const Color(0xff0289ee),
+                  onTap: () => Get.to(() => CustomerReportScreen()),
+                ),
+                ReportItem(
+                  "5 Year Customer Sales",
+                  Icons.timeline,
+                  const Color(0xff37B45D),
+                  onTap: () => Get.to(() => const FiveYearsCustomerSale()),
+                ),
+                ReportItem(
+                  "Top Suppliers Sales",
+                  Icons.business,
+                  const Color(0xffE64A19),
+                  onTap: () => Get.to(() => SupplierReportScreen()),
+                ),
+                ReportItem(
+                  "Top Agent Sales",
+                  Icons.person_outline,
+                  const Color(0xff0289ee),
+                  onTap: () => Get.to(() => AgentReportScreen()),
+                ),
+              ],
+            ),
+          ],
+
         ],
       ),
     );
@@ -139,8 +164,8 @@ class ReportsGridSection extends StatelessWidget {
         onTap: () {
           if (report.onTap != null) {
             report.onTap!();
-          } else if (onReportTap != null) {
-            onReportTap!(category, report.title);
+          } else if (widget.onReportTap != null) {
+            widget.onReportTap!(category, report.title);
           }
         },
         child: Container(

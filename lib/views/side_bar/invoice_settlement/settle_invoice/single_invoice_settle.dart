@@ -243,7 +243,7 @@ class SingleInvoiceSettlementPage extends StatelessWidget {
   }
 
   Widget _buildSelectedInvoicesSheet(SettleInvoiceController controller) {
-    print(controller.selectedInvoices);
+
     return DraggableScrollableSheet(
       initialChildSize: 0.4,
       minChildSize: 0.3,

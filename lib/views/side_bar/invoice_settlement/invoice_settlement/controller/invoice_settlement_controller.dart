@@ -42,19 +42,12 @@ class InvoiceSettlementController extends GetxController {
           additionalParams: {'account': selectedAccount.value});
 
       if (response['status'] == 'success') {
-        print(response);
+
         var invoiceData = response['data'];
 
         // Handle null values by using null-aware operators (??) or checks
         invoices.value = invoiceData.map((invoice) {
           // Safely convert to double if it's a valid number or default to 0.0
-          double safeDouble(String value) {
-            try {
-              return double.parse(value);
-            } catch (e) {
-              return 0.0; // Return 0.0 if parsing fails
-            }
-          }
 
           return {
             'voucher_id': invoice['voucher_id'] ?? '',
@@ -71,7 +64,6 @@ class InvoiceSettlementController extends GetxController {
           };
         }).toList();
 
-        print(invoices);
       } else {
         Get.snackbar('Error', 'Failed to fetch invoices');
       }

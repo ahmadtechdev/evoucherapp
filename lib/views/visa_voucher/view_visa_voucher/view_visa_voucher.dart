@@ -10,7 +10,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../../../common/color_extension.dart';
 import '../../../common_widget/dart_selector2.dart';
 import '../../../common_widget/snackbar.dart';
-import 'visa_invoices_view/view/single_visa_view.dart';
+
 import 'visa_voucher_controller.dart';
 
 class ViewVisaVoucher extends StatelessWidget {
@@ -358,6 +358,7 @@ class ViewVisaVoucher extends StatelessWidget {
       );
 
       // Close loading dialog
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
 
       if (response['status'] != 'success') {

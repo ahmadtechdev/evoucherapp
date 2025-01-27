@@ -1,3 +1,4 @@
+import 'package:evoucher_new/common_widget/snackbar.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../service/api_service.dart';
@@ -95,12 +96,9 @@ class MonthlySalesController extends GetxController {
         );
       }
     } catch (e) {
-      print('Error fetching sales data: $e');
-      Get.snackbar(
-        'Error',
-        'Failed to fetch sales data. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // print('Error fetching sales data: $e');
+
+      CustomSnackBar(message: "Failed to fetch sales data. Please try again.").show();
     } finally {
       isLoading.value = false;
     }

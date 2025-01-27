@@ -85,7 +85,7 @@ class VisaHotelReport extends StatelessWidget {
         itemBuilder: (context, index) {
           final transaction = controller.transactions[index];
           return _TransactionCard(
-            Visahotel: transaction,
+            visaHotel: transaction,
             controller: controller,
           );
         },
@@ -132,11 +132,11 @@ class VisaHotelReport extends StatelessWidget {
 }
 
 class _TransactionCard extends StatelessWidget {
-  final visahotel Visahotel;
+  final VisaHotel visaHotel;
   final VisaHotelController controller;
 
   const _TransactionCard({
-    required this.Visahotel,
+    required this.visaHotel,
     required this.controller,
   });
 
@@ -161,7 +161,7 @@ class _TransactionCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  Visahotel.name,
+                  visaHotel.name,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -169,7 +169,7 @@ class _TransactionCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "#${Visahotel.id}",
+                  "#${visaHotel.id}",
                   style: TextStyle(
                     color: TColor.secondaryText,
                     fontSize: 16,
@@ -192,7 +192,7 @@ class _TransactionCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      controller.currencyFormatter.format(Visahotel.closingDr),
+                      controller.currencyFormatter.format(visaHotel.closingDr),
                       style: TextStyle(
                         fontSize: 16,
                         color: TColor.third,
@@ -212,7 +212,7 @@ class _TransactionCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      controller.currencyFormatter.format(Visahotel.closingCr),
+                      controller.currencyFormatter.format(visaHotel.closingCr),
                       style: TextStyle(
                         fontSize: 16,
                         color: TColor.secondary,
@@ -223,14 +223,14 @@ class _TransactionCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (Visahotel.contact != null) ...[
+            if (visaHotel.contact != null) ...[
               const SizedBox(height: 12),
               Row(
                 children: [
                   Icon(Icons.phone, size: 16, color: TColor.primary),
                   const SizedBox(width: 8),
                   Text(
-                    Visahotel.contact!,
+                    visaHotel.contact!,
                     style: TextStyle(
                       color: TColor.secondaryText,
                       fontSize: 14,
@@ -250,21 +250,21 @@ class _TransactionCard extends StatelessWidget {
                     color: TColor.primary,
                     onPressed: () {
                       Get.to(() => LedgerScreen(
-                        accountId: Visahotel.id,
-                        accountName: Visahotel.name,
+                        accountId: visaHotel.id,
+                        accountName: visaHotel.name,
                       ));
                     },
                   ),
                 ),
                 const SizedBox(width: 10),
-                if (Visahotel.contact != null)
+                if (visaHotel.contact != null)
                   Expanded(
                     child: _ActionButton(
                       icon: Icons.call,
                       label: "WhatsApp",
                       color: TColor.secondary,
                       onPressed: () =>
-                          controller.openWhatsApp(Visahotel.contact!),
+                          controller.openWhatsApp(visaHotel.contact!),
                     ),
                   ),
               ],

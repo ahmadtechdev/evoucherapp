@@ -39,7 +39,7 @@ class _ViewUnPostedVouchersState extends State<ViewUnPostedVouchers> {
               placeholderColor: TColor.placeholder,
               onTotalChanged: (totalDebit, totalCredit) {
                 // Optional: Handle total changes in parent widget
-                print('Total Debit: $totalDebit, Total Credit: $totalCredit');
+                // print('Total Debit: $totalDebit, Total Credit: $totalCredit');
               },
             ),
             const SizedBox(height: 18),

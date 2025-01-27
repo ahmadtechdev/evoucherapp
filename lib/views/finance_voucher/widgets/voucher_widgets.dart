@@ -4,10 +4,14 @@ import 'package:evoucher_new/views/finance_voucher/bank/view_edit_b_voucher.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../common/color_extension.dart';
+import '../../../common_widget/snackbar.dart';
 import '../cash/view_edit_c_voucher.dart';
 import '../expense/view_edit_e_voucher.dart';
 import '../journal/view_edit_j_voucher.dart';
-import '../journal/view_unposted_vouchers.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:flutter/services.dart';
 
 class EntryVoucherCard extends StatelessWidget {
   final Map<String, dynamic> voucher;
@@ -20,6 +24,211 @@ class EntryVoucherCard extends StatelessWidget {
     required this.type,
     this.onVoucherTap,
   });
+
+  Future<void> printVoucher(BuildContext context) async {
+    final pdf = pw.Document();
+
+    // Load the logo
+    final logoImage = await rootBundle.load('assets/img/newLogo.png');
+    final logo = pw.MemoryImage(logoImage.buffer.asUint8List());
+
+    // Format details data
+    final details = (voucher['originalData']['details'] as List<dynamic>? ?? []);
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Container(
+            padding: const pw.EdgeInsets.all(20),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                // Header
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Image(logo, width: 100, height: 50),
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      children: [
+                        pw.Text(
+                          'Journey Online',
+                          style: pw.TextStyle(
+                            fontSize: 24,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
+                        ),
+                        pw.Text(
+                          'Address Line 1, City',
+                          style: const pw.TextStyle(fontSize: 12),
+                        ),
+                        pw.Text(
+                          'Phone: +1234567890',
+                          style: const pw.TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 20),
+
+                // Voucher Title
+                pw.Center(
+                  child: pw.Text(
+                    '${type.toUpperCase()} VOUCHER',
+                    style: pw.TextStyle(
+                      fontSize: 18,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ),
+                pw.SizedBox(height: 20),
+
+                // Voucher Info
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text('Voucher #: ${voucher['id']}'),
+                    pw.Text('Date: ${voucher['date']}'),
+                  ],
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text('Description: ${voucher['description']}'),
+                pw.SizedBox(height: 20),
+
+                // Table Header
+                pw.Table(
+                  border: pw.TableBorder.all(),
+                  columnWidths: {
+                    0: const pw.FlexColumnWidth(3),
+                    1: const pw.FlexColumnWidth(4),
+                    2: const pw.FlexColumnWidth(2),
+                    3: const pw.FlexColumnWidth(2),
+                  },
+                  children: [
+                    // Table Header
+                    pw.TableRow(
+                      decoration: const pw.BoxDecoration(
+                        color: PdfColors.grey300,
+                      ),
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(5),
+                          child: pw.Text(
+                            'Account',
+                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                          ),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(5),
+                          child: pw.Text(
+                            'Description',
+                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                          ),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(5),
+                          child: pw.Text(
+                            'Debit',
+                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                          ),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(5),
+                          child: pw.Text(
+                            'Credit',
+                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Table Rows
+                    ...details.map((detail) => pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(5),
+                          child: pw.Text(detail['account_name'] ?? ''),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(5),
+                          child: pw.Text(detail['description'] ?? ''),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(5),
+                          child: pw.Text(
+                            detail['debit'] ?? '0.00',
+                            textAlign: pw.TextAlign.right,
+                          ),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(5),
+                          child: pw.Text(
+                            detail['credit'] ?? '0.00',
+                            textAlign: pw.TextAlign.right,
+                          ),
+                        ),
+                      ],
+                    )),
+                  ],
+                ),
+                pw.SizedBox(height: 20),
+
+                // Totals
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.end,
+                  children: [
+                    pw.Text(
+                      'Total: ${voucher['amount']}',
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 40),
+
+                // Signatures
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Column(
+                      children: [
+                        pw.Container(
+                          width: 150,
+                          decoration: const pw.BoxDecoration(
+                            border: pw.Border(top: pw.BorderSide()),
+                          ),
+                        ),
+                        pw.Text('Prepared By'),
+                      ],
+                    ),
+                    pw.Column(
+                      children: [
+                        pw.Container(
+                          width: 150,
+                          decoration: const pw.BoxDecoration(
+                            border: pw.Border(top: pw.BorderSide()),
+                          ),
+                        ),
+                        pw.Text('Approved By'),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    // Print the document
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
+  }
+
 
   void _handleViewPress() {
     // Create the properly structured data for the detail view
@@ -166,7 +375,7 @@ class EntryVoucherCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () => printVoucher(context),
                   icon: const Icon(Icons.print),
                   label: const Text('Print'),
                   style: TextButton.styleFrom(
@@ -343,7 +552,9 @@ class UnPostedVoucherCard extends StatelessWidget {
                 // View Button
                 ElevatedButton.icon(
                   onPressed: () {
-                    Get.to(() => const ViewUnPostedVouchers());
+                    // Get.to(() => const ViewUnPostedVouchers());
+                    CustomSnackBar(message: "this feature currently unavailable on mobile. ", backgroundColor: TColor.fourth).show();
+
                   },
                   icon: const Icon(Icons.visibility_outlined, size: 18),
                   label: const Text('View'),
