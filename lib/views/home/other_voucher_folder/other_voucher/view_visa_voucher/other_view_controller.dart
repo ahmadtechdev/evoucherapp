@@ -1,7 +1,7 @@
 
 import 'package:get/get.dart';
 
-import '../../../service/api_service.dart';
+import '../../../../../service/api_service.dart';
 
 class OtherViewController extends GetxController {
   final ApiService _apiService = ApiService();

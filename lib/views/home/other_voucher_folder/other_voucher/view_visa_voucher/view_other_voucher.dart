@@ -7,9 +7,9 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
-import '../../../common/color_extension.dart';
-import '../../../common_widget/dart_selector2.dart';
-import '../../../common_widget/snackbar.dart';
+import '../../../../../common/color_extension.dart';
+import '../../../../../common_widget/dart_selector2.dart';
+import '../../../../../common_widget/snackbar.dart';
 
 import 'other_view_controller.dart';
 

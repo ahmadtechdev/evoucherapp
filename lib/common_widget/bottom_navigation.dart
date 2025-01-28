@@ -1,5 +1,5 @@
 // bottom_navigation.dart
-import 'package:evoucher_new/views/other_voucher/other_voucher.dart';
+import 'package:evoucher_new/views/home/other_voucher_folder/other_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

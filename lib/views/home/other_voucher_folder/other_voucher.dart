@@ -1,10 +1,11 @@
-import 'package:evoucher_new/views/other_voucher/view_visa_voucher/view_other_voucher.dart';
+import 'package:evoucher_new/views/home/other_voucher_folder/other_voucher/view_visa_voucher/view_other_voucher.dart';
+import 'package:evoucher_new/views/home/other_voucher_folder/transport_voucher/view_ticket_voucher/view_transport_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../common/color_extension.dart';
-import '../../common/drawer.dart';
-import '../../common_widget/bottom_navigation.dart';
+import '../../../common/color_extension.dart';
+import '../../../common/drawer.dart';
+import '../../../common_widget/bottom_navigation.dart';
 
 class Other_voucher extends StatefulWidget {
   const Other_voucher({super.key});
@@ -90,12 +91,12 @@ class _Other_voucherState extends State<Other_voucher> {
                 },
               ),
               VoucherOption(
-                title: 'View Transport  Voucher',
+                title: 'View Transport Voucher',
                 icon: Icons.visibility_outlined,
                 color: TColor.fourth,
                 onTap: () {
                   // Handle View Journal Voucher tap
-                  // Get.to(() => const Transport ViewVoucher());
+                  Get.to(() => ViewTransportVoucher());
                 },
               ),
             ]),
