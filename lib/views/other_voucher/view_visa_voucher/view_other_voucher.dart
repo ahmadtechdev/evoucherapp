@@ -26,7 +26,7 @@ class ViewOtherVoucher extends StatelessWidget {
         centerTitle: true,
         backgroundColor: TColor.primary,
         foregroundColor: TColor.white,
-        title: const Text('Visa Vouchers'),
+        title: const Text('Other Vouchers'),
       ),
       body: Column(
         children: [
