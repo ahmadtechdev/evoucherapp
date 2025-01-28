@@ -23,12 +23,18 @@ dependencies:
   url_launcher: ^6.3.1
   excel: ^4.0.6
   permission_handler: ^11.3.1
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.3
 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/img/shorLogo.png"
 flutter:
   uses-material-design: true
   assets:
