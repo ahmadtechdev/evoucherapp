@@ -1,4 +1,6 @@
+import 'package:evoucher_new/views/other_voucher/view_visa_voucher/view_other_voucher.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../common/color_extension.dart';
 import '../../common/drawer.dart';
@@ -49,7 +51,7 @@ class _Other_voucherState extends State<Other_voucher> {
                 color: TColor.primary,
                 onTap: () {
                   // Handle View Journal Voucher tap
-                  // Get.to(() => const JournalViewVoucher());
+                  Get.to(() => ViewOtherVoucher());
                 },
               ),
             ]),
