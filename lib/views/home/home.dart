@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../common_widget/bottom_navigation.dart';
@@ -18,7 +17,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   final SessionManager sessionManager = Get.find<SessionManager>();
   @override
   Widget build(BuildContext context) {
@@ -41,7 +39,7 @@ class _HomeState extends State<Home> {
         ],
       ),
       drawer: const CustomDrawer(currentIndex: 0),
-      body:  const SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
@@ -63,6 +61,4 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-
-
 }

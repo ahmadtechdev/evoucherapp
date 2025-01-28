@@ -1,4 +1,5 @@
 // bottom_navigation.dart
+import 'package:evoucher_new/views/other_voucher/other.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -31,18 +32,21 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
         break;
       case 2:
-      // Navigator.pushNamed(context, '/hotel');
+        // Navigator.pushNamed(context, '/hotel');
         Get.to(() => const Ticket());
 
         break;
       case 3:
-      // Navigator.pushNamed(context, '/visa');
+        // Navigator.pushNamed(context, '/visa');
         Get.to(() => const Hotel());
         break;
       case 4:
-      // Navigator.pushNamed(context, '/ticket');
+        // Navigator.pushNamed(context, '/ticket');
         Get.to(() => const Visa());
         break;
+      case 5:
+        // Navigator.pushNamed(context, '/other');
+        Get.to(() => const Other_voucher());
     }
   }
 
@@ -57,9 +61,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
         // Override the theme to show unselected items when no index is provided
         data: Theme.of(context).copyWith(
           bottomNavigationBarTheme:
-          BottomNavigationBarTheme.of(context).copyWith(
+              BottomNavigationBarTheme.of(context).copyWith(
             selectedItemColor:
-            selectedIndex != null ? TColor.secondary : TColor.white,
+                selectedIndex != null ? TColor.secondary : TColor.white,
           ),
         ),
         child: BottomNavigationBar(
@@ -89,6 +93,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
             BottomNavigationBarItem(
               icon: Icon(Icons.card_travel),
               label: 'Visa',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.card_travel),
+              label: 'other',
             ),
           ],
         ),
