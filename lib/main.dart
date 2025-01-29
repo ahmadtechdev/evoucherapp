@@ -1,13 +1,13 @@
 import 'package:evoucher_new/views/authentication/cotnroller/auth_controller.dart';
-import 'package:evoucher_new/views/hotel_voucher/hotel_sale_register/hotel_sale_register_controller.dart';
+import 'package:evoucher_new/views/bottom_bar/hotel_voucher/entry_hotel_voucher/entry_hotel_controller.dart';
+import 'package:evoucher_new/views/bottom_bar/hotel_voucher/hotel_sale_register/hotel_sale_register_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'common/color_extension.dart';
 import 'service/session_manager.dart';
-import 'views/finance_voucher/controller/entry_controller.dart';
+import 'views/bottom_bar//finance_voucher/controller/entry_controller.dart';
 import 'views/home/home.dart';
-import 'views/hotel_voucher/entry_hotel_voucher/entry_hotel_controller.dart';
 import 'views/side_bar/accounts/accounts/controller/account_controller.dart';
 import 'views/side_bar/incomes_report/controller/income_controller.dart';
 import 'views/welcome_view.dart';

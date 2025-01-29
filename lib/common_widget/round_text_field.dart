@@ -121,8 +121,10 @@ class RoundTitleTextfield extends StatelessWidget {
   final Widget? right;
   final Function(String)? onChanged;
   final String? initialValue;
-  final VoidCallback? onEditingComplete; // Added this line
+  final VoidCallback? onEditingComplete;
   final Color? textClr;
+  final int? maxLines; // Added maxLines parameter
+  final double? height; // Added optional height parameter
 
   const RoundTitleTextfield({
     super.key,
@@ -138,7 +140,9 @@ class RoundTitleTextfield extends StatelessWidget {
     this.obscureText = false,
     this.readOnly = false,
     this.onEditingComplete,
-    this.textClr, // Added this line
+    this.textClr,
+    this.maxLines = 1, // Default to 1 line
+    this.height, // Optional height override
   });
 
   @override
@@ -149,23 +153,27 @@ class RoundTitleTextfield extends StatelessWidget {
       effectiveController.text = initialValue!;
     }
 
+    // Calculate dynamic height based on maxLines
+    final containerHeight = height ?? (maxLines == 1 ? 55.0 : (maxLines ?? 1) * 24.0 + 35.0);
+
     return Container(
-      height: 55,
+      height: containerHeight,
       decoration: BoxDecoration(
           color: bgColor ?? TColor.textField,
           borderRadius: BorderRadius.circular(25)),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start, // Align to top for multiline
         children: [
           if (left != null)
             Padding(
-              padding: const EdgeInsets.only(left: 15),
+              padding: const EdgeInsets.only(left: 15, top: 15),
               child: left!,
             ),
           Expanded(
             child: Stack(
               children: [
                 Container(
-                  height: 55,
+                  height: containerHeight,
                   margin: const EdgeInsets.only(top: 8),
                   alignment: Alignment.topLeft,
                   child: TextField(
@@ -176,10 +184,14 @@ class RoundTitleTextfield extends StatelessWidget {
                     keyboardType: keyboardType,
                     readOnly: readOnly,
                     onChanged: onChanged,
-                    onEditingComplete: onEditingComplete, // Added this line
+                    onEditingComplete: onEditingComplete,
+                    maxLines: maxLines, // Use the maxLines parameter
+                    minLines: 1, // Allow collapsing to single line
                     decoration: InputDecoration(
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: maxLines == 1 ? 0 : 15, // Adjust vertical padding for multiline
+                      ),
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
                       hintText: hintText,
@@ -191,7 +203,7 @@ class RoundTitleTextfield extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  height: 55,
+                  height: 20,
                   margin: const EdgeInsets.only(top: 10, left: 20),
                   alignment: Alignment.topLeft,
                   child: Text(
@@ -204,7 +216,7 @@ class RoundTitleTextfield extends StatelessWidget {
           ),
           if (right != null)
             Padding(
-              padding: const EdgeInsets.only(right: 0),
+              padding: const EdgeInsets.only(right: 0, top: 15),
               child: right!,
             ),
         ],

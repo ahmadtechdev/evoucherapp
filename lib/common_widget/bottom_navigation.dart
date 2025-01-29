@@ -1,14 +1,18 @@
 // bottom_navigation.dart
-import 'package:evoucher_new/views/home/other_voucher_folder/other_voucher.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../common/color_extension.dart';
-import '../views/finance_voucher/finance.dart';
+
+import '../views/bottom_bar/finance_voucher/finance.dart';
+import '../views/bottom_bar/hotel_voucher/hotel.dart';
+
+import '../views/bottom_bar/other_vouchers/other_voucher.dart';
+import '../views/bottom_bar/visa_voucher/visa.dart';
 import '../views/home/home.dart';
-import '../views/hotel_voucher/hotel.dart';
-import '../views/ticket_voucher/ticket.dart';
-import '../views/visa_voucher/visa.dart';
+import '../views/bottom_bar//ticket_voucher/ticket.dart';
+
 
 class CustomBottomNavigationBar extends StatelessWidget {
   // Optional parameter - only pass when on a bottom nav page
