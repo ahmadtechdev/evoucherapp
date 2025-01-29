@@ -1,5 +1,6 @@
 import 'package:evoucher_new/views/bottom_bar//other_vouchers/invoice_voucher/view_invoice_voucher/view_invoice_voucher.dart';
-import 'package:evoucher_new/views/bottom_bar/other_vouchers/other_voucher/view_visa_voucher/view_other_voucher.dart';
+import 'package:evoucher_new/views/bottom_bar/other_vouchers/other_voucher/other_entry_voucher/other_entry_voucher.dart';
+import 'package:evoucher_new/views/bottom_bar/other_vouchers/other_voucher/view_other_voucher/view_other_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -45,7 +46,7 @@ class _Other_voucherState extends State<Other_voucher> {
                 color: TColor.primary,
                 onTap: () {
                   // Handle Entry Journal Voucher tap
-                  // Get.to(() => const JournalEntryVoucher());
+                  Get.to(() => const OtherEntryVoucher());
                 },
               ),
               VoucherOption(

@@ -38,12 +38,10 @@ class MyApp extends StatelessWidget {
 
     return GetMaterialApp(
       title: 'Flutter dome',
-
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: TColor.primary),
         useMaterial3: true,
       ),
-
       home: GetX<SessionManager>(
         builder: (controller) {
           return controller.isLoggedIn ? const Home() : const WelcomeScreen();
