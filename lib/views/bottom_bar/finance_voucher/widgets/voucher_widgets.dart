@@ -1,6 +1,6 @@
 // voucher_widgets.dart
 
-import 'package:evoucher_new/views/bottom_bar//finance_voucher/bank/view_edit_b_voucher.dart';
+import 'package:evoucher_new/views/bottom_bar/finance_voucher/bank/view_edit_b_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../common/color_extension.dart';

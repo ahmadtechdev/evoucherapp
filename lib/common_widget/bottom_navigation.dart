@@ -11,7 +11,7 @@ import '../views/bottom_bar/hotel_voucher/hotel.dart';
 import '../views/bottom_bar/other_vouchers/other_voucher.dart';
 import '../views/bottom_bar/visa_voucher/visa.dart';
 import '../views/home/home.dart';
-import '../views/bottom_bar//ticket_voucher/ticket.dart';
+import '../views/bottom_bar/ticket_voucher/ticket.dart';
 
 
 class CustomBottomNavigationBar extends StatelessWidget {

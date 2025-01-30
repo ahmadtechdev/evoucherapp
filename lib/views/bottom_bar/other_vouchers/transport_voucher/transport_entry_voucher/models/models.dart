@@ -37,7 +37,7 @@ class TransportModel {
     this.sellRate = 0,
     this.sellingROE = 1,
     this.sellingCurrency = 'USD',
-  }) : this.travelDate = travelDate ?? DateTime.now();
+  }) : travelDate = travelDate ?? DateTime.now();
 
   // Copy with method for easy updates
   TransportModel copyWith({

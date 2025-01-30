@@ -129,7 +129,7 @@ class TransportBookingController extends GetxController {
         'Cannot Remove',
         'At least one flight entry is required',
         snackPosition: SnackPosition.BOTTOM,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       );
     }
   }

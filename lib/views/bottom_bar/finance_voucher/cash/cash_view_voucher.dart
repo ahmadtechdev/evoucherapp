@@ -1,5 +1,5 @@
 
-import 'package:evoucher_new/views/bottom_bar//finance_voucher/cash/view_edit_c_voucher.dart';
+import 'package:evoucher_new/views/bottom_bar/finance_voucher/cash/view_edit_c_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';

@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 
 import 'common/color_extension.dart';
 import 'service/session_manager.dart';
-import 'views/bottom_bar//finance_voucher/controller/entry_controller.dart';
+import 'views/bottom_bar/finance_voucher/controller/entry_controller.dart';
 import 'views/home/home.dart';
 import 'views/side_bar/accounts/accounts/controller/account_controller.dart';
 import 'views/side_bar/incomes_report/controller/income_controller.dart';

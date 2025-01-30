@@ -1,4 +1,4 @@
-import 'package:evoucher_new/views/bottom_bar//other_vouchers/invoice_voucher/view_invoice_voucher/view_invoice_voucher.dart';
+import 'package:evoucher_new/views/bottom_bar/other_vouchers/invoice_voucher/view_invoice_voucher/view_invoice_voucher.dart';
 import 'package:evoucher_new/views/bottom_bar/other_vouchers/other_voucher/other_entry_voucher/other_entry_voucher.dart';
 import 'package:evoucher_new/views/bottom_bar/other_vouchers/other_voucher/view_other_voucher/view_other_voucher.dart';
 import 'package:flutter/material.dart';
