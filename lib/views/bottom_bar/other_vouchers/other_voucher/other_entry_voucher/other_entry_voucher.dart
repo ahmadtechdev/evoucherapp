@@ -8,8 +8,6 @@ import 'package:evoucher_new/common_widget/snackbar.dart';
 import 'package:evoucher_new/views/bottom_bar/other_vouchers/other_voucher/other_entry_voucher/other_entry_voucher_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
 
 class OtherEntryVoucher extends StatelessWidget {
   const OtherEntryVoucher({super.key});
@@ -248,14 +246,12 @@ class OtherEntryVoucher extends StatelessWidget {
             },
           ),
           const SizedBox(height: 15),
-          AccountDropdown(
-            showSearch: false,
-            hintText: 'Select Consultant  Account',
-            onChanged: (value) {
-              if (value != null) {
-                // controller.supplierDetail.value = value;
-              }
-            },
+          RoundTitleTextfield(
+            maxLines: 2,
+            controller: controller.passportNo,
+            title: 'Description',
+            hintText: 'Enter description',
+            left: Icon(Icons.description, color: TColor.secondaryText),
           ),
           const SizedBox(height: 20),
           _buildSectionTitle('Financial Details'),
@@ -296,48 +292,19 @@ class OtherEntryVoucher extends StatelessWidget {
         const SizedBox(height: 15),
         RoundTitleTextfield(
           controller: controller.customerAccount,
-          title: 'Customer Name',
-          hintText: 'Enter Customer Name',
+          title: 'Consultant  Name',
+          hintText: 'Enter Consultant  Name',
           left: Icon(Icons.person, color: TColor.secondaryText),
         ),
         const SizedBox(height: 15),
         RoundTitleTextfield(
+          maxLines: 2,
           controller: controller.passportNo,
-          title: 'Passport No',
-          hintText: 'Enter Passport No',
-          left: Icon(MdiIcons.passport, color: TColor.secondaryText),
+          title: 'Description',
+          hintText: 'Enter description',
+          left: Icon(Icons.description, color: TColor.secondaryText),
         ),
         const SizedBox(height: 15),
-        RoundTitleTextfield(
-          controller: controller.visaType,
-          title: 'V. Type',
-          hintText: 'Enter V. Type',
-          left: Icon(Icons.business, color: TColor.secondaryText),
-        ),
-        const SizedBox(height: 15),
-        Row(
-          children: [
-            Expanded(
-              child: RoundTitleTextfield(
-                controller: controller.country,
-
-                title: 'Country',
-                hintText: 'Enter Country',
-                // onChanged: (value) => controller.country.value = value,
-                left: Icon(Icons.flag, color: TColor.secondaryText),
-              ),
-            ),
-            const SizedBox(width: 15),
-            Expanded(
-              child: RoundTitleTextfield(
-                controller: controller.visaNo,
-                title: 'Visa No:',
-                hintText: 'Enter Visa No:',
-                left: Icon(Icons.airplane_ticket, color: TColor.secondaryText),
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }
@@ -518,6 +485,14 @@ class OtherEntryVoucher extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: 15),
+        RoundTitleTextfield(
+          maxLines: 2,
+          controller: controller.passportNo,
+          title: 'Remarks',
+          hintText: 'Enter remarks',
+          left: Icon(Icons.description, color: TColor.secondaryText),
+        ),
       ],
     );
   }
@@ -606,8 +581,11 @@ class OtherEntryVoucher extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           // Add validation logic here
-          CustomSnackBar(message: "Calculations are functional, but saving is not available yet.", backgroundColor: TColor.fourth).show();
-
+          CustomSnackBar(
+                  message:
+                      "Calculations are functional, but saving is not available yet.",
+                  backgroundColor: TColor.fourth)
+              .show();
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: TColor.primary,
