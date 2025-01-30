@@ -12,7 +12,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 class ViewInvoiceVoucher extends StatelessWidget {
   final InvoiceVoucherController controller =
-  Get.put(InvoiceVoucherController());
+      Get.put(InvoiceVoucherController());
 
   ViewInvoiceVoucher({super.key});
 
@@ -142,7 +142,7 @@ class ViewInvoiceVoucher extends StatelessWidget {
                   onPressed: () {
                     CustomSnackBar(
                       message:
-                      "This functionality is currently under development and will be available soon.",
+                          "This functionality is currently under development and will be available soon.",
                       backgroundColor: TColor.fourth,
                     ).show();
                   },
@@ -175,11 +175,17 @@ class ViewInvoiceVoucher extends StatelessWidget {
                         'Invoice',
                         Icons.receipt,
                         onPressed: () {
-                          generateAndPreviewInvoice(
-                            context,
-                            ticket['VV_ID'].split(
-                                ' ')[1], // Extract ID number from "VV 841"
-                          );
+                          CustomSnackBar(
+                                  message:
+                                      "This functionality is currently under development and will be available soon.",
+                                  backgroundColor: TColor.fourth)
+                              .show();
+                          // generateAndPreviewInvoice(
+                          //   context,
+                          //   ticket['VV_ID'].split(
+                          //       ' ')[1],
+                          //        // Extract ID number from "VV 841"
+                          // );
                         },
                       ),
                     ),
@@ -304,7 +310,7 @@ class ViewInvoiceVoucher extends StatelessWidget {
               child: pw.Text(
                 'Developed by Journeyonline.pk | CTC # 0310 0007901',
                 style:
-                pw.TextStyle(fontSize: 10, fontStyle: pw.FontStyle.italic),
+                    pw.TextStyle(fontSize: 10, fontStyle: pw.FontStyle.italic),
               ),
             );
           },
@@ -480,17 +486,17 @@ class ViewInvoiceVoucher extends StatelessWidget {
                           bank == 'Askari Bank'
                               ? '000123300000'
                               : bank == 'Meezan Bank'
-                              ? '000112000108'
-                              : bank == 'Alfalah Bank'
-                              ? '000007676001'
-                              : '010101010',
+                                  ? '000112000108'
+                                  : bank == 'Alfalah Bank'
+                                      ? '000007676001'
+                                      : '010101010',
                           bank == 'Askari Bank'
                               ? 'Satyana Road Branch, Faisalabad'
                               : bank == 'Meezan Bank'
-                              ? 'Susan Road Branch, Faisalabad'
-                              : bank == 'Alfalah Bank'
-                              ? 'PC Branch, Faisalabad'
-                              : 'CANL ROAD BRANCH',
+                                  ? 'Susan Road Branch, Faisalabad'
+                                  : bank == 'Alfalah Bank'
+                                      ? 'PC Branch, Faisalabad'
+                                      : 'CANL ROAD BRANCH',
                         ],
                         fontSize: 10,
                       );

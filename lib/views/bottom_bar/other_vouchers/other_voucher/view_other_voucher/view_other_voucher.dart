@@ -251,10 +251,15 @@ class ViewOtherVoucher extends StatelessWidget {
                         'Invoice ',
                         Icons.receipt,
                         onPressed: () {
-                          generateAndPreviewInvoice(
-                              context,
-                              ticket['VV_ID'].split(
-                                  ' ')[1]); // Extract ID number from "VV 841"
+                          CustomSnackBar(
+                                  message:
+                                      "This functionality is currently under development and will be available soon.",
+                                  backgroundColor: TColor.fourth)
+                              .show();
+                          // generateAndPreviewInvoice(
+                          //     context,
+                          //     ticket['VV_ID'].split(
+                          //         ' ')[1]); // Extract ID number from "VV 841"
                         },
                       ),
                     ),

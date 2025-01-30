@@ -14,7 +14,7 @@ import 'view_transport_voucher_controller.dart';
 
 class ViewTransportVoucher extends StatelessWidget {
   final ViewTransportVoucherController controller =
-  Get.put(ViewTransportVoucherController());
+      Get.put(ViewTransportVoucherController());
 
   ViewTransportVoucher({super.key});
 
@@ -186,9 +186,9 @@ Widget _buildVoucherCard(Map<String, dynamic> ticket, BuildContext context) {
                 onPressed: () {
                   // Get.to(() => const TicketViewSingleVoucher());
                   CustomSnackBar(
-                      message:
-                      "This functionality is currently under development and will be available soon.",
-                      backgroundColor: TColor.fourth)
+                          message:
+                              "This functionality is currently under development and will be available soon.",
+                          backgroundColor: TColor.fourth)
                       .show();
                 },
               ),
@@ -231,9 +231,9 @@ Widget _buildVoucherCard(Map<String, dynamic> ticket, BuildContext context) {
                       Icons.currency_exchange,
                       TColor.third,
                       onPressed: () => CustomSnackBar(
-                          message:
-                          "This functionality is currently under development and will be available soon.",
-                          backgroundColor: TColor.fourth)
+                              message:
+                                  "This functionality is currently under development and will be available soon.",
+                              backgroundColor: TColor.fourth)
                           .show(),
                       // Get.to(() => const TicketRefundTicketScreen()),
                     ),
@@ -244,8 +244,13 @@ Widget _buildVoucherCard(Map<String, dynamic> ticket, BuildContext context) {
                       'Invoice',
                       Icons.receipt_long,
                       TColor.primary,
-                      onPressed: () => generateAndPreviewInvoice(
-                          context, ticket['voucher_id']),
+                      onPressed: () => CustomSnackBar(
+                              message:
+                                  "This functionality is currently under development and will be available soon.",
+                              backgroundColor: TColor.fourth)
+                          .show(),
+                      //  generateAndPreviewInvoice(
+                      //     context, ticket['voucher_id']),
                     ),
                   ),
                 ],
@@ -527,13 +532,13 @@ Future<void> generateAndPreviewInvoice(
               pw.Text(
                 'IN WORDS: ${_numberToWords(double.parse(invoiceData['financial_info']['total']))} Only',
                 style:
-                pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                    pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
               ),
               pw.SizedBox(height: 10),
               pw.Text(
                 'On behalf of ${invoiceData['company_info']['name']}',
                 style:
-                pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
+                    pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10),
               ),
 
               pw.SizedBox(height: 10),
@@ -543,7 +548,7 @@ Future<void> generateAndPreviewInvoice(
               pw.Text(
                 'Bank Account Details with Account Title',
                 style:
-                pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+                    pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
               ),
               pw.Table(
                 border: pw.TableBorder.all(width: 0.5),
@@ -568,17 +573,17 @@ Future<void> generateAndPreviewInvoice(
                         bank == 'Askari Bank'
                             ? '000123300000'
                             : bank == 'Meezan Bank'
-                            ? '000112000108'
-                            : bank == 'Alfalah Bank'
-                            ? '000007676001'
-                            : '010101010',
+                                ? '000112000108'
+                                : bank == 'Alfalah Bank'
+                                    ? '000007676001'
+                                    : '010101010',
                         bank == 'Askari Bank'
                             ? 'Satyana Road Branch, Faisalabad'
                             : bank == 'Meezan Bank'
-                            ? 'Susan Road Branch, Faisalabad'
-                            : bank == 'Alfalah Bank'
-                            ? 'PC Branch, Faisalabad'
-                            : 'CANL ROAD BRANCH',
+                                ? 'Susan Road Branch, Faisalabad'
+                                : bank == 'Alfalah Bank'
+                                    ? 'PC Branch, Faisalabad'
+                                    : 'CANL ROAD BRANCH',
                       ],
                       fontSize: 10,
                     );
@@ -744,7 +749,7 @@ pw.TableRow _buildTableRow(List<String> cells,
           style: pw.TextStyle(
             fontSize: fontSize,
             fontWeight:
-            isHeader || isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
+                isHeader || isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
           ),
         ),
       );
