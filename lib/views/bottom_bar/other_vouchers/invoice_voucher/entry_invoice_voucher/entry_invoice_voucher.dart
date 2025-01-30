@@ -123,6 +123,26 @@ class _EntryInvoiceVoucherState extends State<EntryInvoiceVoucher> {
                       child: Column(
                         children: [
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Entry #${index + 1}',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: TColor.secondary,
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: TColor.third),
+                                onPressed: () => _removeRow(index),
+                              )
+                            ],
+                          ),
+                          Divider(
+                              color: TColor.secondary.withOpacity(0.2),
+                              height: 30),
+                          Row(
                             children: [
                               Expanded(
                                 flex: 2,
@@ -164,7 +184,7 @@ class _EntryInvoiceVoucherState extends State<EntryInvoiceVoucher> {
                               Expanded(
                                 child: RoundTitleTextfield(
                                   controller: rows[index].amountController,
-                                  title: 'Amount',
+                                  title: 'ex Amount',
                                   hintText: '0.00',
                                   readOnly: true,
                                   left: Icon(Icons.calculate,
@@ -197,11 +217,18 @@ class _EntryInvoiceVoucherState extends State<EntryInvoiceVoucher> {
                                       color: TColor.secondaryText),
                                 ),
                               ),
-                              IconButton(
-                                icon: Icon(Icons.close, color: TColor.third),
-                                onPressed: () => _removeRow(index),
-                              ),
                             ],
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          RoundTitleTextfield(
+                            controller: rows[index].amountController,
+                            title: 'Amount',
+                            hintText: '0.00',
+                            readOnly: true,
+                            left: Icon(Icons.calculate,
+                                color: TColor.secondaryText),
                           ),
                         ],
                       ),
@@ -226,6 +253,7 @@ class _EntryInvoiceVoucherState extends State<EntryInvoiceVoucher> {
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
 
               // Summary Card
               Container(
@@ -241,17 +269,10 @@ class _EntryInvoiceVoucherState extends State<EntryInvoiceVoucher> {
                   ],
                 ),
                 padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    _buildSummaryRow('Total Amount:', '₹${calculateTotal()}',
-                        TColor.primary),
-                    const Divider(height: 24),
-                    _buildSummaryRow('Payment:', '₹0.00', TColor.secondary),
-                    const Divider(height: 24),
-                    _buildSummaryRow('Closing Balance:', '₹${calculateTotal()}',
-                        TColor.third),
-                  ],
-                ),
+                child: Column(children: [
+                  _buildSummaryRow(
+                      'Total Amount:', '₹${calculateTotal()}', TColor.primary),
+                ]),
               ),
               const SizedBox(height: 24),
 
