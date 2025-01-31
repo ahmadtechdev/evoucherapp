@@ -29,6 +29,24 @@ class TransportSaleRegisterController extends GetxController {
     fetchVisaSaleRegisterData();
   }
 
+  // Helper function to parse string amount to double
+  double parseAmount(dynamic amount) {
+    if (amount == null) return 0.0;
+
+    if (amount is Map) {
+      // Handle profit_loss object structure
+      String amountStr = amount['amount']?.toString() ?? '0.00';
+      bool isLoss = amount['type'] == 'loss';
+      double parsedAmount =
+          double.tryParse(amountStr.replaceAll(',', '')) ?? 0.0;
+      return isLoss ? -parsedAmount : parsedAmount;
+    }
+
+    // Handle regular string amount
+    String amountStr = amount.toString();
+    return double.tryParse(amountStr.replaceAll(',', '')) ?? 0.0;
+  }
+
   Future<void> fetchVisaSaleRegisterData() async {
     try {
       isLoading.value = true;
@@ -40,7 +58,7 @@ class TransportSaleRegisterController extends GetxController {
           DateFormat('yyyy-MM-dd').format(toDate.value);
 
       final response = await _apiService.fetchDateRangeReport(
-        endpoint: 'visaSaleRegister',
+        endpoint: 'transportSaleRegister',
         fromDate: formattedFromDate,
         toDate: formattedToDate,
       );
@@ -66,14 +84,14 @@ class TransportSaleRegisterController extends GetxController {
     double totalProfit = 0;
 
     for (var dailyRecord in records) {
-      if (dailyRecord['entries'] != null) {
-        final entries = dailyRecord['entries'] as List;
+      if (dailyRecord['tickets'] != null) {
+        final entries = dailyRecord['tickets'] as List;
         totalCount += entries.length;
 
         for (var entry in entries) {
-          totalBuying += entry['buying'] ?? 0;
-          totalSelling += entry['selling'] ?? 0;
-          totalProfit += entry['profit_loss'] ?? 0;
+          totalBuying += parseAmount(entry['buying_amount']);
+          totalSelling += parseAmount(entry['selling_amount']);
+          totalProfit += parseAmount(entry['profit_loss']);
         }
       }
     }

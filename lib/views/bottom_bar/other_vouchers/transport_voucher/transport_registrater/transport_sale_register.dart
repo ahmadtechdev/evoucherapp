@@ -120,7 +120,7 @@ class TransportSaleRegisterScreen extends StatelessWidget {
   }
 
   Widget _buildDailySection(dynamic dailyData) {
-    if (dailyData == null || dailyData['entries'] == null) {
+    if (dailyData == null || dailyData['tickets'] == null) {
       return const SizedBox.shrink();
     }
 
@@ -156,7 +156,7 @@ class TransportSaleRegisterScreen extends StatelessWidget {
         _buildDailySummaryCard(dailyData['totals'] ?? {}),
 
         // Visa Entry Cards
-        ...?dailyData['entries']?.map<Widget>((entry) => _buildVisaCard(entry)),
+        ...?dailyData['tickets']?.map<Widget>((entry) => _buildVisaCard(entry)),
 
         const SizedBox(height: 16),
       ],
@@ -194,7 +194,7 @@ class TransportSaleRegisterScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    entry['v_number'] ?? 'N/A',
+                    entry['voucher_id'] ?? 'N/A',
                     style: TextStyle(
                       color: TColor.primary,
                       fontSize: 16,
@@ -203,7 +203,7 @@ class TransportSaleRegisterScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  entry['visa_number'] ?? 'N/A',
+                  entry['date'] ?? 'N/A',
                   style: TextStyle(
                     color: TColor.secondaryText,
                     fontSize: 14,
@@ -219,13 +219,28 @@ class TransportSaleRegisterScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildDetailRow('Customer', entry['customer'] ?? 'N/A',
+                _buildDetailRow('Customer', entry['customer_account'] ?? 'N/A',
                     isWrappable: true),
-                _buildDetailRow('Account', entry['account'] ?? 'N/A',
+                _buildDetailRow('Description', entry['description'] ?? 'N/A',
                     isWrappable: true),
-                _buildDetailRow('Visa Type', entry['visa_type'] ?? 'N/A'),
-                _buildDetailRow('Country', entry['country'] ?? 'N/A'),
-                _buildDetailRow('Supplier', entry['supplier'] ?? 'N/A',
+                _buildDetailRow(
+                  'Buy Currency',
+                  entry['buy_currency'] ?? 'N/A',
+                ),
+                _buildDetailRow(
+                  'Buy ROE',
+                  entry['buy_rate'] ?? 'N/A',
+                ),
+                _buildDetailRow(
+                  'Sell Currency',
+                  entry['sell_currency'] ?? 'N/A',
+                ),
+                _buildDetailRow(
+                  'Sell ROE',
+                  entry['sell_rate'] ??
+                      'N/A', // Changed from entry['tickets']['sell_rate']
+                ),
+                _buildDetailRow('Supplier', entry['supplier_account'] ?? 'N/A',
                     isWrappable: true),
 
                 const Divider(height: 24),
@@ -233,15 +248,19 @@ class TransportSaleRegisterScreen extends StatelessWidget {
                 // Financial Details
                 _buildFinancialRow(
                     'Buying',
-                    'Rs. ${NumberFormat('#,##0.00').format(entry['buying'] ?? 0)}',
+                    entry['buying_amount'] ??
+                        '0.00', // Changed to use direct property
                     TColor.third),
                 _buildFinancialRow(
                     'Selling',
-                    'Rs. ${NumberFormat('#,##0.00').format(entry['selling'] ?? 0)}',
+                    entry['selling_amount'] ??
+                        '0.00', // Changed to use direct property
                     TColor.secondary),
                 _buildFinancialRow(
                     'Profit',
-                    'Rs. ${NumberFormat('#,##0.00').format(entry['profit_loss'] ?? 0)}',
+                    (entry['profit_loss'] is Map
+                        ? entry['profit_loss']['amount']
+                        : '0.00'), // Handle profit_loss object
                     TColor.primary),
               ],
             ),
@@ -354,13 +373,15 @@ class TransportSaleRegisterScreen extends StatelessWidget {
         child: Row(
           children: [
             _buildSummaryItem(
-                'Count', totals['count'].toString(), TColor.primary),
+                'Count', totals['total_rows'].toString(), TColor.primary),
             const SizedBox(width: 16),
-            _buildSummaryItem('Buying', totals['buying'], TColor.secondary),
+            _buildSummaryItem(
+                'Buying', totals['total_buying'], TColor.secondary),
             const SizedBox(width: 16),
-            _buildSummaryItem('Selling', totals['selling'], TColor.third),
+            _buildSummaryItem('Selling', totals['total_selling'], TColor.third),
             const SizedBox(width: 16),
-            _buildSummaryItem('Profit', totals['profit'], TColor.fourth),
+            _buildSummaryItem(
+                'Profit', totals['total_profit_loss'], TColor.fourth),
           ],
         ),
       ),
