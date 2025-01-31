@@ -99,7 +99,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
               label: 'Visa',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.card_travel),
+              icon: Icon(Icons.widgets),
               label: 'other',
             ),
           ],
