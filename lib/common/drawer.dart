@@ -1,3 +1,4 @@
+import 'package:evoucher_new/views/side_bar/manage_user/manage_user.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../service/session_manager.dart';
@@ -77,10 +78,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
   void _scrollToSelectedItem() {
     if (_selectedItemKey.currentContext != null) {
       final RenderObject? renderObject =
-      _selectedItemKey.currentContext!.findRenderObject();
+          _selectedItemKey.currentContext!.findRenderObject();
       if (renderObject != null) {
         final ScrollableState scrollableState =
-        Scrollable.of(_selectedItemKey.currentContext!);
+            Scrollable.of(_selectedItemKey.currentContext!);
         scrollableState.position.ensureVisible(
           renderObject,
           alignment: 0.5, // Center the item
@@ -224,7 +225,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
     ));
 
     if (loginType == 'toc') {
-
       items.add(_buildNavigationItem(
         title: 'Accounts',
         icon: Icons.person,
@@ -275,9 +275,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           index: currentIndex++,
           onTap: () => Get.to(() => const IncomesComparisonReport()),
         ),
-
       ]);
-
 
       // ************************************** Travel Started Here **************************************
     } else {
@@ -409,6 +407,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
           icon: Icons.analytics_rounded,
           index: currentIndex++,
           onTap: () => Get.to(() => AgentReportScreen()),
+        ),
+        _buildNavigationItem(
+          title: 'Manage User',
+          icon: Icons.analytics_rounded,
+          index: currentIndex++,
+          onTap: () => Get.to(() => ManageUser()),
         ),
       ]);
     }
