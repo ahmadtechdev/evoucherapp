@@ -157,28 +157,25 @@ class _TransactionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SingleChildScrollView(
-              // scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    transaction.name,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: TColor.primaryText,
-                    ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  transaction.name,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: TColor.primaryText,
                   ),
-                  Text(
-                    "#${transaction.id}",
-                    style: TextStyle(
-                      color: TColor.secondaryText,
-                      fontSize: 14,
-                    ),
+                ),
+                Text(
+                  "#${transaction.id}",
+                  style: TextStyle(
+                    color: TColor.secondaryText,
+                    fontSize: 14,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             Row(
