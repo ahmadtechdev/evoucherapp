@@ -22,55 +22,81 @@ class AgentReportController extends GetxController {
     loadTransactions();
   }
 
+  // Helper method to parse amount strings with commas
+  double _parseAmount(String? amount) {
+    if (amount == null || amount.isEmpty) return 0.0;
+    try {
+      return double.parse(amount.replaceAll(',', ''));
+    } catch (e) {
+      return 0.0;
+    }
+  }
+
   void loadTransactions() async {
     try {
-      // Set loading to true
       isLoading.value = true;
 
-      // Format date to match API requirement
       String formattedDate = DateFormat('yyyy-M-d').format(selectedDate.value);
       final response = await _apiService.postRequest(
           endpoint: 'accReports',
           body: {"date": formattedDate, "subhead": "TRAVEL AGENTS"});
 
-      if (response['status'] == 'success' && response['data'] != null) {
-        // Transform API data to match the existing transaction structure
-        transactions.value = (response['data']['customers'] as List)
-            .map((customer) => {
-          'date': response['date'],
-          'name': customer['account_name'],
-          'email': customer['cell'],
-          'receipt':
-          double.parse(customer['credit'].replaceAll(',', '')),
-          'payment':
-          double.parse(customer['debit'].replaceAll(',', '')),
-          'balance': double.parse(
-              customer['balance']['amount'].replaceAll(',', ''))
-        })
-            .toList();
+      // Clear existing transactions
+      transactions.clear();
 
-        // Update totals
-        totals['totalDebit']!.value = double.parse(
-            response['data']['totals']['total_debit'].replaceAll(',', ''));
-        totals['totalCredit']!.value = double.parse(
-            response['data']['totals']['total_credit'].replaceAll(',', ''));
-        totals['totalBalance']!.value = double.parse(
-            response['data']['totals']['total_balance'].replaceAll(',', ''));
+      if (response['status'] == 'success' && response['data'] != null) {
+        // Transform and filter API data
+        final transformedTransactions =
+            (response['data']['customers'] as List).map((customer) {
+          final receipt = _parseAmount(customer['credit']);
+          final payment = _parseAmount(customer['debit']);
+          final balance = _parseAmount(customer['balance']['amount']);
+
+          return {
+            'date': response['date'],
+            'name': customer['account_name'],
+            'email': customer['cell'],
+            'receipt': receipt,
+            'payment': payment,
+            'balance': balance,
+          };
+        }).where((transaction) {
+          // Only include transactions where either payment or receipt is non-zero
+          return transaction['payment'] != 0 || transaction['receipt'] != 0;
+        }).toList();
+
+        transactions.value = transformedTransactions;
+
+        // Update totals from the API response
+        final apiTotals = response['data']['totals'];
+        totals['totalDebit']!.value = _parseAmount(apiTotals['total_debit']);
+        totals['totalCredit']!.value = _parseAmount(apiTotals['total_credit']);
+        totals['totalBalance']!.value =
+            _parseAmount(apiTotals['total_balance']);
+      } else {
+        // Handle invalid response
+        Get.snackbar(
+          'Error',
+          'Invalid response format from server',
+          snackPosition: SnackPosition.BOTTOM,
+        );
       }
     } catch (e) {
-      // print('Error fetching transactions: $e');
-      // Handle error - perhaps show a snackbar or toast
+      // Handle error with specific message
+      Get.snackbar(
+        'Error',
+        'Failed to load transactions: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      // Reset values on error
+      transactions.clear();
+      totals['totalDebit']!.value = 0.0;
+      totals['totalCredit']!.value = 0.0;
+      totals['totalBalance']!.value = 0.0;
     } finally {
-      // Set loading to false
       isLoading.value = false;
     }
   }
-
-  // Helper method to parse amount strings with commas
-  // double _parseAmount(String? amount) {
-  //   if (amount == null || amount.isEmpty) return 0.0;
-  //   return double.parse(amount.replaceAll(',', ''));
-  // }
 
   void updateDate(DateTime date) {
     selectedDate.value = date;
@@ -78,7 +104,6 @@ class AgentReportController extends GetxController {
   }
 
   void printReport() {
-    // Implement print functionality
     Get.snackbar(
       'Print',
       'Printing report...',
@@ -87,12 +112,10 @@ class AgentReportController extends GetxController {
   }
 
   void openLedger(String id) {
-    // Implement ledger navigation
     Get.toNamed('/ledger/$id');
   }
 
   void openWhatsApp(String contact) {
-    // Implement WhatsApp functionality
     Get.snackbar(
       'WhatsApp',
       'Opening WhatsApp chat...',

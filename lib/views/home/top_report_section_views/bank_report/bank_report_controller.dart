@@ -15,59 +15,78 @@ class BanksController extends GetxController {
   var closingBalance = 0.0.obs;
   var isLoading = false.obs;
   String? loginType;
-  String subhead="Banks";
+  String subhead = "Banks";
 
   final currencyFormatter = NumberFormat("#,##0.00", "en_US");
 
   @override
   void onInit() {
     super.onInit();
-    _initializeLoginType();
-    loadTransactions();
+    // Initialize controller with async operation
+    initializeController();
+  }
 
+  Future<void> initializeController() async {
+    try {
+      isLoading.value = true;
+      await _initializeLoginType();
+      await loadTransactions();
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to initialize: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> _initializeLoginType() async {
     final sessionManager = Get.find<SessionManager>();
     loginType = await sessionManager.getLoginType();
-
+    // Set subhead based on loginType immediately after getting it
+    subhead = loginType == "toc" ? "Travelocity Bank Accounts" : "Banks";
   }
 
-  void loadTransactions() async {
+  Future<void> loadTransactions() async {
+    if (loginType == null) {
+      await _initializeLoginType();
+    }
+
     try {
-      // Set loading to true
       isLoading.value = true;
 
-      // Format date to match API requirement
       String formattedDate = DateFormat('yyyy-M-d').format(selectedDate.value);
-      if(loginType=="toc"){
-        subhead = "Travelocity Bank Accounts";
-      }else{
-        subhead = "Banks";
-      }
 
       final response = await _apiService.postRequest(
           endpoint: 'accReports',
+          body: {"date": formattedDate, "subhead": subhead});
 
-          body: {"date": formattedDate, "subhead":subhead});
-
-      // Clear existing transactions
       transactions.clear();
 
-      // Parse API response
-      if (response['status'] == 'success' &&
-          response['data']['customers'] != null) {
-        // Transform API data to CustomerTransaction
+      if (response == null || response['status'] != 'success') {
+        throw 'Failed to load transactions: Invalid response';
+      }
+
+      if (response['data']['customers'] != null) {
+        // Transform and filter API data
         transactions.value =
             (response['data']['customers'] as List).map((customer) {
+          final debit = _parseAmount(customer['debit']);
+          final credit = _parseAmount(customer['credit']);
+
           return Bank(
               id: customer['account_id'],
               name: customer['account_name'],
-              closingDr: _parseAmount(customer['debit']),
-              closingCr: _parseAmount(customer['credit']),
+              closingDr: debit,
+              closingCr: credit,
               accountNumber: customer['cell']?.trim().isEmpty == true
                   ? null
                   : customer['cell']);
+        }).where((bank) {
+          // Only include banks where either debit or credit is non-zero
+          return bank.closingDr != 0 || bank.closingCr != 0;
         }).toList();
 
         // Calculate totals based on API response
@@ -77,36 +96,31 @@ class BanksController extends GetxController {
         closingBalance.value = _parseAmount(totals['total_balance']);
       }
     } catch (e) {
-      // Handle errors
       Get.snackbar(
         'Error',
-        e.toString(),
+        'Failed to load transactions: ${e.toString()}',
         snackPosition: SnackPosition.BOTTOM,
       );
-      // Optionally, set some default or empty state
       transactions.clear();
       totalReceipt.value = 0.0;
       totalPayment.value = 0.0;
       closingBalance.value = 0.0;
     } finally {
-      // Set loading to false
       isLoading.value = false;
     }
   }
 
-  // Helper method to parse amount strings with commas
   double _parseAmount(String? amount) {
     if (amount == null || amount.isEmpty) return 0.0;
     return double.parse(amount.replaceAll(',', ''));
   }
 
-  void updateDate(DateTime date) {
+  Future<void> updateDate(DateTime date) async {
     selectedDate.value = date;
-    loadTransactions();
+    await loadTransactions();
   }
 
   void printReport() {
-    // Implement print functionality
     Get.snackbar(
       'Print',
       'Printing report...',
@@ -115,12 +129,10 @@ class BanksController extends GetxController {
   }
 
   void openLedger(String id) {
-    // Implement ledger navigation
     Get.toNamed('/ledger/$id');
   }
 
   void openWhatsApp(String contact) {
-    // Implement WhatsApp functionality
     Get.snackbar(
       'WhatsApp',
       'Opening WhatsApp chat...',

@@ -32,10 +32,7 @@ class CustomerReportController extends GetxController {
 
       final response = await apiService.postRequest(
         endpoint: 'topReport',
-        body: {
-          'year': selectedYear.value.toString(),
-          "subhead":"customer"
-        },
+        body: {'year': selectedYear.value.toString(), "subhead": "customer"},
       );
 
       if (response['status'] == 'success') {
@@ -53,9 +50,9 @@ class CustomerReportController extends GetxController {
             .asMap()
             .entries
             .map((entry) => Customer.fromJson(
-          entry.value,
-          nonZeroSales.length + entry.key + 1,
-        ))
+                  entry.value,
+                  nonZeroSales.length + entry.key + 1,
+                ))
             .toList();
 
         activeCustomers.value = nonZeroSales;
@@ -91,12 +88,12 @@ class CustomerReportController extends GetxController {
 
     filteredActiveCustomers.value = activeCustomers
         .where((customer) =>
-        customer.name.toLowerCase().contains(query.toLowerCase()))
+            customer.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
     filteredZeroSaleCustomers.value = zeroSaleCustomers
         .where((customer) =>
-        customer.name.toLowerCase().contains(query.toLowerCase()))
+            customer.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
   }
 
@@ -233,7 +230,8 @@ class CustomerReportController extends GetxController {
     );
   }
 
-  pw.Widget _buildSaleItem(String label, double amount, NumberFormat formatter) {
+  pw.Widget _buildSaleItem(
+      String label, double amount, NumberFormat formatter) {
     return pw.Expanded(
       child: pw.Row(
         children: [

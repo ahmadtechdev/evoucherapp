@@ -64,27 +64,35 @@ class ApiService extends GetxController {
         case 200:
           return responseData;
         case 400:
-          throw BadRequestException(responseData['message'] ?? 'Bad Request: Invalid input');
+          throw BadRequestException(
+              responseData['message'] ?? 'Bad Request: Invalid input');
         case 401:
           await _sessionManager.logout();
-          throw UnauthorizedException(responseData['message'] ?? 'Unauthorized: Invalid credentials');
+          throw UnauthorizedException(
+              responseData['message'] ?? 'Unauthorized: Invalid credentials');
         case 403:
-          throw ForbiddenException(responseData['message'] ?? 'Forbidden: Access denied');
+          throw ForbiddenException(
+              responseData['message'] ?? 'Forbidden: Access denied');
         case 404:
-          throw NotFoundException(responseData['message'] ?? 'Not Found: Resource does not exist');
+          throw NotFoundException(
+              responseData['message'] ?? 'Not Found: Resource does not exist');
         case 500:
-          throw ServerException(responseData['message'] ?? 'Internal Server Error');
+          throw ServerException(
+              responseData['message'] ?? 'Internal Server Error');
         default:
-          throw HttpException('Unexpected error occurred: ${response.statusCode}');
+          throw HttpException(
+              'Unexpected error occurred: ${response.statusCode}');
       }
     } catch (e) {
       // Re-throw specific exceptions
       if (e is TimeoutException) {
-        throw NetworkException('Connection timed out. Please check your internet.');
+        throw NetworkException(
+            'Connection timed out. Please check your internet.');
       } else if (e is SocketException) {
         throw NetworkException('No internet connection. Please try again.');
       } else if (e is FormatException) {
-        throw const FormatException('Invalid response format. Please try again.');
+        throw const FormatException(
+            'Invalid response format. Please try again.');
       } else if (e is UnauthorizedException ||
           e is BadRequestException ||
           e is ForbiddenException ||
@@ -115,6 +123,7 @@ class ApiService extends GetxController {
     );
   }
 }
+
 // Custom Exception Classes
 class NetworkException implements Exception {
   final String message;

@@ -262,9 +262,9 @@ class TicketListingScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Obx(
-                () => Text(
+            () => Text(
               'From ${DateFormat('MMM dd, yyyy').format(controller.startDate.value)} '
-                  'To ${DateFormat('MMM dd, yyyy').format(controller.endDate.value)}',
+              'To ${DateFormat('MMM dd, yyyy').format(controller.endDate.value)}',
               style: TextStyle(
                 color: TColor.primaryText,
                 fontWeight: FontWeight.w500,
@@ -290,7 +290,7 @@ class TicketListingScreen extends StatelessWidget {
         ],
       ),
       child: Obx(
-            () => Row(
+        () => Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
@@ -301,7 +301,7 @@ class TicketListingScreen extends StatelessWidget {
               ),
             ),
             Text(
-              'Total Amount: PKR ${NumberFormat('#,##0.00').format(controller.totalAmount.value)}', // Use .value explicitly
+              'Total Amount: PKR ${NumberFormat('#,##0').format(controller.totalAmount.value)}', // Use .value explicitly
               style: TextStyle(
                 color: TColor.secondary,
                 fontWeight: FontWeight.bold,

@@ -157,25 +157,28 @@ class _TransactionCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  transaction.name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: TColor.primaryText,
+            SingleChildScrollView(
+              // scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    transaction.name,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: TColor.primaryText,
+                    ),
                   ),
-                ),
-                Text(
-                  "#${transaction.id}",
-                  style: TextStyle(
-                    color: TColor.secondaryText,
-                    fontSize: 16,
+                  Text(
+                    "#${transaction.id}",
+                    style: TextStyle(
+                      color: TColor.secondaryText,
+                      fontSize: 14,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 12),
             Row(
@@ -252,9 +255,9 @@ class _TransactionCard extends StatelessWidget {
                     color: TColor.primary,
                     onPressed: () {
                       Get.to(() => LedgerScreen(
-                        accountId: transaction.id,
-                        accountName: transaction.name,
-                      ));
+                            accountId: transaction.id,
+                            accountName: transaction.name,
+                          ));
                     },
                   ),
                 ),
