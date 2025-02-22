@@ -1,4 +1,3 @@
-
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../service/api_service.dart';
@@ -6,11 +5,8 @@ import '../../charts_of_accounts/models/modal.dart';
 
 class TrialOfBalanceController extends GetxController {
   var accountHeaders = <AccountHeader>[].obs;
-  var selectedDate = DateTime(
-    DateTime.now().year,  
-    DateTime.now().month,
-    1,
-  ).obs;
+    var selectedDate = DateTime.now().obs;
+
 
   var isLoading = false.obs;
   final ApiService _apiService = Get.put(ApiService());
