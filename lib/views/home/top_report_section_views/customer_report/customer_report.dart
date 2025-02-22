@@ -163,7 +163,7 @@ class _TransactionCard extends StatelessWidget {
                 Text(
                   transaction.name,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: TColor.primaryText,
                   ),
@@ -259,16 +259,16 @@ class _TransactionCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                if (transaction.contact != null)
-                  Expanded(
-                    child: _ActionButton(
-                      icon: Icons.call,
-                      label: "WhatsApp",
-                      color: TColor.secondary,
-                      onPressed: () =>
-                          controller.openWhatsApp(transaction.contact!),
-                    ),
-                  ),
+                // if (transaction.contact != null)
+                // Expanded(
+                //   child: _ActionButton(
+                //     icon: Icons.call,
+                //     label: "WhatsApp",
+                //     color: TColor.secondary,
+                //     onPressed: () =>
+                //         controller.openWhatsApp(transaction.contact!),
+                //   ),
+                // ),
               ],
             ),
           ],

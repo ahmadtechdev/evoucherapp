@@ -52,8 +52,10 @@ class TrialOfBalanceScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Obx(() {
             if (controller.isLoading.value) {
-              return const Center(
-                child: CircularProgressIndicator(),
+              return Expanded(
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
               );
             }
 

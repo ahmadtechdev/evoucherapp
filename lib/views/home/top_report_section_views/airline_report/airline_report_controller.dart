@@ -23,33 +23,35 @@ class AirlineReportController extends GetxController {
 
   void loadTransactions() async {
     try {
-      // Set loading to true
       isLoading.value = true;
 
-      // Format date to match API requirement
       String formattedDate = DateFormat('yyyy-M-d').format(selectedDate.value);
 
       final response = await _apiService.postRequest(
           endpoint: 'accReports',
           body: {"date": formattedDate, "subhead": "Air Tickets Suppliers"});
 
-      // Clear existing transactions
       transactions.clear();
 
-      // Parse API response
       if (response['status'] == 'success' &&
           response['data']['customers'] != null) {
-        // Transform API data to CustomerTransaction
+        // Transform and filter API data
         transactions.value =
             (response['data']['customers'] as List).map((customer) {
+          final debit = _parseAmount(customer['debit']);
+          final credit = _parseAmount(customer['credit']);
+
           return AirLine(
               id: customer['account_id'],
               name: customer['account_name'],
-              closingDr: _parseAmount(customer['debit']),
-              closingCr: _parseAmount(customer['credit']),
+              closingDr: debit,
+              closingCr: credit,
               accountNumber: customer['cell']?.trim().isEmpty == true
                   ? null
                   : customer['cell']);
+        }).where((airline) {
+          // Only include airlines where either debit or credit is non-zero
+          return airline.closingDr != 0 || airline.closingCr != 0;
         }).toList();
 
         // Calculate totals based on API response
@@ -57,29 +59,43 @@ class AirlineReportController extends GetxController {
         totalReceipt.value = _parseAmount(totals['total_debit']);
         totalPayment.value = _parseAmount(totals['total_credit']);
         closingBalance.value = _parseAmount(totals['total_balance']);
+      } else {
+        // Handle invalid response
+        Get.snackbar(
+          'Error',
+          'Invalid response format from server',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        _resetValues();
       }
     } catch (e) {
-      // Handle errors
       Get.snackbar(
         'Error',
-        e.toString(),
+        'Failed to load transactions: ${e.toString()}',
         snackPosition: SnackPosition.BOTTOM,
       );
-      // Optionally, set some default or empty state
-      transactions.clear();
-      totalReceipt.value = 0.0;
-      totalPayment.value = 0.0;
-      closingBalance.value = 0.0;
+      _resetValues();
     } finally {
-      // Set loading to false
       isLoading.value = false;
     }
+  }
+
+  // Helper method to reset all values
+  void _resetValues() {
+    transactions.clear();
+    totalReceipt.value = 0.0;
+    totalPayment.value = 0.0;
+    closingBalance.value = 0.0;
   }
 
   // Helper method to parse amount strings with commas
   double _parseAmount(String? amount) {
     if (amount == null || amount.isEmpty) return 0.0;
-    return double.parse(amount.replaceAll(',', ''));
+    try {
+      return double.parse(amount.replaceAll(',', ''));
+    } catch (e) {
+      return 0.0;
+    }
   }
 
   void updateDate(DateTime date) {
@@ -88,7 +104,6 @@ class AirlineReportController extends GetxController {
   }
 
   void printReport() {
-    // Implement print functionality
     Get.snackbar(
       'Print',
       'Printing report...',
@@ -97,12 +112,10 @@ class AirlineReportController extends GetxController {
   }
 
   void openLedger(String id) {
-    // Implement ledger navigation
     Get.toNamed('/ledger/$id');
   }
 
   void openWhatsApp(String contact) {
-    // Implement WhatsApp functionality
     Get.snackbar(
       'WhatsApp',
       'Opening WhatsApp chat...',
