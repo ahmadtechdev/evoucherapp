@@ -1,0 +1,2 @@
+C:/Users/Ahmad/StudioProjects/evoucher_new/android/app/.cxx/Debug/m2h6m265/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Ahmad/StudioProjects/evoucher_new/android/app/.cxx/Debug/m2h6m265/armeabi-v7a/CMakeFiles/rebuild_cache.dir
