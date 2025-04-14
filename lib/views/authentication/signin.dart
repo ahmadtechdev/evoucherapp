@@ -64,6 +64,7 @@ class _SignInState extends State<SignIn> {
       Map<String, dynamic> body = {
         "Username": txtUser.text.trim(),
         "Password": txtPassword.text.trim(),
+        "Plateform": "App",
       };
 
       final response = await _apiService.postRequest(endpoint: "token", body: body);
