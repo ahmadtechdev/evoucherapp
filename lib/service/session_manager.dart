@@ -12,7 +12,7 @@ class SessionManager extends GetxController {
   static const String BASE_URL_KEY = 'base_url';
 
   final _isLoggedIn = false.obs;
-  final baseUrl = "https://evoucher.pk/api-test/".obs;
+  final baseUrl = "https://evoucher.pk/api-new/".obs;
 
   bool get isLoggedIn => _isLoggedIn.value;
 
@@ -20,7 +20,7 @@ class SessionManager extends GetxController {
   void updateBaseUrl(String client) {
     String newUrl = switch (client) {
       'TOC' => "https://evoucher.pk/api-toc-test/",
-      _ => "https://evoucher.pk/api-test/",
+      _ => "https://evoucher.pk/api-new/",
     };
     baseUrl.value = newUrl;
     _saveBaseUrl(newUrl);
@@ -54,14 +54,16 @@ class SessionManager extends GetxController {
     }
   }
 
-  Future<void> saveToken(String token, String clientType, String loginType) async {
+  Future<void> saveToken(
+      String token, String clientType, String loginType) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(TOKEN_KEY, token);
     await prefs.setString(CLIENT_TYPE_KEY, clientType);
     await prefs.setString(LOGIN_TYPE_KEY, loginType);
     updateBaseUrl(clientType);
 
-    final expiryTime = DateTime.now().add(const Duration(days: 30)).millisecondsSinceEpoch;
+    final expiryTime =
+        DateTime.now().add(const Duration(days: 30)).millisecondsSinceEpoch;
     await prefs.setInt(TOKEN_EXPIRY_KEY, expiryTime);
 
     _isLoggedIn.value = true;
@@ -98,7 +100,7 @@ class SessionManager extends GetxController {
     await prefs.remove(CLIENT_TYPE_KEY);
     await prefs.remove(LOGIN_TYPE_KEY);
     await prefs.remove(BASE_URL_KEY);
-    baseUrl.value = "https://evoucher.pk/api-test/";
+    baseUrl.value = "https://evoucher.pk/api-new/";
     _isLoggedIn.value = false;
     Get.offAll(() => const WelcomeScreen());
   }

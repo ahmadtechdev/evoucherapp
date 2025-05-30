@@ -27,7 +27,14 @@ class _SignInState extends State<SignIn> {
   bool _obscurePassword = true;
 
   String? selectedClient;
-  final List<String> clients = ['Travel','Travel 1', 'Travel 2', 'Travel 3', 'TOC'];
+  final List<String> clients = [
+    'Travel 1',
+    'Travel 2',
+    'Travel 3',
+    'Travel 4',
+    'Travel 5',
+    'TOC'
+  ];
 
   @override
   void dispose() {
@@ -35,7 +42,30 @@ class _SignInState extends State<SignIn> {
     txtPassword.dispose();
     super.dispose();
   }
+
   final SessionManager _sessionManager = Get.find<SessionManager>();
+
+  // Function to get travel value based on selected client
+  String getTravelValue(String? client) {
+    if (client == null) return "1"; // Default value
+
+    switch (client) {
+      case 'Travel 1':
+        return "1";
+      case 'Travel 2':
+        return "2";
+      case 'Travel 3':
+        return "3";
+      case 'Travel 4':
+        return "4";
+      case 'Travel 5':
+        return "5";
+      case 'TOC':
+        return "0";
+      default:
+        return "1"; // Default fallback
+    }
+  }
 
   Future<void> _handleLogin() async {
     // First validate the form
@@ -48,7 +78,9 @@ class _SignInState extends State<SignIn> {
     }
 
     // Additional validation for empty fields
-    if (txtUser.text.trim().isEmpty || txtPassword.text.trim().isEmpty || selectedClient == null) {
+    if (txtUser.text.trim().isEmpty ||
+        txtPassword.text.trim().isEmpty ||
+        selectedClient == null) {
       CustomSnackBar(
         message: "Please fill in all required fields",
         backgroundColor: Colors.red,
@@ -65,9 +97,11 @@ class _SignInState extends State<SignIn> {
         "Username": txtUser.text.trim(),
         "Password": txtPassword.text.trim(),
         "Plateform": "App",
+        "travel": getTravelValue(selectedClient),
       };
 
-      final response = await _apiService.postRequest(endpoint: "token", body: body);
+      final response =
+          await _apiService.postRequest(endpoint: "token", body: body);
 
       // Check if widget is still mounted before proceeding
       if (!mounted) return;
@@ -76,10 +110,7 @@ class _SignInState extends State<SignIn> {
         final token = response['token'];
 
         await _sessionManager.saveToken(
-            token,
-            selectedClient!,
-            response['login_type']
-        );
+            token, selectedClient!, response['login_type'] ?? "travel");
 
         if (mounted) {
           CustomSnackBar(
@@ -119,7 +150,6 @@ class _SignInState extends State<SignIn> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-
       body: Stack(
         children: [
           // Background gradient
@@ -149,7 +179,6 @@ class _SignInState extends State<SignIn> {
             ),
           ),
 
-
           // Waves at the bottom
           Positioned(
             bottom: 0,
@@ -161,7 +190,6 @@ class _SignInState extends State<SignIn> {
             ),
           ),
 
-
           // Main Content - Centered
           Center(
             child: SingleChildScrollView(
@@ -170,7 +198,8 @@ class _SignInState extends State<SignIn> {
                 child: Form(
                   key: _formKey,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
@@ -195,7 +224,7 @@ class _SignInState extends State<SignIn> {
                         const SizedBox(height: 12),
                         // Let's Travel Text
                         RichText(
-                          text:  TextSpan(
+                          text: TextSpan(
                             children: [
                               TextSpan(
                                 text: "Travel ",
@@ -244,7 +273,6 @@ class _SignInState extends State<SignIn> {
                         const SizedBox(height: 12),
 
                         // Dropdown for client selection
-                        // Replace the existing dropdown with:
                         RoundDropdownField(
                           hintText: "Select Client",
                           value: selectedClient,
@@ -254,10 +282,13 @@ class _SignInState extends State<SignIn> {
                               selectedClient = value;
                               if (value != null) {
                                 _sessionManager.updateBaseUrl(value);
+                                print(
+                                    "Selected client: $value, Travel value: ${getTravelValue(value)}");
                               }
                             });
                           },
-                          validator: (value) => value == null ? "Please select a client" : null,
+                          validator: (value) =>
+                              value == null ? "Please select a client" : null,
                           right: Icon(
                             Icons.arrow_drop_down,
                             color: TColor.secondaryText,
@@ -276,7 +307,9 @@ class _SignInState extends State<SignIn> {
                           obscureText: _obscurePassword,
                           right: IconButton(
                             icon: Icon(
-                              _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                               color: TColor.secondaryText,
                             ),
                             onPressed: () {
@@ -286,21 +319,6 @@ class _SignInState extends State<SignIn> {
                             },
                           ),
                         ),
-                        // const SizedBox(height: 8),
-                        // Align(
-                        //   alignment: Alignment.centerRight,
-                        //   child: TextButton(
-                        //     onPressed: () {
-                        //       Get.offAll(() => const Home());
-                        //     },
-                        //     child: const Text(
-                        //       "Forgot password?",
-                        //       style: TextStyle(
-                        //         color: Colors.grey,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                         const SizedBox(height: 12),
 
                         SizedBox(
@@ -308,14 +326,14 @@ class _SignInState extends State<SignIn> {
                           height: 50,
                           child: isLoading
                               ? Center(
-                            child: CircularProgressIndicator(
-                              color: TColor.primary,
-                            ),
-                          )
+                                  child: CircularProgressIndicator(
+                                    color: TColor.primary,
+                                  ),
+                                )
                               : RoundButton(
-                            title: "Login",
-                            onPressed: _handleLogin,
-                          ),
+                                  title: "Login",
+                                  onPressed: _handleLogin,
+                                ),
                         ),
                         const SizedBox(height: 8),
                         TextButton(
@@ -351,8 +369,6 @@ class _SignInState extends State<SignIn> {
               ),
             ),
           ),
-
-
         ],
       ),
     );
