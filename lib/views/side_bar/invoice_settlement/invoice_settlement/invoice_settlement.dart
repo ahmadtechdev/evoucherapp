@@ -48,7 +48,30 @@ class InvoiceSettlement extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Obx(() {
-                      if (controller.invoices.isEmpty) {
+                      if (controller.isLoading.value) {
+                        return Container(
+                          height: 200,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      TColor.primary),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Loading invoices...',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: TColor.primaryText.withOpacity(0.7),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      } else if (controller.invoices.isEmpty) {
                         return Center(
                           child: Text(
                             'No Record In This Range',

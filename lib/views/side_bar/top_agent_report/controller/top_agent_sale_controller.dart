@@ -13,7 +13,7 @@ import 'package:intl/intl.dart';
 class AgentReportController extends GetxController {
   final ApiService apiService = ApiService();
 
-  final selectedYear = 2024.obs;
+  final selectedYear = 2025.obs;
   final searchQuery = ''.obs;
 
   final RxList<Agent> activeAgents = <Agent>[].obs;
@@ -34,10 +34,7 @@ class AgentReportController extends GetxController {
 
       final response = await apiService.postRequest(
         endpoint: 'topReport',
-        body: {
-          'year': selectedYear.value.toString(),
-          "subhead":"agent"
-        },
+        body: {'year': selectedYear.value.toString(), "subhead": "agent"},
       );
 
       if (response['status'] == 'success') {
@@ -55,9 +52,9 @@ class AgentReportController extends GetxController {
             .asMap()
             .entries
             .map((entry) => Agent.fromJson(
-          entry.value,
-          nonZeroSales.length + entry.key + 1,
-        ))
+                  entry.value,
+                  nonZeroSales.length + entry.key + 1,
+                ))
             .toList();
 
         activeAgents.value = nonZeroSales;
@@ -66,8 +63,9 @@ class AgentReportController extends GetxController {
         filteredZeroSaleAgents.value = zeroSales;
       }
     } catch (e) {
-
-      CustomSnackBar(message: 'Failed to fetch customer report: ${e.toString()}', backgroundColor: TColor.third);
+      CustomSnackBar(
+          message: 'Failed to fetch customer report: ${e.toString()}',
+          backgroundColor: TColor.third);
     } finally {
       isLoading.value = false;
     }
@@ -88,12 +86,12 @@ class AgentReportController extends GetxController {
 
     filteredActiveAgents.value = activeAgents
         .where((customer) =>
-        customer.name.toLowerCase().contains(query.toLowerCase()))
+            customer.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
     filteredZeroSaleAgents.value = zeroSaleAgents
         .where((customer) =>
-        customer.name.toLowerCase().contains(query.toLowerCase()))
+            customer.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
   }
 
@@ -230,7 +228,8 @@ class AgentReportController extends GetxController {
     );
   }
 
-  pw.Widget _buildSaleItem(String label, double amount, NumberFormat formatter) {
+  pw.Widget _buildSaleItem(
+      String label, double amount, NumberFormat formatter) {
     return pw.Expanded(
       child: pw.Row(
         children: [

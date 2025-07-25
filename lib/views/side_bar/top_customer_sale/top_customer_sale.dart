@@ -7,7 +7,8 @@ import 'controller/top_customer_sale_controller.dart';
 import 'widgets/customer_card.dart';
 
 class CustomerReportScreen extends StatelessWidget {
-  final CustomerReportController controller = Get.put(CustomerReportController());
+  final CustomerReportController controller =
+      Get.put(CustomerReportController());
 
   CustomerReportScreen({super.key});
 
@@ -62,23 +63,24 @@ class CustomerReportScreen extends StatelessWidget {
     return Row(
       children: [
         Obx(() => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            border: Border.all(color: TColor.secondaryText.withOpacity(0.2)),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: DropdownButton<int>(
-            value: controller.selectedYear.value,
-            underline: const SizedBox(),
-            items: List.generate(5, (index) => 2024 - index).map((year) {
-              return DropdownMenuItem(
-                value: year,
-                child: Text('YEAR - $year'),
-              );
-            }).toList(),
-            onChanged: (value) => controller.updateYear(value!),
-          ),
-        )),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                border:
+                    Border.all(color: TColor.secondaryText.withOpacity(0.2)),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: DropdownButton<int>(
+                value: controller.selectedYear.value,
+                underline: const SizedBox(),
+                items: List.generate(5, (index) => 2025 - index).map((year) {
+                  return DropdownMenuItem(
+                    value: year,
+                    child: Text('YEAR - $year'),
+                  );
+                }).toList(),
+                onChanged: (value) => controller.updateYear(value!),
+              ),
+            )),
         const SizedBox(width: 12),
         const Spacer(),
         ElevatedButton.icon(

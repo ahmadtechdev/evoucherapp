@@ -11,6 +11,8 @@ import 'views/home/home.dart';
 import 'views/side_bar/accounts/accounts/controller/account_controller.dart';
 import 'views/side_bar/incomes_report/controller/income_controller.dart';
 import 'views/welcome_view.dart';
+import 'package:flutter/foundation.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,13 +20,14 @@ void main() async {
   // Initialize SessionManager
   final sessionManager = Get.put(SessionManager());
   await sessionManager.initializeSession();
+  // await DevPermissionCheck.run(); // Only logs in debug mode
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  // This widget is the root of your application
   @override
   Widget build(BuildContext context) {
     // Initialize the controller
@@ -49,5 +52,35 @@ class MyApp extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class DevPermissionCheck {
+  /// Add any permissions you want to monitor here
+  static final List<Permission> _permissionsToCheck = [
+    Permission.camera,
+    Permission.microphone,
+    Permission.location,
+    Permission.locationAlways,
+    Permission.locationWhenInUse,
+    Permission.storage,
+    Permission.photos,
+    Permission.contacts,
+    Permission.sms,
+    Permission.phone,
+    Permission.bluetooth,
+    Permission.notification,
+    // Add more if needed
+  ];
+
+  /// Call this in main() or initState for debugging only
+  static Future<void> run() async {
+    if (kDebugMode) {
+      print('🔍 [DevPermissionCheck] Checking permissions...');
+      for (var permission in _permissionsToCheck) {
+        final status = await permission.status;
+        print('📋 Permission: ${describeEnum(permission)} → Status: $status');
+      }
+    }
   }
 }

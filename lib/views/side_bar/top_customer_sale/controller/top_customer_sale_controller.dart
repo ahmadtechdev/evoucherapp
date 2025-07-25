@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 class CustomerReportController extends GetxController {
   final ApiService apiService = ApiService();
 
-  final selectedYear = 2024.obs;
+  final selectedYear = 2025.obs;
   final searchQuery = ''.obs;
 
   final RxList<Customer> activeCustomers = <Customer>[].obs;

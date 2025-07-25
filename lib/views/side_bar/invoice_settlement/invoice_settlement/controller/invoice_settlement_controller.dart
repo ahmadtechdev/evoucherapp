@@ -8,15 +8,18 @@ class InvoiceSettlementController extends GetxController {
   var dateFrom = DateTime.now().obs;
   var dateTo = DateTime.now().obs;
   var invoices = [].obs;
+  var isLoading = false.obs; // Add loading state
 
   @override
   void onInit() {
     super.onInit();
 
-    // Set dateFrom to the first day of the current month
-    dateFrom.value = DateTime(DateTime.now().year, DateTime.now().month);
-    fetchInvoices();
+    // Set dateFrom to one month back from today
+    final now = DateTime.now();
+    dateFrom.value = DateTime(now.year, now.month - 1, now.day);
+    dateTo.value = now;
 
+    fetchInvoices();
   }
 
   void setAccount(String account) {
@@ -30,6 +33,8 @@ class InvoiceSettlementController extends GetxController {
 
   fetchInvoices() async {
     try {
+      isLoading.value = true; // Start loading
+
       // Format dates as "YYYY-MM-DD"
       final fromDate = DateFormat('yyyy-MM-dd').format(dateFrom.value);
       final toDate = DateFormat('yyyy-MM-dd').format(dateTo.value);
@@ -42,9 +47,7 @@ class InvoiceSettlementController extends GetxController {
           additionalParams: {'account': selectedAccount.value});
 
       if (response['status'] == 'success') {
-
         var invoiceData = response['data'];
-
         // Handle null values by using null-aware operators (??) or checks
         invoices.value = invoiceData.map((invoice) {
           // Safely convert to double if it's a valid number or default to 0.0
@@ -63,12 +66,13 @@ class InvoiceSettlementController extends GetxController {
             'can_select': invoice['can_select'] ?? false,
           };
         }).toList();
-
       } else {
         Get.snackbar('Error', 'Failed to fetch invoices');
       }
     } catch (e) {
       Get.snackbar('Exception', e.toString());
+    } finally {
+      isLoading.value = false; // Stop loading
     }
   }
 }

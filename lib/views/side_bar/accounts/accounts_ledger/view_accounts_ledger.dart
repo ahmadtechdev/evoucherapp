@@ -89,14 +89,14 @@ class LedgerScreen extends StatelessWidget {
                   'Balance'
                 ],
                 ...controller.filteredVouchers.map((voucher) => [
-                  voucher.voucher,
-                  DateFormat('dd-MMM-yyyy')
-                      .format(DateTime.parse(voucher.date)),
-                  voucher.description,
-                  voucher.debit.toStringAsFixed(2),
-                  voucher.credit.toStringAsFixed(2),
-                  voucher.balance,
-                ]),
+                      voucher.voucher,
+                      DateFormat('dd-MMM-yyyy')
+                          .format(DateTime.parse(voucher.date)),
+                      voucher.description,
+                      voucher.debit.toStringAsFixed(2),
+                      voucher.credit.toStringAsFixed(2),
+                      voucher.balance,
+                    ]),
               ],
               headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               cellStyle: const pw.TextStyle(),
@@ -255,9 +255,9 @@ class LedgerScreen extends StatelessWidget {
       child: Row(
         children: [
           _buildActionButton(MdiIcons.microsoftExcel, 'Excel', TColor.primary,
-                  () => _exportToExcel(context, controller.filteredVouchers)),
+              () => _exportToExcel(context, controller.filteredVouchers)),
           _buildActionButton(MdiIcons.printer, 'Print', TColor.third,
-                  () => _exportToPDF(context, controller)),
+              () => _exportToPDF(context, controller)),
           _buildActionButton(MdiIcons.whatsapp, 'Whatsapp', TColor.secondary,
               launchWhatsappWithMobileNumber),
         ],
@@ -314,16 +314,22 @@ class LedgerScreen extends StatelessWidget {
 
         // Show success message
 
-        CustomSnackBar(message: 'Excel file exported to $filePath', backgroundColor: TColor.secondary).show();
+        CustomSnackBar(
+                message: 'Excel file exported to $filePath',
+                backgroundColor: TColor.secondary)
+            .show();
       } else {
-
-        CustomSnackBar(message: 'Failed to export Excel file', backgroundColor: TColor.third).show();
+        CustomSnackBar(
+                message: 'Failed to export Excel file',
+                backgroundColor: TColor.third)
+            .show();
       }
     } catch (e) {
       // Handle exceptions
 
-      CustomSnackBar(message: 'Error: ${e.toString()}', backgroundColor: TColor.third).show();
-
+      CustomSnackBar(
+              message: 'Error: ${e.toString()}', backgroundColor: TColor.third)
+          .show();
     }
   }
 
@@ -337,7 +343,7 @@ class LedgerScreen extends StatelessWidget {
     } else if (status.isDenied) {
       // Request permission
       PermissionStatus newStatus =
-      await Permission.manageExternalStorage.request();
+          await Permission.manageExternalStorage.request();
       if (newStatus.isGranted) {
         return true;
       } else if (newStatus.isPermanentlyDenied) {
@@ -446,7 +452,7 @@ class LedgerScreen extends StatelessWidget {
                       DateFormat('dd MMM yyyy')
                           .format(DateTime.parse(voucher.date)),
                       style:
-                      TextStyle(color: TColor.secondaryText, fontSize: 12),
+                          TextStyle(color: TColor.secondaryText, fontSize: 12),
                     ),
                   ],
                 ),
@@ -646,16 +652,16 @@ class LedgerScreen extends StatelessWidget {
               _buildSummaryRow(Icons.account_balance, TColor.primary,
                   'Opening Balance B/F', masterData.opening),
               _buildSummaryRow(Icons.add_circle, Colors.green,
-                  'Add Sale Invoice', 'PKR 76,004 -d'),
+                  'Add Sale Invoice', 'PKR 0 -d'),
               _buildSummaryRow(Icons.remove_circle, Colors.red,
                   'Less Refund Invoices', 'PKR 0 -d'),
-              _buildSummaryRow(Icons.remove_circle, Colors.red, 'Less Receipts',
-                  'PKR 25,000 -d'),
               _buildSummaryRow(
-                  Icons.add_circle, Colors.green, 'Add Payments', 'PKR 56 -d'),
+                  Icons.remove_circle, Colors.red, 'Less Receipts', 'PKR 0 -d'),
+              _buildSummaryRow(
+                  Icons.add_circle, Colors.green, 'Add Payments', 'PKR 0 -d'),
               const Divider(height: 1),
               _buildSummaryRow(Icons.account_balance_wallet, TColor.primary,
-                  'Net Balance', '51,060 Dr -d',
+                  'Net Balance', masterData.opening,
                   isTotal: true),
             ],
           ),

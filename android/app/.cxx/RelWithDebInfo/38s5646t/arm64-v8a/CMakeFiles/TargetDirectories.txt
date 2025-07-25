@@ -1,0 +1,2 @@
+C:/Users/zeeshan/Desktop/evoucher/evoucherapp/android/app/.cxx/RelWithDebInfo/38s5646t/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/zeeshan/Desktop/evoucher/evoucherapp/android/app/.cxx/RelWithDebInfo/38s5646t/arm64-v8a/CMakeFiles/rebuild_cache.dir
