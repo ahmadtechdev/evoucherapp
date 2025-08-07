@@ -26,6 +26,8 @@ class _SignInState extends State<SignIn> {
   bool isLoading = false;
   bool _obscurePassword = true;
 
+
+
   String? selectedClient;
   final List<String> clients = [
     'Travel 1',
@@ -103,14 +105,23 @@ class _SignInState extends State<SignIn> {
       final response =
           await _apiService.postRequest(endpoint: "token", body: body);
 
+      print("response data");
+      print(response);
       // Check if widget is still mounted before proceeding
       if (!mounted) return;
 
       if (response.containsKey("token")) {
         final token = response['token'];
+        final access = response['access'] as Map<String, dynamic>?; // Get access data
+
+
 
         await _sessionManager.saveToken(
-            token, selectedClient!, response['login_type'] ?? "travel");
+            token,
+            selectedClient!,
+            response['login_type'] ?? "travel",
+            access // Pass access data to session manager
+        );
 
         if (mounted) {
           CustomSnackBar(

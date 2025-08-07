@@ -1,4 +1,3 @@
-import 'package:evoucher_new/views/authentication/cotnroller/auth_controller.dart';
 import 'package:evoucher_new/views/bottom_bar/hotel_voucher/entry_hotel_voucher/entry_hotel_controller.dart';
 import 'package:evoucher_new/views/bottom_bar/hotel_voucher/hotel_sale_register/hotel_sale_register_controller.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +15,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   // Initialize SessionManager
   final sessionManager = Get.put(SessionManager());
   await sessionManager.initializeSession();
@@ -36,7 +34,6 @@ class MyApp extends StatelessWidget {
     Get.lazyPut(() => VoucherController(), fenix: true);
     Get.lazyPut(() => IncomesReportController(), fenix: true);
     Get.lazyPut(() => EntryHotelController(), fenix: true);
-    Get.lazyPut(() => AuthController(), fenix: true);
     Get.lazyPut(() => HotelSaleRegisterController(), fenix: true);
 
     return GetMaterialApp(

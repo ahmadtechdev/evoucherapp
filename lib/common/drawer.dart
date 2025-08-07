@@ -38,6 +38,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _selectedItemKey = GlobalKey();
   String? loginType;
+  Map<String, dynamic>? userAccess;
 
   @override
   void initState() {
@@ -52,7 +53,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
   Future<void> _initializeLoginType() async {
     final sessionManager = Get.find<SessionManager>();
     loginType = await sessionManager.getLoginType();
+    userAccess = await sessionManager.getUserAccess();
+    print("check");
+    print(userAccess);
     setState(() {});
+  }
+
+  // Add method to check access
+  bool _hasAccess(String moduleKey) {
+    return userAccess?.containsKey(moduleKey) ?? false;
   }
 
   @override
@@ -216,7 +225,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     int currentIndex = 0;
     final List<Widget> items = [];
 
-    // Home Section
+    // Always show Home (no access check needed)
     items.add(_buildNavigationItem(
       title: 'Home',
       icon: Icons.dashboard_rounded,
@@ -224,198 +233,170 @@ class _CustomDrawerState extends State<CustomDrawer> {
       onTap: () => Get.to(() => const Home()),
     ));
 
-    if (loginType == 'toc') {
-      items.add(_buildNavigationItem(
-        title: 'Accounts',
-        icon: Icons.person,
-        index: currentIndex++,
-        onTap: () => Get.to(() => const Accounts()),
-      ));
+    // Check if user has any accounts-related access
+    bool hasAccountsSection = _hasAccess('1AB') || _hasAccess('13DATA'); // chartofaccounts or viewaccounts
 
-      items.addAll([
-        _buildNavigationItem(
-          title: 'Daily Cash Book',
-          icon: Icons.menu_book_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => DailyCashBook()),
-        ),
-        _buildNavigationItem(
-          title: 'Daily Activity Report',
-          icon: Icons.calendar_today_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => DailyActivityReport()),
-        ),
-        _buildNavigationItem(
-          title: 'Daily Cash Activity',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => const DailyCashActivity()),
-        ),
-        _buildNavigationItem(
-          title: 'Trial Balance',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => TrialOfBalanceScreen()),
-        ),
-        _buildNavigationItem(
-          title: 'Daily Sales Report',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => const DailySalesReportScreen()),
-        ),
-        _buildNavigationItem(
-          title: 'Expenses Report',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => ExpenseComparisonReport()),
-        ),
-        _buildNavigationItem(
-          title: 'Incomes Report',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => const IncomesComparisonReport()),
-        ),
-      ]);
-
-      // ************************************** Travel Started Here **************************************
-    } else {
-      // Accounts Section
+    if (hasAccountsSection) {
       items.add(_buildSectionHeader(
         title: 'ACCOUNTS',
         icon: Icons.account_balance_wallet_rounded,
       ));
 
+      if (_hasAccess('1AB') || _hasAccess('13DATA')) { // chartofaccounts or viewaccounts
+        items.add(_buildNavigationItem(
+          title: 'Accounts',
+          icon: Icons.person,
+          index: currentIndex++,
+          onTap: () => Get.to(() => const Accounts()),
+        ));
+      }
+    }
+
+    // Invoice Settlement
+    items.add(_buildNavigationItem(
+      title: 'Invoice Settlement',
+      icon: Icons.receipt_long_rounded,
+      index: currentIndex++,
+      onTap: () => Get.to(() => const InvoiceSettlement()),
+    ));
+
+    if (_hasAccess('2AS')) { // dailycashbook
       items.add(_buildNavigationItem(
-        title: 'Accounts',
-        icon: Icons.person,
+        title: 'Daily Cash Book',
+        icon: Icons.menu_book_rounded,
         index: currentIndex++,
-        onTap: () => Get.to(() => const Accounts()),
+        onTap: () => Get.to(() => DailyCashBook()),
       ));
+    }
 
-      // Reports Section
-      items.addAll([
-        _buildNavigationItem(
-          title: 'Invoice Settlement',
-          icon: Icons.receipt_long_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => const InvoiceSettlement()),
-        ),
-        _buildNavigationItem(
-          title: 'Daily Cash Book',
-          icon: Icons.menu_book_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => DailyCashBook()),
-        ),
-        _buildNavigationItem(
-          title: 'Daily Activity Report',
-          icon: Icons.calendar_today_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => DailyActivityReport()),
-        ),
-        _buildNavigationItem(
-          title: 'Daily Cash Activity',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => const DailyCashActivity()),
-        ),
-        _buildNavigationItem(
-          title: 'Monthly Sale Report',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => MonthlySalesReport()),
-        ),
-        _buildNavigationItem(
-          title: 'Expenses Report',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => ExpenseComparisonReport()),
-        ),
-        _buildNavigationItem(
-          title: 'Incomes Report',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => const IncomesComparisonReport()),
-        ),
-        _buildNavigationItem(
-          title: 'Daily Sales Report',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => const DailySalesReportScreen()),
-        ),
-        _buildNavigationItem(
-          title: 'Recovery List',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => RecoveryListsScreen()),
-        ),
-      ]);
+    if (_hasAccess('24DAR')) { // dailyactivityreport
+      items.add(_buildNavigationItem(
+        title: 'Daily Activity Report',
+        icon: Icons.calendar_today_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => DailyActivityReport()),
+      ));
+    }
 
-      // Financial Reports Section
+    // Daily Cash Activity
+    items.add(_buildNavigationItem(
+      title: 'Daily Cash Activity',
+      icon: Icons.analytics_rounded,
+      index: currentIndex++,
+      onTap: () => Get.to(() => const DailyCashActivity()),
+    ));
+
+    // Monthly Sale Report
+    items.add(_buildNavigationItem(
+      title: 'Monthly Sale Report',
+      icon: Icons.analytics_rounded,
+      index: currentIndex++,
+      onTap: () => Get.to(() => MonthlySalesReport()),
+    ));
+
+    // Expenses Report
+    items.add(_buildNavigationItem(
+      title: 'Expenses Report',
+      icon: Icons.analytics_rounded,
+      index: currentIndex++,
+      onTap: () => Get.to(() => ExpenseComparisonReport()),
+    ));
+
+    // Incomes Report
+    items.add(_buildNavigationItem(
+      title: 'Incomes Report',
+      icon: Icons.analytics_rounded,
+      index: currentIndex++,
+      onTap: () => Get.to(() => const IncomesComparisonReport()),
+    ));
+
+    // Daily Sales Report
+    items.add(_buildNavigationItem(
+      title: 'Daily Sales Report',
+      icon: Icons.analytics_rounded,
+      index: currentIndex++,
+      onTap: () => Get.to(() => const DailySalesReportScreen()),
+    ));
+
+    // Recovery List
+    items.add(_buildNavigationItem(
+      title: 'Recovery List',
+      icon: Icons.analytics_rounded,
+      index: currentIndex++,
+      onTap: () => Get.to(() => RecoveryListsScreen()),
+    ));
+
+    // Financial Reports Section
+    bool hasFinancialReports = _hasAccess('14GSK') || _hasAccess('17PL'); // trialbalance or profitloss
+
+    if (hasFinancialReports) {
       items.add(_buildSectionHeader(
         title: 'FINANCIAL REPORTS',
         icon: Icons.analytics_rounded,
       ));
 
-      items.addAll([
-        _buildNavigationItem(
+      if (_hasAccess('14GSK')) { // trialbalance
+        items.add(_buildNavigationItem(
           title: 'Trial Balance',
           icon: Icons.analytics_rounded,
           index: currentIndex++,
           onTap: () => Get.to(() => TrialOfBalanceScreen()),
-        ),
-        _buildNavigationItem(
+        ));
+      }
+
+      if (_hasAccess('17PL')) { // profitloss
+        items.add(_buildNavigationItem(
           title: 'Monthly Profit Loss',
           icon: Icons.analytics_rounded,
           index: currentIndex++,
           onTap: () => Get.to(() => MonthlyProfitLoss()),
-        ),
-        // _buildNavigationItem(
-        //   title: 'Total Monthly Profit Loss',
-        //   icon: Icons.analytics_rounded,
-        //   index: currentIndex++,
-        //   onTap: () => Get.to(() => TotalMonthlyProfitLoss()),
-        // ),
-        // _buildNavigationItem(
-        //   title: 'Total Expenses Report',
-        //   icon: Icons.analytics_rounded,
-        //   index: currentIndex++,
-        //   onTap: () => Get.to(() => TotalMonthlyExpenses()),
-        // ),
-      ]);
-
-      items.addAll([
-        _buildNavigationItem(
-          title: 'Top Customers Sales',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => CustomerReportScreen()),
-        ),
-        _buildNavigationItem(
-          title: '5 Year Customers Sales',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => const FiveYearsCustomerSale()),
-        ),
-        _buildNavigationItem(
-          title: 'Top Supplier Report',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => SupplierReportScreen()),
-        ),
-        _buildNavigationItem(
-          title: 'Top Agent Sales',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => AgentReportScreen()),
-        ),
-        _buildNavigationItem(
-          title: 'Manage User',
-          icon: Icons.analytics_rounded,
-          index: currentIndex++,
-          onTap: () => Get.to(() => ManageUser()),
-        ),
-      ]);
+        ));
+      }
     }
+
+    // Customer and Other Reports
+    if (_hasAccess('18CSTRPT')) { // customerreports
+      items.add(_buildNavigationItem(
+        title: 'Top Customers Sales',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => CustomerReportScreen()),
+      ));
+    }
+
+    // 5 Year Customer Sales
+    items.add(_buildNavigationItem(
+      title: '5 Year Customers Sales',
+      icon: Icons.analytics_rounded,
+      index: currentIndex++,
+      onTap: () => Get.to(() => const FiveYearsCustomerSale()),
+    ));
+
+    // Top Supplier Report
+    items.add(_buildNavigationItem(
+      title: 'Top Supplier Report',
+      icon: Icons.analytics_rounded,
+      index: currentIndex++,
+      onTap: () => Get.to(() => SupplierReportScreen()),
+    ));
+
+    if (_hasAccess('20AGTRPT')) { // subagentreports
+      items.add(_buildNavigationItem(
+        title: 'Top Agent Sales',
+        icon: Icons.analytics_rounded,
+        index: currentIndex++,
+        onTap: () => Get.to(() => AgentReportScreen()),
+      ));
+    }
+
+    // Manage User
+    items.add(_buildNavigationItem(
+      title: 'Manage User',
+      icon: Icons.analytics_rounded,
+      index: currentIndex++,
+      onTap: () => Get.to(() => ManageUser()),
+    ));
+
     return items;
   }
 

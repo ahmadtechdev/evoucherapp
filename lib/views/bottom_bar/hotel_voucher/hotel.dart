@@ -1,10 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../common/color_extension.dart';
 import '../../../common/drawer.dart';
 import '../../../common_widget/bottom_navigation.dart';
+import '../../../service/session_manager.dart';
 import 'entry_hotel_voucher/entry_hotel_voucher.dart';
 import 'hotel_sale_register/hotel_sale_register.dart';
 import 'view_hotel_voucher/view_hotel_voucher.dart';
@@ -17,6 +17,24 @@ class Hotel extends StatefulWidget {
 }
 
 class _HotelState extends State<Hotel> {
+  Map<String, dynamic>? userAccess;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeUserAccess();
+  }
+
+  Future<void> _initializeUserAccess() async {
+    final sessionManager = Get.find<SessionManager>();
+    userAccess = await sessionManager.getUserAccess();
+    setState(() {});
+  }
+
+  bool _hasAccess(String moduleKey) {
+    return userAccess?.containsKey(moduleKey) ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -74,21 +92,36 @@ class _HotelState extends State<Hotel> {
                   subtitle: 'Create a new hotel voucher entry',
                   icon: Icons.add_circle_outline,
                   color: TColor.primary,
-                  onTap: () => Get.to(() => const EntryHotelVoucher()),
+                  hasAccess: _hasAccess('97EHV'), // entryhotelvoucher
+                  onTap: () {
+                    if (_hasAccess('97EHV')) {
+                      Get.to(() => const EntryHotelVoucher());
+                    }
+                  },
                 ),
                 VoucherOption(
                   title: 'View Hotel Voucher',
                   subtitle: 'Check existing voucher details',
                   icon: Icons.visibility_outlined,
                   color: TColor.primary,
-                  onTap: () => Get.to(() => ViewHotelVoucher()),
+                  hasAccess: _hasAccess('96VHV'), // viewhotelvoucher
+                  onTap: () {
+                    if (_hasAccess('96VHV')) {
+                      Get.to(() => ViewHotelVoucher());
+                    }
+                  },
                 ),
                 VoucherOption(
                   title: 'Hotel Sale Register',
                   subtitle: 'Register view details',
                   icon: Icons.app_registration,
                   color: TColor.primary,
-                  onTap: () => Get.to(() => HotelSaleRegisterScreen()),
+                  hasAccess: _hasAccess('96VHV'), // viewhotelvoucher (same permission)
+                  onTap: () {
+                    if (_hasAccess('96VHV')) {
+                      Get.to(() => HotelSaleRegisterScreen());
+                    }
+                  },
                 ),
               ]),
             ],
@@ -166,8 +199,8 @@ class _HotelState extends State<Hotel> {
                         ),
                       const SizedBox(height: 8),
                       Icon(
-                        Icons.arrow_forward,
-                        color: TColor.primary,
+                        option.hasAccess ? Icons.arrow_forward : Icons.lock,
+                        color: option.hasAccess ? TColor.primary : Colors.grey,
                         size: 24,
                       ),
                     ],
@@ -188,6 +221,7 @@ class VoucherOption {
   final IconData icon;
   final Color color;
   final String? badge;
+  final bool hasAccess;
   final VoidCallback onTap;
 
   VoucherOption({
@@ -196,6 +230,7 @@ class VoucherOption {
     required this.icon,
     required this.color,
     this.badge,
+    required this.hasAccess,
     required this.onTap,
   });
 }

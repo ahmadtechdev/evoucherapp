@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import '../../../common/color_extension.dart';
 import '../../../common/drawer.dart';
 import '../../../common_widget/bottom_navigation.dart';
+import '../../../service/session_manager.dart';
 import 'transport_voucher/transport_entry_voucher/transport_entry_voucher.dart';
 import 'transport_voucher/view_transport_voucher/view_transport_voucher.dart';
 
@@ -20,6 +21,24 @@ class Other_voucher extends StatefulWidget {
 }
 
 class _Other_voucherState extends State<Other_voucher> {
+  Map<String, dynamic>? userAccess;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeUserAccess();
+  }
+
+  Future<void> _initializeUserAccess() async {
+    final sessionManager = Get.find<SessionManager>();
+    userAccess = await sessionManager.getUserAccess();
+    setState(() {});
+  }
+
+  bool _hasAccess(String moduleKey) {
+    return userAccess?.containsKey(moduleKey) ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,71 +65,85 @@ class _Other_voucherState extends State<Other_voucher> {
                 title: 'Entry Other Voucher',
                 icon: Icons.add_circle_outline,
                 color: TColor.primary,
+                hasAccess: _hasAccess('93OSV'), // other_voucher
                 onTap: () {
-                  // Handle Entry Journal Voucher tap
-                  Get.to(() => const OtherEntryVoucher());
+                  if (_hasAccess('93OSV')) {
+                    Get.to(() => const OtherEntryVoucher());
+                  }
                 },
               ),
               VoucherOption(
                 title: 'View Other Voucher',
                 icon: Icons.visibility_outlined,
                 color: TColor.primary,
+                hasAccess: _hasAccess('93OSV'), // other_voucher
                 onTap: () {
-                  // Handle View Journal Voucher tap
-                  Get.to(() => ViewOtherVoucher());
+                  if (_hasAccess('93OSV')) {
+                    Get.to(() => ViewOtherVoucher());
+                  }
                 },
               ),
             ]),
             const SizedBox(height: 24),
-            _buildSectionTitle('Invoice  Voucher'),
+            _buildSectionTitle('Invoice Voucher'),
             _buildVoucherOptions([
               VoucherOption(
-                title: 'Entry Invoice  Voucher',
+                title: 'Entry Invoice Voucher',
                 icon: Icons.add_circle_outline,
                 color: TColor.secondary,
+                hasAccess: _hasAccess('EIV81'), // entryinvoicevoucher
                 onTap: () {
-                  // Handle Entry Journal Voucher tap
-                  Get.to(() => const EntryInvoiceVoucher());
+                  if (_hasAccess('EIV81')) {
+                    Get.to(() => const EntryInvoiceVoucher());
+                  }
                 },
               ),
               VoucherOption(
-                title: 'View Invoice  Voucher',
+                title: 'View Invoice Voucher',
                 icon: Icons.visibility_outlined,
                 color: TColor.secondary,
+                hasAccess: _hasAccess('VIV19'), // viewinvoicevoucher
                 onTap: () {
-                  // Handle View Journal Voucher tap
-                  Get.to(() => ViewInvoiceVoucher());
+                  if (_hasAccess('VIV19')) {
+                    Get.to(() => ViewInvoiceVoucher());
+                  }
                 },
               ),
             ]),
             const SizedBox(height: 24),
-            _buildSectionTitle('Transport  Voucher'),
+            _buildSectionTitle('Transport Voucher'),
             _buildVoucherOptions([
               VoucherOption(
-                title: 'Entry Transport  Voucher',
+                title: 'Entry Transport Voucher',
                 icon: Icons.add_circle_outline,
                 color: TColor.fourth,
+                hasAccess: _hasAccess('ELB87'), // entry_lab_voucher
                 onTap: () {
-                  // Handle Entry Journal Voucher tap
-                  Get.to(() => TransportEntryVoucherScreen());
+                  if (_hasAccess('ELB87')) {
+                    Get.to(() => TransportEntryVoucherScreen());
+                  }
                 },
               ),
               VoucherOption(
                 title: 'View Transport Voucher',
                 icon: Icons.visibility_outlined,
                 color: TColor.fourth,
+                hasAccess: _hasAccess('VLB87'), // view_lab_voucher
                 onTap: () {
-                  // Handle View Journal Voucher tap
-                  Get.to(() => ViewTransportVoucher());
+                  if (_hasAccess('VLB87')) {
+                    Get.to(() => ViewTransportVoucher());
+                  }
                 },
               ),
               VoucherOption(
                 title: 'Register Transport Voucher',
                 icon: Icons.visibility_outlined,
                 color: TColor.fourth,
+                hasAccess: _hasAccess('VLB87'), // view_lab_voucher
                 onTap: () {
-                  // Handle View Journal Voucher tap
-                  Get.to(() => TransportSaleRegisterScreen());
+                  if (_hasAccess('VLB87')) {
+                    Get.to(() => TransportSaleRegisterScreen());
+                  }
                 },
               ),
             ]),
@@ -156,39 +189,37 @@ class _Other_voucherState extends State<Other_voucher> {
           child: ListTile(
             leading: Icon(
               option.icon,
-              color: option.color,
+              color: option.hasAccess ? option.color : Colors.grey,
               size: 24,
             ),
             title: Text(
               option.title,
               style: TextStyle(
-                color: TColor.primaryText,
+                color: option.hasAccess ? TColor.primaryText : Colors.grey,
                 fontSize: 16,
               ),
             ),
-            trailing: option.badge != null
+            trailing: option.hasAccess
+                ? (option.badge != null
                 ? Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: TColor.third,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      option.badge!,
-                      style: TextStyle(
-                        color: TColor.white,
-                        fontSize: 12,
-                      ),
-                    ),
-                  )
-                : null,
-            // Icon(
-            //   Icons.chevron_right,
-            //   color: TColor.secondaryText,
-            // ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 4,
+              ),
+              decoration: BoxDecoration(
+                color: TColor.third,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                option.badge!,
+                style: TextStyle(
+                  color: TColor.white,
+                  fontSize: 12,
+                ),
+              ),
+            )
+                : null)
+                : const Icon(Icons.lock, color: Colors.grey),
             onTap: option.onTap,
           ),
         );
@@ -202,6 +233,7 @@ class VoucherOption {
   final IconData icon;
   final Color color;
   final String? badge;
+  final bool hasAccess;
   final VoidCallback onTap;
 
   VoucherOption({
@@ -209,6 +241,7 @@ class VoucherOption {
     required this.icon,
     required this.color,
     this.badge,
+    required this.hasAccess,
     required this.onTap,
   });
 }

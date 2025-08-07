@@ -25,18 +25,24 @@ class ReportSection extends StatefulWidget {
 
 class _ReportSectionState extends State<ReportSection> {
   String? loginType;
+  Map<String, dynamic>? userAccess;
 
   @override
   void initState() {
     super.initState();
-
-    _initializeLoginType();
+    _initializeLoginTypeAndAccess();
   }
 
-  Future<void> _initializeLoginType() async {
+  Future<void> _initializeLoginTypeAndAccess() async {
     final sessionManager = Get.find<SessionManager>();
     loginType = await sessionManager.getLoginType();
+    userAccess = await sessionManager.getUserAccess();
     setState(() {});
+  }
+
+  // Check if user has access to a specific module
+  bool _hasAccess(String moduleKey) {
+    return userAccess?.containsKey(moduleKey) ?? false;
   }
 
   @override
@@ -62,128 +68,125 @@ class _ReportSectionState extends State<ReportSection> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _dashboardItem(
-                  Icons.person,
-                  'LEDGER',
-                  'Report',
-                      () {
-                    Get.to(() => const Accounts());
-                    // Handle onTap for CUSTOMERS
-                  },
-                ),
-                _dashboardItem(
-                  Icons.people,
-                  'CUSTOMERS',
-                  'Report',
-                  () {
-                    Get.to(() => CustomerTransactionScreen());
-                    // Handle onTap for CUSTOMERS
-                  },
-                ),
-                _dashboardItem(
-                  Icons.account_balance,
-                  'BANKS',
-                  'Report',
-                  () {
-                    // Handle onTap for BANKS
-                    Get.to(() => BanksScreen());
-                  },
-                ),
-                _dashboardItem(
-                  Icons.person,
-                  'AGENTS',
-                  'Report',
-                  () {
-                    // Handle onTap for AGENTS
-                    Get.to(() => AgentReport());
-                  },
-                ),
-                _dashboardItem(
-                  Icons.flight,
-                  'AIRLINES',
-                  'Report',
-                  () {
-                    // Handle onTap for AIRLINES
-                    Get.to(() => AirlineReport());
-                  },
-                ),
-                _dashboardItem(
-                  Icons.hotel,
-                  'VISA HOTEL',
-                  'Report',
-                  () {
-                    // Handle onTap for VISA HOTEL
-                    Get.to(() => VisaHotelReport());
-                  },
-                ),
-                _dashboardItem(
-                  Icons.analytics,
-                  'BSP',
-                  'Report',
-                  () {
-                    // Handle onTap for BSP
-                    Get.to(() => TicketListingScreen());
-                  },
-                ),
-                _dashboardItem(
-                  Icons.calculate,
-                  'TRIAL BALANCE',
-                  'Report',
-                  () {
-                    Get.to(() => TrialOfBalanceScreen());
-                  },
-                ),
-                if (loginType == 'travel') ...[
+                if (_hasAccess('13DATA')) // viewaccounts
                   _dashboardItem(
-                    Icons.star,
-                    'TOP CUSTOMERS',
+                    Icons.person,
+                    'LEDGER',
                     'Report',
-                    () {
-                      // Handle onTap for TOP CUSTOMERS
-
-                      Get.to(() => CustomerReportScreen());
+                        () {
+                      Get.to(() => const Accounts());
                     },
                   ),
+
+                if (_hasAccess('18CSTRPT')) // customerreports
+                  _dashboardItem(
+                    Icons.people,
+                    'CUSTOMERS',
+                    'Report',
+                        () {
+                      Get.to(() => CustomerTransactionScreen());
+                    },
+                  ),
+
+                if (_hasAccess('19BNKRPT')) // bankreports
+                  _dashboardItem(
+                    Icons.account_balance,
+                    'BANKS',
+                    'Report',
+                        () {
+                      Get.to(() => BanksScreen());
+                    },
+                  ),
+
+                if (_hasAccess('20AGTRPT')) // subagentreports
+                  _dashboardItem(
+                    Icons.person,
+                    'AGENTS',
+                    'Report',
+                        () {
+                      Get.to(() => AgentReport());
+                    },
+                  ),
+
+                if (_hasAccess('21ARLRPT')) // airlinereports
+                  _dashboardItem(
+                    Icons.flight,
+                    'AIRLINES',
+                    'Report',
+                        () {
+                      Get.to(() => AirlineReport());
+                    },
+                  ),
+
+                if (_hasAccess('25VHS')) // visahotelreports
+                  _dashboardItem(
+                    Icons.hotel,
+                    'VISA HOTEL',
+                    'Report',
+                        () {
+                      Get.to(() => VisaHotelReport());
+                    },
+                  ),
+
+                if (_hasAccess('22BSP')) // bspreports
+                  _dashboardItem(
+                    Icons.analytics,
+                    'BSP',
+                    'Report',
+                        () {
+                      Get.to(() => TicketListingScreen());
+                    },
+                  ),
+
+                if (_hasAccess('14GSK')) // trialbalance
+                  _dashboardItem(
+                    Icons.calculate,
+                    'TRIAL BALANCE',
+                    'Report',
+                        () {
+                      Get.to(() => TrialOfBalanceScreen());
+                    },
+                  ),
+
+                if (loginType == 'travel') ...[
+                  if (_hasAccess('18CSTRPT')) // customerreports
+                    _dashboardItem(
+                      Icons.star,
+                      'TOP CUSTOMERS',
+                      'Report',
+                          () {
+                        Get.to(() => CustomerReportScreen());
+                      },
+                    ),
+
                   _dashboardItem(
                     Icons.trending_up,
                     'TOP SUPPLIER',
                     'Report',
-                    () {
-                      // Handle onTap for TOP SUPPLIER
-
+                        () {
                       Get.to(() => SupplierReportScreen());
                     },
                   ),
-                  _dashboardItem(
-                    Icons.group,
-                    'TOP AGENTS',
-                    'Report',
-                    () {
-                      // Handle onTap for TOP AGENTS
 
-                      Get.to(() => AgentReportScreen());
-                    },
-                  ),
+                  if (_hasAccess('20AGTRPT')) // subagentreports
+                    _dashboardItem(
+                      Icons.group,
+                      'TOP AGENTS',
+                      'Report',
+                          () {
+                        Get.to(() => AgentReportScreen());
+                      },
+                    ),
                 ],
+
                 _dashboardItem(
                   Icons.calendar_today,
                   'DAY WISE',
                   'Sales Report',
-                  () {
+                      () {
                     Get.to(() => const DetailsSaleReport());
                   },
                 ),
-                // if (loginType == 'travel') ...[
-                //   _dashboardItem(
-                //     Icons.bar_chart,
-                //     'YEARLY SALES',
-                //     'Report',
-                //     () {
-                //       // Handle onTap for YEARLY SALES
-                //       print('YEARLY SALES Report tapped');
-                //     },
-                //   ),
-                // ]
               ],
             ),
           ),
@@ -195,7 +198,7 @@ class _ReportSectionState extends State<ReportSection> {
   Widget _dashboardItem(
       IconData icon, String title, String subtitle, VoidCallback onTap) {
     return GestureDetector(
-      onTap: onTap, // Add the onTap callback here
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.only(right: 16.0),
         child: Column(

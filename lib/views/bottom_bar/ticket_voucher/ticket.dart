@@ -1,15 +1,12 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../common/color_extension.dart';
 import '../../../common/drawer.dart';
 import '../../../common_widget/bottom_navigation.dart';
-
+import '../../../service/session_manager.dart';
 import 'entry_ticket_voucher/entry_ticket_voucher.dart';
-
 import 'ticket_sale_register/ticket_sale_register.dart';
-
 import 'view_ticket_voucher/view_ticket_voucher.dart';
 
 class Ticket extends StatefulWidget {
@@ -20,6 +17,24 @@ class Ticket extends StatefulWidget {
 }
 
 class _TicketState extends State<Ticket> {
+  Map<String, dynamic>? userAccess;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeUserAccess();
+  }
+
+  Future<void> _initializeUserAccess() async {
+    final sessionManager = Get.find<SessionManager>();
+    userAccess = await sessionManager.getUserAccess();
+    setState(() {});
+  }
+
+  bool _hasAccess(String moduleKey) {
+    return userAccess?.containsKey(moduleKey) ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -77,21 +92,36 @@ class _TicketState extends State<Ticket> {
                   subtitle: 'Create a new ticket voucher entry',
                   icon: Icons.add_circle_outline,
                   color: TColor.primary,
-                  onTap: () => Get.to(() => const EntryTicketVoucher()),
+                  hasAccess: _hasAccess('ETV878'),
+                  onTap: () {
+                    if (_hasAccess('ETV878')) {
+                      Get.to(() => const EntryTicketVoucher());
+                    }
+                  },
                 ),
                 VoucherOption(
                   title: 'View Ticket Voucher',
                   subtitle: 'Check existing voucher details',
                   icon: Icons.visibility_outlined,
                   color: TColor.primary,
-                  onTap: () => Get.to(() => ViewTicketVoucher()),
+                  hasAccess: _hasAccess('94VTV'),
+                  onTap: () {
+                    if (_hasAccess('94VTV')) {
+                      Get.to(() => ViewTicketVoucher());
+                    }
+                  },
                 ),
                 VoucherOption(
                   title: 'Ticket Sale Register',
                   subtitle: 'Register view details',
                   icon: Icons.app_registration,
                   color: TColor.primary,
-                  onTap: () => Get.to(() =>TicketSaleRegisterScreen()),
+                  hasAccess: _hasAccess('94VTV'),
+                  onTap: () {
+                    if (_hasAccess('94VTV')) {
+                      Get.to(() => TicketSaleRegisterScreen());
+                    }
+                  },
                 ),
               ]),
             ],
@@ -169,8 +199,8 @@ class _TicketState extends State<Ticket> {
                         ),
                       const SizedBox(height: 8),
                       Icon(
-                        Icons.arrow_forward,
-                        color: TColor.primary,
+                        option.hasAccess ? Icons.arrow_forward : Icons.lock,
+                        color: option.hasAccess ? TColor.primary : Colors.grey,
                         size: 24,
                       ),
                     ],
@@ -191,6 +221,7 @@ class VoucherOption {
   final IconData icon;
   final Color color;
   final String? badge;
+  final bool hasAccess;
   final VoidCallback onTap;
 
   VoucherOption({
@@ -199,6 +230,7 @@ class VoucherOption {
     required this.icon,
     required this.color,
     this.badge,
+    required this.hasAccess,
     required this.onTap,
   });
 }
