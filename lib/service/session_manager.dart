@@ -60,16 +60,14 @@ class SessionManager extends GetxController {
   }
 
 // Add this method to save access data
-  Future<void> saveToken(
-      String token, String clientType, String loginType, Map<String, dynamic>? access) async {
+  Future<void> saveToken(String token, String clientType, String loginType,
+      Map<String, dynamic>? access) async {
     print("check 0");
     print(access);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(TOKEN_KEY, token);
     await prefs.setString(CLIENT_TYPE_KEY, clientType);
     await prefs.setString(LOGIN_TYPE_KEY, loginType);
-
-
 
     // Save access data if provided
     if (access != null) {

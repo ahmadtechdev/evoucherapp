@@ -26,8 +26,6 @@ class _SignInState extends State<SignIn> {
   bool isLoading = false;
   bool _obscurePassword = true;
 
-
-
   String? selectedClient;
   final List<String> clients = [
     'Travel 1',
@@ -37,6 +35,18 @@ class _SignInState extends State<SignIn> {
     'Travel 5',
     'TOC'
   ];
+
+
+
+
+
+
+
+
+
+
+
+
 
   @override
   void dispose() {
@@ -112,16 +122,15 @@ class _SignInState extends State<SignIn> {
 
       if (response.containsKey("token")) {
         final token = response['token'];
-        final access = response['access'] as Map<String, dynamic>?; // Get access data
-
-
+        final access =
+            response['access'] as Map<String, dynamic>?; // Get access data
 
         await _sessionManager.saveToken(
             token,
             selectedClient!,
             response['login_type'] ?? "travel",
             access // Pass access data to session manager
-        );
+            );
 
         if (mounted) {
           CustomSnackBar(

@@ -13,7 +13,7 @@ import 'package:intl/intl.dart';
 class SupplierReportController extends GetxController {
   final ApiService apiService = ApiService();
 
-  final selectedYear = 2024.obs;
+  final selectedYear = 2025.obs;
   final searchQuery = ''.obs;
 
   final RxList<Supplier> activeSupplier = <Supplier>[].obs;

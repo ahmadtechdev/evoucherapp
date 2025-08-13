@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-
 import '../../../../../service/api_service.dart';
 
 class ManageUserController extends GetxController {
@@ -38,15 +37,15 @@ class ManageUserController extends GetxController {
         final List<Map<String, dynamic>> formattedVouchers =
             (response['data'] as List)
                 .map((voucher) => {
-                      'VV_ID': 'OSV ${voucher['voucher_id']}',
-                      'customer': voucher['details']['customer_account'],
-                      'description': voucher['details']['description'],
-                      'supplier': voucher['details']['supplier_account'],
-                      'added_by': voucher['added_by'],
-                      'price': voucher['details']['selling_amount'],
-                      'date': voucher['formatted_date'],
-                      'needs_attention': voucher['needs_attention'],
-                      'changes_by': voucher['changes_by'],
+                      'VV_ID': 'OSV ${voucher['voucher_id'] ?? ''}',
+                      'customer': voucher['details']?['customer_account'] ?? 'N/A',
+                      'description': voucher['details']?['description'] ?? 'No description',
+                      'supplier': voucher['details']?['supplier_account'] ?? 'N/A',
+                      'added_by': voucher['added_by'] ?? 'Unknown',
+                      'price': voucher['details']?['selling_amount'] ?? '0.00',
+                      'date': voucher['formatted_date'] ?? 'N/A',
+                      'needs_attention': voucher['needs_attention'] ?? false,
+                      'changes_by': voucher['changes_by'] ?? 'User', // This was null in API response
                     })
                 .toList();
 

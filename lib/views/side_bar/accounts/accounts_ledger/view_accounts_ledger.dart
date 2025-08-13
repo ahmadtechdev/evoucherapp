@@ -642,7 +642,7 @@ class LedgerScreen extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text('Summary of Ledger Adam',
+                child: Text('Summary of Ledger $accountName',
                     style: TextStyle(
                         color: TColor.primaryText,
                         fontWeight: FontWeight.bold,
@@ -661,7 +661,7 @@ class LedgerScreen extends StatelessWidget {
                   Icons.add_circle, Colors.green, 'Add Payments', 'PKR 0 -d'),
               const Divider(height: 1),
               _buildSummaryRow(Icons.account_balance_wallet, TColor.primary,
-                  'Net Balance', masterData.opening,
+                  'Net Balance', masterData.closing,
                   isTotal: true),
             ],
           ),

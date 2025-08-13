@@ -32,8 +32,9 @@ class TicketVoucherController extends GetxController {
           additionalParams: {'voucherType': 'tv'});
 
       if (response['status'] == 'success') {
-        ticketVouchers.value =
-            List<Map<String, dynamic>>.from(response['data']);
+        ticketVouchers.value =response['data']!=null?
+
+            List<Map<String, dynamic>>.from(response['data']):[];
         totalRecords.value = response['total_records'] ?? 0;
       } else {
         throw 'Failed to fetch ticket vouchers';

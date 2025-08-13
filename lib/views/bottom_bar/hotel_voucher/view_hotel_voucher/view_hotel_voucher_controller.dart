@@ -32,10 +32,9 @@ class HotelVoucherController extends GetxController {
         additionalParams: {'voucherType': 'hv'},
       );
 
-      if (response['status'] == 'success') {
-        // Transform the data to match our UI structure
-        final List<Map<String, dynamic>> transformedData =
-        (response['data'] as List).map((voucher) {
+    if (response['status'] == 'success') {
+  final transformedData = response['data'] != null
+      ? (response['data'] as List).map((voucher) {
           return {
             'hv_id': voucher['voucher_id'],
             'customer': voucher['details']['customer_account'],
@@ -47,7 +46,8 @@ class HotelVoucherController extends GetxController {
             'needs_attention': voucher['needs_attention'],
             'is_refunded': voucher['refunded'] == '1',
           };
-        }).toList();
+        }).toList()
+      : <Map<String, dynamic>>[];
 
         vouchers.value = transformedData;
       } else {

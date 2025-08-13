@@ -48,32 +48,70 @@ class VisaSaleRegisterScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: Obx(() => DateSelector2(
-                    fontSize: 14,
-                    initialDate: controller.fromDate.value,
-                    onDateChanged: (DateTime date) {
-                      controller.fromDate.value = date;
-                      controller.fetchVisaSaleRegisterData();
-                    },
-                    label: 'From Date',
-                  )),
+                        fontSize: 14,
+                        initialDate: controller.fromDate.value,
+                        onDateChanged: (DateTime date) {
+                          controller.fromDate.value = date;
+                          controller.fetchVisaSaleRegisterData();
+                        },
+                        label: 'From Date',
+                      )),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Obx(() => DateSelector2(
-                    fontSize: 14,
-                    initialDate: controller.toDate.value,
-                    onDateChanged: (DateTime date) {
-                      controller.toDate.value = date;
-                      controller.fetchVisaSaleRegisterData();
-                    },
-                    label: 'To Date',
-                  )),
+                        fontSize: 14,
+                        initialDate: controller.toDate.value,
+                        onDateChanged: (DateTime date) {
+                          controller.toDate.value = date;
+                          controller.fetchVisaSaleRegisterData();
+                        },
+                        label: 'To Date',
+                      )),
                 ),
-                // IconButton(
-                //   icon: Icon(Icons.refresh, color: TColor.primary),
-                //   onPressed: () => controller.fetchVisaSaleRegisterData(),
-                // ),
               ],
+            ),
+          ),
+
+          // Search Bar
+          Container(
+            decoration: BoxDecoration(
+              color: TColor.white,
+              boxShadow: [
+                BoxShadow(
+                  color: TColor.primaryText.withOpacity(0.05),
+                  blurRadius: 5,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              onChanged: (value) => controller.updateSearchQuery(value),
+              decoration: InputDecoration(
+                hintText:
+                    'Search by visa number, customer, country, or visa type...',
+                hintStyle: TextStyle(color: TColor.secondaryText),
+                prefixIcon: Icon(Icons.search, color: TColor.primary),
+                suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(Icons.clear, color: TColor.secondaryText),
+                        onPressed: () => controller.clearSearch(),
+                      )
+                    : const SizedBox.shrink()),
+                filled: true,
+                fillColor: TColor.textField,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: TColor.primary, width: 2),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
             ),
           ),
 
@@ -97,19 +135,23 @@ class VisaSaleRegisterScreen extends StatelessWidget {
             }
 
             return Expanded(
-              child: Obx(() => controller.dailyRecords.isEmpty
+              child: Obx(() => controller.filteredDailyRecords.isEmpty
                   ? Center(
-                  child: Text(
-                    'No records found',
-                    style: TextStyle(color: TColor.secondaryText),
-                  ))
+                      child: Text(
+                      controller.searchQuery.value.isNotEmpty
+                          ? 'No records found matching "${controller.searchQuery.value}"'
+                          : 'No records found',
+                      style: TextStyle(color: TColor.secondaryText),
+                      textAlign: TextAlign.center,
+                    ))
                   : ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: controller.dailyRecords.length,
-                itemBuilder: (context, index) {
-                  return _buildDailySection(controller.dailyRecords[index]);
-                },
-              )),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: controller.filteredDailyRecords.length,
+                      itemBuilder: (context, index) {
+                        return _buildDailySection(
+                            controller.filteredDailyRecords[index]);
+                      },
+                    )),
             );
           }),
         ],
@@ -132,7 +174,8 @@ class VisaSaleRegisterScreen extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: TColor.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -217,22 +260,28 @@ class VisaSaleRegisterScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildDetailRow('Customer', entry['customer'] ?? 'N/A', isWrappable: true),
-                _buildDetailRow('Account', entry['account'] ?? 'N/A', isWrappable: true),
+                _buildDetailRow('Customer', entry['customer'] ?? 'N/A',
+                    isWrappable: true),
+                _buildDetailRow('Account', entry['account'] ?? 'N/A',
+                    isWrappable: true),
                 _buildDetailRow('Visa Type', entry['visa_type'] ?? 'N/A'),
                 _buildDetailRow('Country', entry['country'] ?? 'N/A'),
-                _buildDetailRow('Supplier', entry['supplier'] ?? 'N/A', isWrappable: true),
+                _buildDetailRow('Supplier', entry['supplier'] ?? 'N/A',
+                    isWrappable: true),
 
                 const Divider(height: 24),
 
                 // Financial Details
-                _buildFinancialRow('Buying',
+                _buildFinancialRow(
+                    'Buying',
                     'Rs. ${NumberFormat('#,##0.00').format(entry['buying'] ?? 0)}',
                     TColor.third),
-                _buildFinancialRow('Selling',
+                _buildFinancialRow(
+                    'Selling',
                     'Rs. ${NumberFormat('#,##0.00').format(entry['selling'] ?? 0)}',
                     TColor.secondary),
-                _buildFinancialRow('Profit',
+                _buildFinancialRow(
+                    'Profit',
                     'Rs. ${NumberFormat('#,##0.00').format(entry['profit_loss'] ?? 0)}',
                     TColor.primary),
               ],
@@ -243,57 +292,58 @@ class VisaSaleRegisterScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {bool isWrappable = false}) {
+  Widget _buildDetailRow(String label, String value,
+      {bool isWrappable = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: isWrappable
           ? Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: TColor.secondaryText,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              color: TColor.primaryText,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      )
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: TColor.secondaryText,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: TColor.primaryText,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            )
           : Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: TColor.secondaryText,
-                fontSize: 14,
-              ),
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: TColor.secondaryText,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      color: TColor.primaryText,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+              ],
             ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: TextStyle(
-                color: TColor.primaryText,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.right,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -344,7 +394,8 @@ class VisaSaleRegisterScreen extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _buildSummaryItem('Count', totals['count'].toString(), TColor.primary),
+            _buildSummaryItem(
+                'Count', totals['count'].toString(), TColor.primary),
             const SizedBox(width: 16),
             _buildSummaryItem('Buying', totals['buying'], TColor.secondary),
             const SizedBox(width: 16),
@@ -359,34 +410,33 @@ class VisaSaleRegisterScreen extends StatelessWidget {
 
   Widget _buildSummaryItem(String label, String value, Color color) {
     return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    decoration: BoxDecoration(
-    color: color.withOpacity(0.1),
-    borderRadius: BorderRadius.circular(12),
-    border: Border.all(color: color.withOpacity(0.2)),
-    ),
-    child: Column(
-    children: [
-    Text(
-    label,
-    style: TextStyle(
-    color: TColor.secondaryText,
-    fontSize: 13,
-    fontWeight: FontWeight.w500,
-    ),
-    ),
-    const SizedBox(height: 4),
-    Text(
-
-      value,
-      style: TextStyle(
-        color: color,
-        fontSize: 15,
-        fontWeight: FontWeight.bold,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2)),
       ),
-    ),
-    ],
-    ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: TColor.secondaryText,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -438,7 +488,7 @@ class VisaSaleRegisterScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Obx(() {
-              final totals = controller.totalSummary.value;
+              final totals = controller.filteredTotalSummary.value;
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(

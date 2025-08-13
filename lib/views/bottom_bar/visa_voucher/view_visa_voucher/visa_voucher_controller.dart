@@ -34,8 +34,9 @@ class VisaVoucherController extends GetxController {
         additionalParams: {"voucherType": "vv"},
       );
 
-      if (response['status'] == 'success') {
-        final List<Map<String, dynamic>> formattedVouchers = (response['data'] as List)
+      if (response['status'] == 'success' ) {
+        final formattedVouchers =response['data'] !=null?
+         (response['data'] as List)
             .map((voucher) => {
                   'VV_ID': 'VV ${voucher['voucher_id']}',
                   'customer': voucher['details']['customer_account'],
@@ -49,7 +50,7 @@ class VisaVoucherController extends GetxController {
                   'changes_by': voucher['changes_by'],
                   'assign_status': voucher['assign_status']['text'],
                 })
-            .toList();
+            .toList():<Map<String, dynamic>>[];
 
         ticketVouchers.value = formattedVouchers;
       } else {

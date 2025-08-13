@@ -31,7 +31,8 @@ class _SalesDashboardWidgetState extends State<SalesDashboardWidget>
     _setupAnimation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Your state update logic here
-      _controller.fetchDashboardData(selectedDate); // Example of a state update
+      _controller.fetchDashboardData(selectedDate);
+      // Example of a state update
     });
   }
 

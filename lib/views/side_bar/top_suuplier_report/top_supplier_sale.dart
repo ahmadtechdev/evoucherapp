@@ -19,7 +19,7 @@ class SupplierReportScreen extends StatelessWidget {
         centerTitle: true,
         backgroundColor: TColor.primary,
         foregroundColor: TColor.white,
-        title: const Text('Top Customer Sale Report'),
+        title: const Text('Top Supplier Sale Report'),
       ),
       drawer: const CustomDrawer(currentIndex: 15),
       body: SafeArea(
@@ -30,6 +30,7 @@ class SupplierReportScreen extends StatelessWidget {
             children: [
               _buildHeader(),
               SearchTextField(
+
                 hintText: "Search...",
                 onChange: controller.updateSearch,
               ),
@@ -70,7 +71,7 @@ class SupplierReportScreen extends StatelessWidget {
           child: DropdownButton<int>(
             value: controller.selectedYear.value,
             underline: const SizedBox(),
-            items: List.generate(5, (index) => 2024 - index).map((year) {
+            items: List.generate(5, (index) => 2025 - index).map((year) {
               return DropdownMenuItem(
                 value: year,
                 child: Text('YEAR - $year'),

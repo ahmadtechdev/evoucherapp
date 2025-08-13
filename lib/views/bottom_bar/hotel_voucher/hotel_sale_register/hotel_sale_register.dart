@@ -69,11 +69,49 @@ class HotelSaleRegisterScreen extends StatelessWidget {
                         label: 'To Date',
                       )),
                 ),
-                // IconButton(
-                //   icon: Icon(Icons.refresh, color: TColor.primary),
-                //   onPressed: () => controller.fetchHotelSaleRegisterData(),
-                // ),
               ],
+            ),
+          ),
+
+          // Search Bar
+          Container(
+            decoration: BoxDecoration(
+              color: TColor.white,
+              boxShadow: [
+                BoxShadow(
+                  color: TColor.primaryText.withOpacity(0.05),
+                  blurRadius: 5,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              onChanged: (value) => controller.updateSearchQuery(value),
+              decoration: InputDecoration(
+                hintText:
+                    'Search by voucher name, ID, customer account, or sector...',
+                hintStyle: TextStyle(color: TColor.secondaryText),
+                prefixIcon: Icon(Icons.search, color: TColor.primary),
+                suffixIcon: Obx(() => controller.searchQuery.value.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(Icons.clear, color: TColor.secondaryText),
+                        onPressed: () => controller.clearSearch(),
+                      )
+                    : const SizedBox.shrink()),
+                filled: true,
+                fillColor: TColor.textField,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: TColor.primary, width: 2),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
             ),
           ),
 
@@ -98,18 +136,21 @@ class HotelSaleRegisterScreen extends StatelessWidget {
 
             // Booking List with enhanced scrolling
             return Expanded(
-              child: Obx(() => controller.dailyRecords.isEmpty
+              child: Obx(() => controller.filteredDailyRecords.isEmpty
                   ? Center(
                       child: Text(
-                      'No records found',
+                      controller.searchQuery.value.isNotEmpty
+                          ? 'No records found matching "${controller.searchQuery.value}"'
+                          : 'No records found',
                       style: TextStyle(color: TColor.secondaryText),
+                      textAlign: TextAlign.center,
                     ))
                   : ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: controller.dailyRecords.length,
+                      itemCount: controller.filteredDailyRecords.length,
                       itemBuilder: (context, index) {
                         return _buildDailyBookingSection(
-                            controller.dailyRecords[index]);
+                            controller.filteredDailyRecords[index]);
                       },
                     )),
             );
@@ -461,32 +502,9 @@ class HotelSaleRegisterScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            // const SizedBox(height: 20),
-            // Obx(() {
-            //   final totals = controller.totalSummary.value;
-            //   return SingleChildScrollView(
-            //     scrollDirection: Axis.horizontal,
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-            //       children: [
-            //         _buildSummaryStatItem('Total Rows',
-            //             totals['total_rows'].toString(), TColor.primary),
-            //         const SizedBox(width: 16),
-            //         _buildSummaryStatItem('Total Buying',
-            //             totals['total_buying'], TColor.secondary),
-            //         const SizedBox(width: 16),
-            //         _buildSummaryStatItem(
-            //             'Total Selling', totals['total_selling'], TColor.third),
-            //         const SizedBox(width: 16),
-            //         _buildSummaryStatItem('Total Profit',
-            //             totals['total_profit_loss'], TColor.fourth),
-            //       ],
-            //     ),
-            //   );
-            // }),
             const SizedBox(height: 20),
             Obx(() {
-              final totals = controller.totalSummary.value;
+              final totals = controller.filteredTotalSummary.value;
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(

@@ -36,14 +36,16 @@ class TotalMonthlyExpensesController extends GetxController {
       );
 
       if (response['status'] == 'success') {
-        final branchesData = response['data']['branches'] as Map<String, dynamic>;
+        final branchesData =
+            response['data']['branches'] as Map<String, dynamic>;
 
         // Transform API data into our model
         final List<TotalMonthlyExpensesModel> newCompanies = [];
 
         branchesData.forEach((branchName, branchData) {
           newCompanies.add(
-            TotalMonthlyExpensesModel.fromApiData(branchName, branchData as Map<String, dynamic>),
+            TotalMonthlyExpensesModel.fromApiData(
+                branchName, branchData as Map<String, dynamic>),
           );
         });
 
@@ -66,7 +68,8 @@ class TotalMonthlyExpensesController extends GetxController {
     List<DateTime> months = [];
     DateTime current = fromDate.value;
     while (current.isBefore(toDate.value) ||
-        current.month == toDate.value.month && current.year == toDate.value.year) {
+        current.month == toDate.value.month &&
+            current.year == toDate.value.year) {
       months.add(current);
       current = DateTime(current.year + (current.month == 12 ? 1 : 0),
           current.month == 12 ? 1 : current.month + 1);
@@ -78,7 +81,8 @@ class TotalMonthlyExpensesController extends GetxController {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}';
   }
 
-  double calculateCompanyTotalForMonth(TotalMonthlyExpensesModel company, String monthKey) {
+  double calculateCompanyTotalForMonth(
+      TotalMonthlyExpensesModel company, String monthKey) {
     final monthExpenses = company.getExpensesForMonth(monthKey);
     return monthExpenses.values.fold(0.0, (sum, value) => sum + value);
   }
@@ -94,6 +98,7 @@ class TotalMonthlyExpensesController extends GetxController {
   }
 
   double calculateTotalExpenses() {
-    return companies.fold(0.0, (sum, company) => sum + company.getTotalExpenses());
+    return companies.fold(
+        0.0, (sum, company) => sum + company.getTotalExpenses());
   }
 }
