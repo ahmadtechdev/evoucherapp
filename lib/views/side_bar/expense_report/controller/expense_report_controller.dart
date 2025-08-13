@@ -13,6 +13,12 @@ class ExpenseReportController extends GetxController {
   final isLoading = true.obs;
   final ApiService apiService = ApiService();
   final monthlyTotals = <Map<String, dynamic>>[].obs;
+  
+  // Store raw expense accounts data for monthly calculations
+  final rawExpenseAccounts = <Map<String, dynamic>>[].obs;
+
+  // Flag to control debug logging
+  static const bool _debugMode = true;
 
   @override
   void onInit() {
@@ -20,9 +26,12 @@ class ExpenseReportController extends GetxController {
     DateTime now = DateTime.now();
     fromDate.value = DateTime(now.year, now.month, 1);
     toDate.value = DateTime(now.year, now.month, 1);
-    print('🚀 ExpenseReportController initialized');
-    print('Initial From Date: ${fromDate.value}');
-    print('Initial To Date: ${toDate.value}');
+    
+    if (_debugMode) {
+      print('ExpenseReportController initialized');
+      print('Date range: ${fromDate.value} to ${toDate.value}');
+    }
+    
     fetchExpenseData();
   }
 
@@ -34,119 +43,84 @@ class ExpenseReportController extends GetxController {
       String fromDateStr = DateFormat('yyyy-MM-dd').format(fromDate.value);
       String toDateStr = DateFormat('yyyy-MM-dd').format(toDate.value);
 
-      print('\n🔍 API Request Details:');
-      print('Endpoint: expensesReport');
-      print('From Date: $fromDateStr');
-      print('To Date: $toDateStr');
-
       // Prepare the request body
       final requestBody = {
         "fromDate": fromDateStr,
         "toDate": toDateStr,
-        // Add any additional parameters if required by your API
       };
 
-      print('📝 Request Body:');
-      print(requestBody);
-      print('\n' + '=' * 60 + '\n');
+      if (_debugMode) {
+        print('Fetching expense data: $fromDateStr to $toDateStr');
+      }
 
-      // Make API call using postRequest
+      // Make API call
       final response = await apiService.postRequest(
         endpoint: 'expensesReport',
         body: requestBody,
       );
 
-      print('📦 COMPLETE API RESPONSE:');
-      print('Response Type: ${response.runtimeType}');
-      print('Response: $response');
-      print('\n' + '=' * 60 + '\n');
-
       if (response['status'] == 'success') {
-        print('✅ API Status: SUCCESS');
-
-        // Log data section
-        print('📊 Response Data Section:');
-        print('Data: ${response['data']}');
-        print('\n' + '-' * 40 + '\n');
+        if (_debugMode) {
+          print('✅ API Status: SUCCESS');
+        }
 
         // Parse expense accounts
         final expenseAccounts = response['data']['expense_accounts'] as List;
-        print('💰 Expense Accounts (Raw):');
-        print('Count: ${expenseAccounts.length}');
-        for (int i = 0; i < expenseAccounts.length; i++) {
-          print('Account $i: ${expenseAccounts[i]}');
-        }
-        print('\n' + '-' * 30 + '\n');
-
+        
+        // Store raw data for monthly calculations
+        rawExpenseAccounts.value = List<Map<String, dynamic>>.from(expenseAccounts);
+        
+        // Create expense items
         expenseItems.value = expenseAccounts.map((account) {
-          print('🔄 Processing Account: ${account['account_name']}');
-          print('Account Data: $account');
-
-          final monthlyAmounts = (account['monthly_amounts'] as List).first;
-          print('Monthly Amounts: $monthlyAmounts');
-
-          final expenseItem = ExpenseItemModel(
+          final monthlyAmounts = (account['monthly_amounts'] as List);
+          
+          return ExpenseItemModel(
             name: account['account_name'],
-            amount: (monthlyAmounts['amount']).toDouble(),
+            amount: 0, // Will be calculated dynamically per month
             total: account['total'].toDouble(),
+            monthlyAmounts: monthlyAmounts,
           );
-
-          print('✨ Created ExpenseItem:');
-          print('  Name: ${expenseItem.name}');
-          print('  Amount: ${expenseItem.amount}');
-          print('  Total: ${expenseItem.total}');
-          print('');
-
-          return expenseItem;
         }).toList();
 
-        print('📈 Final Expense Items:');
-        print('Total Items: ${expenseItems.length}');
-        for (var item in expenseItems) {
-          print('- ${item.name}: ${item.amount} (Total: ${item.total})');
-        }
-        print('\n' + '-' * 30 + '\n');
-
-        // Parse monthly totals
-        final monthlyTotalsRaw = response['data']['monthly_totals'] as List;
-        print('📅 Monthly Totals (Raw):');
-        print('Count: ${monthlyTotalsRaw.length}');
-        for (int i = 0; i < monthlyTotalsRaw.length; i++) {
-          print('Month $i: ${monthlyTotalsRaw[i]}');
-        }
-
-        monthlyTotals.value = monthlyTotalsRaw
-            .map((e) => {
-                  'month': e['month'],
-                  'total': e['total'],
-                  'formatted_total': e['formatted_total']
-                })
-            .toList();
-
-        print('📊 Processed Monthly Totals:');
-        for (var total in monthlyTotals) {
-          print(
-              '- Month: ${total['month']}, Total: ${total['total']}, Formatted: ${total['formatted_total']}');
+        // Parse monthly totals - FIXED: Store with proper key matching
+        if (response['data']['monthly_totals'] != null) {
+          final monthlyTotalsRaw = response['data']['monthly_totals'] as List;
+          
+          monthlyTotals.value = monthlyTotalsRaw
+              .map((e) => {
+                    'month': e['month'].toString().trim(), // Ensure clean string
+                    'total': e['total'],
+                    'formatted_total': e['formatted_total']
+                  })
+              .toList();
+              
+          // Debug: Print all monthly totals
+          if (_debugMode) {
+            print('\n🎯 PARSED MONTHLY TOTALS:');
+            for (var total in monthlyTotals) {
+              print('Key: "${total['month']}" -> Total: ${total['total']}');
+            }
+          }
         }
 
-        print('\n🎯 SUMMARY:');
-        print('✓ Expense Items: ${expenseItems.length}');
-        print('✓ Monthly Totals: ${monthlyTotals.length}');
-        print('✓ Data loaded successfully');
+        if (_debugMode) {
+          print('🎯 FINAL SUMMARY:');
+          print('Expense Items Count: ${expenseItems.length}');
+          print('Monthly Totals Count: ${monthlyTotals.length}');
+          
+          // Call debug method to print all data
+          debugPrintAllData();
+        }
+        
       } else {
-        print('❌ API Status: ${response['status']}');
-        print('Message: ${response['message'] ?? 'No message provided'}');
-        print('Full Response: $response');
+        if (_debugMode) {
+          print('❌ API Error: ${response['status']} - ${response['message']}');
+        }
+        CustomSnackBar(
+          message: response['message'] ?? "Failed to load expense data."
+        ).show();
       }
     } catch (e, stackTrace) {
-      print('\n💥 EXCEPTION OCCURRED:');
-      print('Error Type: ${e.runtimeType}');
-      print('Error Message: $e');
-      print('Stack Trace:');
-      print(stackTrace);
-      print('\n' + '=' * 60 + '\n');
-
-      // Also use developer.log for better debugging
       developer.log(
         'Failed to fetch expense data',
         error: e,
@@ -154,23 +128,98 @@ class ExpenseReportController extends GetxController {
         name: 'ExpenseReportController',
       );
 
+      if (_debugMode) {
+        print('💥 Exception: $e');
+      }
+
       CustomSnackBar(message: "Failed to load expense data. Please try again.")
           .show();
     } finally {
       isLoading.value = false;
-      print('🔄 Loading finished - isLoading: ${isLoading.value}');
-      print('\n' + '=' * 60 + '\n');
     }
   }
 
+  // FIXED: Get monthly amount for specific expense account and month
+  double getMonthlyAmountForAccount(String accountName, String monthKey) {
+    if (_debugMode) {
+      print('🔍 Looking for: Account="$accountName", Month="$monthKey"');
+    }
+    
+    final account = rawExpenseAccounts.firstWhere(
+      (acc) => acc['account_name'] == accountName,
+      orElse: () => {},
+    );
+    
+    if (account.isEmpty) {
+      if (_debugMode) {
+        print('❌ Account not found: $accountName');
+      }
+      return 0.0;
+    }
+    
+    final monthlyAmounts = account['monthly_amounts'] as List? ?? [];
+    
+    // Clean the monthKey for comparison
+    String cleanMonthKey = monthKey.trim();
+    
+    // Find exact match first
+    var monthData = monthlyAmounts.firstWhere(
+      (month) => month['month'].toString().trim() == cleanMonthKey,
+      orElse: () => null,
+    );
+    
+    if (monthData == null) {
+      if (_debugMode) {
+        print('❌ Month not found: $cleanMonthKey');
+        print('Available months: ${monthlyAmounts.map((m) => m['month']).toList()}');
+      }
+      return 0.0;
+    }
+    
+    double amount = (monthData['amount'] ?? 0).toDouble();
+    
+    if (_debugMode) {
+      print('✅ Found amount: $amount for $accountName in $cleanMonthKey');
+    }
+    
+    return amount;
+  }
+
+  // FIXED: Get monthly total for specific month with better matching
+  double getMonthlyTotal(String monthKey) {
+    String cleanMonthKey = monthKey.trim();
+    
+    if (_debugMode) {
+      print('🔍 Looking for monthly total for: "$cleanMonthKey"');
+      print('Available totals: ${monthlyTotals.map((t) => t['month']).toList()}');
+    }
+    
+    final monthData = monthlyTotals.firstWhere(
+      (total) => total['month'].toString().trim() == cleanMonthKey,
+      orElse: () => {'total': 0},
+    );
+    
+    double total = (monthData['total'] ?? 0).toDouble();
+    
+    if (_debugMode) {
+      print('✅ Monthly total for $cleanMonthKey: $total');
+    }
+    
+    return total;
+  }
+
   void updateFromDate(DateTime date) {
-    print('📅 Updating From Date: ${fromDate.value} → $date');
+    if (_debugMode) {
+      print('📅 From date updated: $date');
+    }
     fromDate.value = date;
     fetchExpenseData();
   }
 
   void updateToDate(DateTime date) {
-    print('📅 Updating To Date: ${toDate.value} → $date');
+    if (_debugMode) {
+      print('📅 To date updated: $date');
+    }
     toDate.value = date;
     fetchExpenseData();
   }
@@ -185,8 +234,6 @@ class ExpenseReportController extends GetxController {
       current = DateTime(current.year + (current.month == 12 ? 1 : 0),
           current.month == 12 ? 1 : current.month + 1);
     }
-    print(
-        '📆 Months between ${fromDate.value} and ${toDate.value}: ${months.length}');
     return months;
   }
 
@@ -219,5 +266,48 @@ class ExpenseReportController extends GetxController {
       Colors.orange
     ];
     return colors[index % colors.length];
+  }
+
+  // Debug method to print all data for troubleshooting
+  void debugPrintAllData() {
+    print('\n🔥 =========================== DEBUG ALL DATA ===========================');
+    
+    // Debug raw expense accounts
+    print('\n📊 RAW EXPENSE ACCOUNTS:');
+    for (int i = 0; i < rawExpenseAccounts.length; i++) {
+      var account = rawExpenseAccounts[i];
+      print('Account ${i + 1}: ${account['account_name']}');
+      var monthlyAmounts = account['monthly_amounts'] as List;
+      for (var monthData in monthlyAmounts) {
+        print('  - Month: "${monthData['month']}" = ${monthData['amount']}');
+      }
+    }
+    
+    // Debug monthly totals
+    print('\n💰 MONTHLY TOTALS:');
+    for (int i = 0; i < monthlyTotals.length; i++) {
+      var total = monthlyTotals[i];
+      print('Total ${i + 1}: Month="${total['month']}" = ${total['total']}');
+    }
+    
+    // Test specific lookups
+    print('\n🧪 TESTING LOOKUPS:');
+    
+    // Test for July 2025
+    print('\nTesting July 2025:');
+    double julyTotal = getMonthlyTotal('Jul 2025');
+    print('July Total: $julyTotal');
+    
+    // Test Mobile Allowance for both months
+    double julyMobile = getMonthlyAmountForAccount('Mobile Allowance', 'Jul 2025');
+    double augMobile = getMonthlyAmountForAccount('Mobile Allowance', 'Aug 2025');
+    print('Mobile Allowance - July: $julyMobile, August: $augMobile');
+    
+    // Test for August 2025
+    print('\nTesting August 2025:');
+    double augTotal = getMonthlyTotal('Aug 2025');
+    print('August Total: $augTotal');
+    
+    print('\n🔥 ========================= END DEBUG DATA =========================\n');
   }
 }

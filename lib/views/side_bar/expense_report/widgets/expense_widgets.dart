@@ -10,9 +10,16 @@ class ExpenseWidgets {
     DateTime month,
     ExpenseReportController controller,
   ) {
-    double total = controller.expenseItems.fold(0.0, (sum, expense) {
-      return sum + expense.amount; // Sum the amounts from expenseItems
-    });
+    // Format month key to match API response format (e.g., "Jan 2025")
+    String monthKey = DateFormat('MMM yyyy').format(month);
+    
+    // Debug: Print the month we're looking for
+    print('🔍 Building card for month: $monthKey');
+    
+    // Get the monthly total for this specific month using controller method
+    double monthlyTotal = controller.getMonthlyTotal(monthKey);
+    
+    print('📊 Monthly total for $monthKey: $monthlyTotal');
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -33,18 +40,27 @@ class ExpenseWidgets {
           ...controller.expenseItems.asMap().entries.map((entry) {
             final index = entry.key;
             final expense = entry.value;
+            
+            // Get the amount for this specific month
+            double monthlyAmount = controller.getMonthlyAmountForAccount(expense.name, monthKey);
+            
+            print('💰 ${expense.name} for $monthKey: $monthlyAmount');
+            
+            // Only show expense item if it has a non-zero amount or if we want to show all
             return _buildExpenseItem(
               expense.name,
-              currencyFormat.format(expense.amount),
+              currencyFormat.format(monthlyAmount),
               expense.icon,
               controller.getColorForIndex(index),
               isLast: index == controller.expenseItems.length - 1,
+              // Optional: hide zero amounts
+              isVisible: true, // Set to monthlyAmount != 0 if you want to hide zero amounts
             );
           }),
           const Divider(thickness: 2, height: 1),
           _buildExpenseItem(
             'Total',
-            currencyFormat.format(total), // Pass the calculated total
+            currencyFormat.format(monthlyTotal),
             Icons.summarize,
             TColor.primary,
             isLast: true,
@@ -122,7 +138,12 @@ class ExpenseWidgets {
     IconData icon,
     Color color, {
     bool isLast = false,
+    bool isVisible = true,
   }) {
+    if (!isVisible) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
@@ -173,8 +194,12 @@ class ExpenseWidgets {
 
   static Widget _buildDynamicTotalSummary(ExpenseReportController controller) {
     List<Widget> rows = [];
-    for (int i = 0; i < controller.expenseItems.length; i += 3) {
-      List<Widget> rowItems = controller.expenseItems
+    
+    // Filter out items with zero totals for cleaner display
+    final nonZeroItems = controller.expenseItems.where((item) => item.total != 0).toList();
+    
+    for (int i = 0; i < nonZeroItems.length; i += 3) {
+      List<Widget> rowItems = nonZeroItems
           .skip(i)
           .take(3)
           .map((expense) => Expanded(
